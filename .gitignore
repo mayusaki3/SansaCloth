@@ -1,0 +1,20 @@
+# --- O3DE / CMake / VS extra ---
+[Bb]uild/
+build*/
+out/
+bin/
+lib/
+*.o
+*.obj
+*.pdb
+*.ilk
+*.log
+CMakeFiles/
+CMakeCache.txt
+.vs/
+Cache/
+user/
+.editor/
+.project.json
+.venv/
+venv/
