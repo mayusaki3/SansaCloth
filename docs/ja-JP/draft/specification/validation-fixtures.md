@@ -92,9 +92,32 @@ Regular U/V gridを使用する。
 
 各quadは固定対角線で2 triangleへ分割し、全解像度で同じ規則を使用する。
 
-**TBD:** 固定対角線の厳密な頂点順序を実装前に確定する。
+quadの頂点を次のように定義する。
 
-Triangle windingはBase Outward Normalと整合させ、`dot(TriangleNormal, AnalyticNormal) > 0` を検証する。
+```text
+V01 ---- V11
+ |        |
+ |        |
+V00 ---- V10
+
+V00 = (u_i,     v_j)
+V10 = (u_{i+1}, v_j)
+V01 = (u_i,     v_{j+1})
+V11 = (u_{i+1}, v_{j+1})
+```
+
+固定対角線は `V00 -> V11` とする。
+
+Base Outward Normal = +Y と整合するWindingは次の通り。
+
+```text
+Triangle A = (V00, V01, V11)
+Triangle B = (V00, V11, V10)
+```
+
+平面Fixtureでは、右手系cross product `cross(P1-P0, P2-P0)` により両TriangleのGeometric Normalが+Yとなる。凸面・凹面でも同じ頂点順序を使用する。
+
+全Triangleについて `dot(TriangleNormal, AnalyticNormal) > 0` を検証する。
 
 Analytic Normal、Mesh Geometric Normal、Render Vertex Normalを区別する。
 
@@ -188,7 +211,6 @@ Analytic Atlas:
 ## 12. 未確定事項
 
 - Stable SurfaceDomainIDの具体的表現
-- Fixed diagonalの厳密な分割方向・頂点順序
 - Runtime binding tolerance
 - Mesh/analytic convergence threshold
 
