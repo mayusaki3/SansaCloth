@@ -3,9 +3,27 @@ on:
   pull_request:
   push:
     branches: [ main, develop ]
+
 jobs:
   sanity:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: echo "SansaCloth CI sanity check OK"
+
+  rust-reference:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reference
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Test
+        run: cargo test --workspace
