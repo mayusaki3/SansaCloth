@@ -32,11 +32,7 @@ pub struct FlatClothFixture;
 impl FlatClothFixture {
     /// Evaluates the cloth-local position at normalized U/V coordinates.
     pub fn position(&self, u: f64, v: f64) -> DVec3 {
-        DVec3::new(
-            (u - 0.5) * CLOTH_WIDTH_M,
-            0.0,
-            (v - 0.5) * CLOTH_DEPTH_M,
-        )
+        DVec3::new((u - 0.5) * CLOTH_WIDTH_M, 0.0, (v - 0.5) * CLOTH_DEPTH_M)
     }
 
     /// Generates a deterministic regular control-point grid.
@@ -245,7 +241,6 @@ mod tests {
             assert!(f.position(u, v).is_finite());
         }
     }
-
 
     #[test]
     fn fix_008_flat_cloth_fixture_dimensions() {
