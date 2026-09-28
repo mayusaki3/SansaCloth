@@ -44,7 +44,6 @@ pub fn resolve_support(points: &[SupportPointInput]) -> Vec<SupportKind> {
         .collect()
 }
 
-
 /// Input for Bridge / 架橋 of one ordered cloth strip.
 ///
 /// Reference v1 treats the strip parameter as an already-established cloth
@@ -119,7 +118,6 @@ mod tests {
         let result = resolve_support(&[point(false, false)]);
         assert_eq!(result, vec![SupportKind::Unsupported]);
     }
-
 
     #[test]
     fn ref_bri_001_preserves_supported_endpoint_positions() {
@@ -202,7 +200,6 @@ mod tests {
         };
         assert_eq!(resolve_bridge(&input), input.positions_m);
     }
-
 
     #[test]
     fn support_resolution_preserves_input_positions() {
