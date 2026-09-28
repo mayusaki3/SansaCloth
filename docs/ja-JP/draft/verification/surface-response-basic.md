@@ -228,7 +228,90 @@ Mapping:
 - MAP-002 mapping preserved by Body Transform
 - MAP-003 independent of Runtime Triangle ID
 
-## 13. Collision専用Suiteとの分離
+## 13. Rust実装前テスト一覧 / Implementation Gate
+
+Rust実装開始前に、以下を番号付きTestとして実装対象に固定する。
+
+### Core
+
+- CORE-001 internal Lengthはm
+- CORE-002 cm display/input -> m変換
+- CORE-003 mm display/input -> m変換
+- CORE-004 valid SurfaceReference
+- CORE-005 barycentric normalization
+- CORE-006 SurfaceFrame orthonormal
+- CORE-007 SurfaceOffsetからPositionを再構成
+- CORE-008 Transform後もSurfaceReferenceの意味を維持
+- CORE-009 AnchorがCloth Control Pointを正しく参照
+- CORE-010 Gravity vector transform
+
+### Fixture
+
+- FIX-001 flat plane
+- FIX-002 convex maximum height
+- FIX-003 convex feature width
+- FIX-004 shallow concavity depth
+- FIX-005 deep concavity depth
+- FIX-006 same input -> deterministic mesh
+- FIX-007 resolution変更でanalytic shape semantics維持
+- FIX-008 CF-FLAT-001 dimensions
+- FIX-009 AF-EDGE-001
+- FIX-010 AF-BOTH-EDGES-001
+- FIX-011 fixed diagonal = V00 -> V11
+- FIX-012 triangle winding produces outward normal
+- FIX-013 every triangle satisfies dot(geometric, analytic) > 0
+
+### Reference Support
+
+- REF-SUP-001 Anchor -> Support
+- REF-SUP-002 Contactだけで全自由度を固定しない
+- REF-SUP-003 unsupported pointを識別
+
+### Reference Bridge
+
+- REF-BRI-001 Support位置を維持
+- REF-BRI-002 continuous bridge
+- REF-BRI-003 Bridge単独ではConcave Surfaceへ吸着しない
+
+### Reference Gravity
+
+GRV-001～012をReference unit/integration testとして使用する。
+
+### Reference Conformity
+
+CONF-001～015をReference unit/integration testとして使用する。
+
+### Reference Collision
+
+- REF-COL-001 non-penetrating pointを不要に移動しない
+- REF-COL-002 penetrating pointをoutwardへ補正
+- REF-COL-003 final penetration <= configured tolerance
+
+### Integration
+
+- INT-SR-001 SR-001 six cases
+- INT-SR-002 SR-002 six cases
+- INT-SR-003 SR-003 six cases
+- INT-SR-004 SR-004 six cases
+- INT-SR-005 SR-005 six cases
+
+これら5 Integration Test Definitionから30 Basic Runsを生成する。
+
+### Bake
+
+Reference Geometry Bake開始時に以下を必須化する。
+
+- BAKE-001 CP resultをRender Meshへ転送
+- BAKE-002 Anchor vertex維持
+- BAKE-003 Flatで不要変形なし
+- BAKE-004 Reference Positionへ近似
+- BAKE-005 Normal再構築
+- BAKE-006 Render resolution変更でSurface破綻なし
+- INT-BAKE-001～005: SR-001～005相当のBake比較
+
+Bake実装はReference Solverの内部Stageへ直接依存せず、共通SurfaceResponseResult/IRを入力とする。
+
+## 14. Collision専用Suiteとの分離
 
 PL-PENETRATING-001は30 Basic Runsへ混ぜず、別の `SurfaceResponse.Collision` Suiteで使用する。
 
@@ -241,11 +324,11 @@ SurfaceResponse.Resolution
 SurfaceResponse.Performance
 ```
 
-## 14. Coverage
+## 15. Coverage
 
 Core / Reference / Bakeの対象コードはUnit Test Coverage 100%を完了条件とする。到達不能分岐等を除外する場合は理由を文書化する。利用可能ならBranch Coverageも確認する。
 
-## 15. 未確定事項
+## 16. 未確定事項
 
 - AnchorTolerance
 - CollisionTolerance
