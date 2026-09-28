@@ -10,6 +10,75 @@ pub const FIXTURE_WIDTH_M: f64 = 0.20;
 pub const FIXTURE_DEPTH_M: f64 = 0.10;
 pub const FEATURE_WIDTH_M: f64 = 0.10;
 
+pub const CLOTH_WIDTH_M: f64 = 0.20;
+pub const CLOTH_DEPTH_M: f64 = 0.10;
+
+/// Logical control point on CF-FLAT-001.
+///
+/// `stable_id` is deterministic within the generated control-point grid.
+/// The semantic location is carried by normalized `u`/`v`, not by a mesh triangle ID.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ClothControlPoint {
+    pub stable_id: u64,
+    pub u: f64,
+    pub v: f64,
+    pub position_m: DVec3,
+}
+
+/// Flat validation cloth fixture, independent from Body placement.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct FlatClothFixture;
+
+impl FlatClothFixture {
+    /// Evaluates the cloth-local position at normalized U/V coordinates.
+    pub fn position(&self, u: f64, v: f64) -> DVec3 {
+        DVec3::new(
+            (u - 0.5) * CLOTH_WIDTH_M,
+            0.0,
+            (v - 0.5) * CLOTH_DEPTH_M,
+        )
+    }
+
+    /// Generates a deterministic regular control-point grid.
+    pub fn control_points(&self, u_samples: usize, v_samples: usize) -> Vec<ClothControlPoint> {
+        assert!(u_samples >= 2 && v_samples >= 2);
+        let mut points = Vec::with_capacity(u_samples * v_samples);
+        for j in 0..v_samples {
+            let v = j as f64 / (v_samples - 1) as f64;
+            for i in 0..u_samples {
+                let u = i as f64 / (u_samples - 1) as f64;
+                let stable_id = (j * u_samples + i) as u64;
+                points.push(ClothControlPoint {
+                    stable_id,
+                    u,
+                    v,
+                    position_m: self.position(u, v),
+                });
+            }
+        }
+        points
+    }
+}
+
+/// Validation anchor profile.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AnchorProfile {
+    /// Anchor only the U=0 edge.
+    EdgeU0,
+    /// Anchor both U=0 and U=1 edges.
+    BothEdgesU,
+}
+
+impl AnchorProfile {
+    /// Returns whether a control point belongs to this anchor profile.
+    pub fn contains(&self, point: &ClothControlPoint) -> bool {
+        match self {
+            Self::EdgeU0 => point.u == 0.0,
+            Self::BothEdgesU => point.u == 0.0 || point.u == 1.0,
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SurfaceKind {
     Flat,
@@ -175,6 +244,49 @@ mod tests {
         for &(u, v) in &[(0.0, 0.0), (0.5, 0.5), (1.0, 1.0)] {
             assert!(f.position(u, v).is_finite());
         }
+    }
+
+
+    #[test]
+    fn fix_008_flat_cloth_fixture_dimensions() {
+        let cloth = FlatClothFixture;
+        let p00 = cloth.position(0.0, 0.0);
+        let p11 = cloth.position(1.0, 1.0);
+        assert!((p00.x + CLOTH_WIDTH_M * 0.5).abs() < EPS);
+        assert!((p00.z + CLOTH_DEPTH_M * 0.5).abs() < EPS);
+        assert!((p11.x - CLOTH_WIDTH_M * 0.5).abs() < EPS);
+        assert!((p11.z - CLOTH_DEPTH_M * 0.5).abs() < EPS);
+
+        let points = cloth.control_points(21, 7);
+        assert_eq!(points.len(), 147);
+        assert_eq!(points[0].stable_id, 0);
+        assert_eq!(points[146].stable_id, 146);
+    }
+
+    #[test]
+    fn fix_009_edge_anchor_selects_only_u0() {
+        let points = FlatClothFixture.control_points(21, 7);
+        let anchored: Vec<_> = points
+            .iter()
+            .filter(|point| AnchorProfile::EdgeU0.contains(point))
+            .collect();
+        assert_eq!(anchored.len(), 7);
+        assert!(anchored.iter().all(|point| point.u == 0.0));
+    }
+
+    #[test]
+    fn fix_010_both_edges_anchor_selects_u0_and_u1() {
+        let points = FlatClothFixture.control_points(21, 7);
+        let anchored: Vec<_> = points
+            .iter()
+            .filter(|point| AnchorProfile::BothEdgesU.contains(point))
+            .collect();
+        assert_eq!(anchored.len(), 14);
+        assert!(
+            anchored
+                .iter()
+                .all(|point| point.u == 0.0 || point.u == 1.0)
+        );
     }
 
     #[test]
