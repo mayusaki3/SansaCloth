@@ -23,10 +23,26 @@ pub struct AnalyticFixture {
 }
 
 impl AnalyticFixture {
-    pub const fn flat() -> Self { Self { kind: SurfaceKind::Flat } }
-    pub const fn convex() -> Self { Self { kind: SurfaceKind::Convex { height_m: 0.03 } } }
-    pub const fn concave_shallow() -> Self { Self { kind: SurfaceKind::Concave { depth_m: 0.02 } } }
-    pub const fn concave_deep() -> Self { Self { kind: SurfaceKind::Concave { depth_m: 0.05 } } }
+    pub const fn flat() -> Self {
+        Self {
+            kind: SurfaceKind::Flat,
+        }
+    }
+    pub const fn convex() -> Self {
+        Self {
+            kind: SurfaceKind::Convex { height_m: 0.03 },
+        }
+    }
+    pub const fn concave_shallow() -> Self {
+        Self {
+            kind: SurfaceKind::Concave { depth_m: 0.02 },
+        }
+    }
+    pub const fn concave_deep() -> Self {
+        Self {
+            kind: SurfaceKind::Concave { depth_m: 0.05 },
+        }
+    }
 
     /// Evaluates the analytic fixture position for normalized U/V coordinates.
     pub fn position(&self, u: f64, v: f64) -> DVec3 {
@@ -45,8 +61,12 @@ impl AnalyticFixture {
         let x = (u - 0.5) * FIXTURE_WIDTH_M;
         let dydx = match self.kind {
             SurfaceKind::Flat => 0.0,
-            SurfaceKind::Convex { height_m } => raised_cosine_derivative(x, FEATURE_WIDTH_M, height_m),
-            SurfaceKind::Concave { depth_m } => -raised_cosine_derivative(x, FEATURE_WIDTH_M, depth_m),
+            SurfaceKind::Convex { height_m } => {
+                raised_cosine_derivative(x, FEATURE_WIDTH_M, height_m)
+            }
+            SurfaceKind::Concave { depth_m } => {
+                -raised_cosine_derivative(x, FEATURE_WIDTH_M, depth_m)
+            }
         };
         DVec3::new(-dydx, 1.0, 0.0).normalize()
     }
@@ -77,7 +97,10 @@ impl AnalyticFixture {
                 triangles.push([v00, v11, v10]);
             }
         }
-        Mesh { positions, triangles }
+        Mesh {
+            positions,
+            triangles,
+        }
     }
 }
 
