@@ -1,0 +1,14 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/sansacloth-core",
+    "crates/sansacloth-fixture",
+]
+
+[workspace.package]
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/mayusaki3/SansaCloth"
+
+[workspace.dependencies]
+glam = "0.30"
