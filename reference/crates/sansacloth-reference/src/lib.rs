@@ -89,6 +89,88 @@ pub fn resolve_bridge(input: &BridgeStripInput) -> Vec<DVec3> {
     result
 }
 
+
+/// Reference-v1 settings for quasi-static gravity response.
+///
+/// `quasi_static_gravity_scale` is dimensionless and is deliberately not a
+/// physical material property. It controls Reference-v1 displacement magnitude.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ReferenceSolverSettings {
+    pub quasi_static_gravity_scale: f64,
+}
+
+/// Support layout used by the fixture-specific Reference-v1 gravity weighting.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GravitySupportLayout {
+    BothEdges,
+    OneEdge,
+}
+
+/// Input for GravityResponse / 重力応答 of one ordered cloth strip.
+#[derive(Clone, Debug, PartialEq)]
+pub struct GravityStripInput {
+    pub positions_m: Vec<DVec3>,
+    pub support: Vec<SupportKind>,
+    pub gravity_m_per_s2: DVec3,
+    pub characteristic_length_m: f64,
+    pub support_layout: GravitySupportLayout,
+}
+
+/// Applies the deterministic Reference-v1 quasi-static gravity approximation.
+///
+/// Gravity magnitude is not converted into displacement because Reference v1
+/// has no time, mass, tension, or bending model. A non-zero gravity vector
+/// supplies direction only. Displacement magnitude is
+/// `characteristic_length_m * quasi_static_gravity_scale * support_weight`.
+///
+/// Both-edge fixture weight: `4*t*(1-t)`.
+/// One-edge fixture weight: `t`.
+///
+/// Anchor positions are preserved exactly.
+///
+/// # Panics
+/// Panics when positions and support arrays differ in length, or when settings
+/// and characteristic length are non-finite/negative.
+pub fn apply_gravity_response(
+    input: &GravityStripInput,
+    settings: ReferenceSolverSettings,
+) -> Vec<DVec3> {
+    assert_eq!(input.positions_m.len(), input.support.len());
+    assert!(
+        settings.quasi_static_gravity_scale.is_finite()
+            && settings.quasi_static_gravity_scale >= 0.0
+    );
+    assert!(input.characteristic_length_m.is_finite() && input.characteristic_length_m >= 0.0);
+
+    let Some(gravity_direction) = input.gravity_m_per_s2.try_normalize() else {
+        return input.positions_m.clone();
+    };
+
+    let mut result = input.positions_m.clone();
+    let last = result.len().saturating_sub(1);
+    if last == 0 {
+        return result;
+    }
+
+    for (index, position) in result.iter_mut().enumerate() {
+        if input.support[index] != SupportKind::Unsupported {
+            continue;
+        }
+
+        let t = index as f64 / last as f64;
+        let support_weight = match input.support_layout {
+            GravitySupportLayout::BothEdges => 4.0 * t * (1.0 - t),
+            GravitySupportLayout::OneEdge => t,
+        };
+        let displacement_m = input.characteristic_length_m
+            * settings.quasi_static_gravity_scale
+            * support_weight;
+        *position += gravity_direction * displacement_m;
+    }
+
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -200,6 +282,168 @@ mod tests {
         };
         assert_eq!(resolve_bridge(&input), input.positions_m);
     }
+
+
+    fn gravity_input(
+        gravity_m_per_s2: DVec3,
+        layout: GravitySupportLayout,
+    ) -> GravityStripInput {
+        GravityStripInput {
+            positions_m: vec![DVec3::ZERO; 5],
+            support: match layout {
+                GravitySupportLayout::BothEdges => vec![
+                    SupportKind::Anchor,
+                    SupportKind::Unsupported,
+                    SupportKind::Unsupported,
+                    SupportKind::Unsupported,
+                    SupportKind::Anchor,
+                ],
+                GravitySupportLayout::OneEdge => vec![
+                    SupportKind::Anchor,
+                    SupportKind::Unsupported,
+                    SupportKind::Unsupported,
+                    SupportKind::Unsupported,
+                    SupportKind::Unsupported,
+                ],
+            },
+            gravity_m_per_s2,
+            characteristic_length_m: 0.10,
+            support_layout: layout,
+        }
+    }
+
+    fn gravity_settings() -> ReferenceSolverSettings {
+        ReferenceSolverSettings {
+            quasi_static_gravity_scale: 0.1,
+        }
+    }
+
+    #[test]
+    fn grv_001_zero_gravity_has_zero_displacement() {
+        let input = gravity_input(DVec3::ZERO, GravitySupportLayout::BothEdges);
+        assert_eq!(
+            apply_gravity_response(&input, gravity_settings()),
+            input.positions_m
+        );
+    }
+
+    #[test]
+    fn grv_002_anchor_displacement_is_zero() {
+        let input = gravity_input(
+            DVec3::new(0.0, -9.80665, 0.0),
+            GravitySupportLayout::BothEdges,
+        );
+        let result = apply_gravity_response(&input, gravity_settings());
+        assert_eq!(result[0], input.positions_m[0]);
+        assert_eq!(result[4], input.positions_m[4]);
+    }
+
+    #[test]
+    fn grv_003_both_edge_center_has_largest_tendency() {
+        let input = gravity_input(DVec3::NEG_Y, GravitySupportLayout::BothEdges);
+        let result = apply_gravity_response(&input, gravity_settings());
+        assert!(result[2].y < result[1].y);
+        assert!(result[2].y < result[3].y);
+    }
+
+    #[test]
+    fn grv_004_one_edge_response_increases_away_from_anchor() {
+        let input = gravity_input(DVec3::NEG_Y, GravitySupportLayout::OneEdge);
+        let result = apply_gravity_response(&input, gravity_settings());
+        assert!(result[1].y > result[2].y);
+        assert!(result[2].y > result[3].y);
+        assert!(result[3].y > result[4].y);
+    }
+
+    #[test]
+    fn grv_005_reversing_gravity_reverses_displacement() {
+        let down = gravity_input(DVec3::NEG_Y, GravitySupportLayout::BothEdges);
+        let up = gravity_input(DVec3::Y, GravitySupportLayout::BothEdges);
+        let down_result = apply_gravity_response(&down, gravity_settings());
+        let up_result = apply_gravity_response(&up, gravity_settings());
+        assert_eq!(down_result[2], -up_result[2]);
+    }
+
+    #[test]
+    fn grv_006_body_only_rotation_does_not_change_world_gravity_input() {
+        let input = gravity_input(
+            DVec3::new(0.0, -9.80665, 0.0),
+            GravitySupportLayout::BothEdges,
+        );
+        let before = input.gravity_m_per_s2;
+        let _ = apply_gravity_response(&input, gravity_settings());
+        assert_eq!(input.gravity_m_per_s2, before);
+    }
+
+    #[test]
+    fn grv_007_rotated_gravity_follows_supplied_direction() {
+        let input = gravity_input(DVec3::X, GravitySupportLayout::BothEdges);
+        let result = apply_gravity_response(&input, gravity_settings());
+        assert!(result[2].x > 0.0);
+        assert_eq!(result[2].y, 0.0);
+        assert_eq!(result[2].z, 0.0);
+    }
+
+    #[test]
+    fn grv_008_gravity_stage_does_not_perform_collision_correction() {
+        let mut input = gravity_input(DVec3::NEG_Y, GravitySupportLayout::BothEdges);
+        input.positions_m[2] = DVec3::new(0.0, -1.0, 0.0);
+        let result = apply_gravity_response(&input, gravity_settings());
+        assert!(result[2].y < -1.0);
+    }
+
+    #[test]
+    fn grv_009_gravity_stage_has_no_conformity_input_or_response() {
+        let input = gravity_input(DVec3::NEG_Y, GravitySupportLayout::BothEdges);
+        let result = apply_gravity_response(&input, gravity_settings());
+        assert_eq!(result[2].x, input.positions_m[2].x);
+        assert_eq!(result[2].z, input.positions_m[2].z);
+    }
+
+    #[test]
+    fn grv_010_is_deterministic() {
+        let input = gravity_input(DVec3::NEG_Y, GravitySupportLayout::BothEdges);
+        assert_eq!(
+            apply_gravity_response(&input, gravity_settings()),
+            apply_gravity_response(&input, gravity_settings())
+        );
+    }
+
+    #[test]
+    fn grv_011_resolution_does_not_change_center_displacement() {
+        let low = gravity_input(DVec3::NEG_Y, GravitySupportLayout::BothEdges);
+        let high = GravityStripInput {
+            positions_m: vec![DVec3::ZERO; 9],
+            support: vec![
+                SupportKind::Anchor,
+                SupportKind::Unsupported,
+                SupportKind::Unsupported,
+                SupportKind::Unsupported,
+                SupportKind::Unsupported,
+                SupportKind::Unsupported,
+                SupportKind::Unsupported,
+                SupportKind::Unsupported,
+                SupportKind::Anchor,
+            ],
+            gravity_m_per_s2: DVec3::NEG_Y,
+            characteristic_length_m: 0.10,
+            support_layout: GravitySupportLayout::BothEdges,
+        };
+        let low_result = apply_gravity_response(&low, gravity_settings());
+        let high_result = apply_gravity_response(&high, gravity_settings());
+        assert_eq!(low_result[2], high_result[4]);
+    }
+
+    #[test]
+    fn grv_012_outputs_are_finite() {
+        let input = gravity_input(
+            DVec3::new(1.0, -9.80665, 2.0),
+            GravitySupportLayout::BothEdges,
+        );
+        let result = apply_gravity_response(&input, gravity_settings());
+        assert!(result.iter().all(|position| position.is_finite()));
+    }
+
 
     #[test]
     fn support_resolution_preserves_input_positions() {
