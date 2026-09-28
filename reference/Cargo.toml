@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/sansacloth-core",
     "crates/sansacloth-fixture",
+    "crates/sansacloth-reference",
 ]
 
 [workspace.package]
