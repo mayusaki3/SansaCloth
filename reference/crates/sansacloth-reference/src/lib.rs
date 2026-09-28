@@ -89,7 +89,6 @@ pub fn resolve_bridge(input: &BridgeStripInput) -> Vec<DVec3> {
     result
 }
 
-
 /// Reference-v1 settings for quasi-static gravity response.
 ///
 /// `quasi_static_gravity_scale` is dimensionless and is deliberately not a
@@ -162,9 +161,8 @@ pub fn apply_gravity_response(
             GravitySupportLayout::BothEdges => 4.0 * t * (1.0 - t),
             GravitySupportLayout::OneEdge => t,
         };
-        let displacement_m = input.characteristic_length_m
-            * settings.quasi_static_gravity_scale
-            * support_weight;
+        let displacement_m =
+            input.characteristic_length_m * settings.quasi_static_gravity_scale * support_weight;
         *position += gravity_direction * displacement_m;
     }
 
@@ -283,11 +281,7 @@ mod tests {
         assert_eq!(resolve_bridge(&input), input.positions_m);
     }
 
-
-    fn gravity_input(
-        gravity_m_per_s2: DVec3,
-        layout: GravitySupportLayout,
-    ) -> GravityStripInput {
+    fn gravity_input(gravity_m_per_s2: DVec3, layout: GravitySupportLayout) -> GravityStripInput {
         GravityStripInput {
             positions_m: vec![DVec3::ZERO; 5],
             support: match layout {
@@ -443,7 +437,6 @@ mod tests {
         let result = apply_gravity_response(&input, gravity_settings());
         assert!(result.iter().all(|position| position.is_finite()));
     }
-
 
     #[test]
     fn support_resolution_preserves_input_positions() {
