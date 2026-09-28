@@ -153,18 +153,29 @@ mod tests {
 
     #[test]
     fn core_005_barycentric_normalization() {
-        let b = Barycentric { a: 2.0, b: 3.0, c: 5.0 }.normalized().unwrap();
+        let b = Barycentric {
+            a: 2.0,
+            b: 3.0,
+            c: 5.0,
+        }
+        .normalized()
+        .unwrap();
         assert!((b.a + b.b + b.c - 1.0).abs() < EPS);
-        assert!(Barycentric { a: 0.0, b: 0.0, c: 0.0 }.normalized().is_none());
+        assert!(
+            Barycentric {
+                a: 0.0,
+                b: 0.0,
+                c: 0.0
+            }
+            .normalized()
+            .is_none()
+        );
     }
 
     #[test]
     fn core_006_surface_frame_is_orthonormal() {
-        let frame = SurfaceFrame::from_normal_and_tangent_u(
-            DVec3::ZERO,
-            DVec3::Y,
-            DVec3::X,
-        ).unwrap();
+        let frame =
+            SurfaceFrame::from_normal_and_tangent_u(DVec3::ZERO, DVec3::Y, DVec3::X).unwrap();
         assert!(frame.normal.dot(frame.tangent_u).abs() < EPS);
         assert!(frame.normal.dot(frame.tangent_v).abs() < EPS);
         assert!(frame.tangent_u.dot(frame.tangent_v).abs() < EPS);
@@ -175,11 +186,9 @@ mod tests {
 
     #[test]
     fn core_007_surface_offset_reconstructs_position() {
-        let frame = SurfaceFrame::from_normal_and_tangent_u(
-            DVec3::new(1.0, 2.0, 3.0),
-            DVec3::Y,
-            DVec3::X,
-        ).unwrap();
+        let frame =
+            SurfaceFrame::from_normal_and_tangent_u(DVec3::new(1.0, 2.0, 3.0), DVec3::Y, DVec3::X)
+                .unwrap();
         let p = frame.position_from_offset(SurfaceOffset {
             tangent_u_m: 0.1,
             tangent_v_m: 0.2,
