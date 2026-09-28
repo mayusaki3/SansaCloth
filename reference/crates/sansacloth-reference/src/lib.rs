@@ -96,6 +96,7 @@ pub fn resolve_bridge(input: &BridgeStripInput) -> Vec<DVec3> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ReferenceSolverSettings {
     pub quasi_static_gravity_scale: f64,
+    pub conformity_reach_m: f64,
 }
 
 /// Support layout used by the fixture-specific Reference-v1 gravity weighting.
@@ -167,6 +168,72 @@ pub fn apply_gravity_response(
     }
 
     result
+}
+
+
+/// Input for ConformityResponse / 表面追従応答 of one ordered cloth strip.
+///
+/// `desired_surface_positions_m` is supplied by the fixture/surface layer.
+/// Reference v1 does not yet apply orientation weighting or surface filtering.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConformityStripInput {
+    pub positions_m: Vec<DVec3>,
+    pub desired_surface_positions_m: Vec<DVec3>,
+    pub separation_m: Vec<f64>,
+    pub support: Vec<SupportKind>,
+    pub conformity: f64,
+    /// True when the point belongs to a strip connected to established support.
+    pub supported_strip: Vec<bool>,
+}
+
+/// Applies Reference-v1 Conformity / 表面追従性.
+///
+/// Effective conformity is
+/// `conformity * distance_weight * support_eligibility`, where
+/// `distance_weight = clamp(1 - separation / reach, 0, 1)`.
+///
+/// Anchors never move. Points outside reach, or points not connected to an
+/// established supported strip, are not attracted toward the desired surface.
+/// This stage does not perform gravity, collision correction, or slip.
+///
+/// # Panics
+/// Panics for mismatched array lengths or invalid scalar settings.
+pub fn apply_conformity_response(
+    input: &ConformityStripInput,
+    settings: ReferenceSolverSettings,
+) -> Vec<DVec3> {
+    let count = input.positions_m.len();
+    assert_eq!(input.desired_surface_positions_m.len(), count);
+    assert_eq!(input.separation_m.len(), count);
+    assert_eq!(input.support.len(), count);
+    assert_eq!(input.supported_strip.len(), count);
+    assert!(input.conformity.is_finite() && (0.0..=1.0).contains(&input.conformity));
+    assert!(settings.conformity_reach_m.is_finite() && settings.conformity_reach_m >= 0.0);
+
+    if input.conformity == 0.0 || settings.conformity_reach_m == 0.0 {
+        return input.positions_m.clone();
+    }
+
+    input
+        .positions_m
+        .iter()
+        .enumerate()
+        .map(|(index, &position)| {
+            if input.support[index] != SupportKind::Unsupported || !input.supported_strip[index] {
+                return position;
+            }
+
+            let separation = input.separation_m[index];
+            if !separation.is_finite() || separation < 0.0 {
+                return position;
+            }
+
+            let distance_weight =
+                (1.0 - separation / settings.conformity_reach_m).clamp(0.0, 1.0);
+            let effective = input.conformity * distance_weight;
+            position.lerp(input.desired_surface_positions_m[index], effective)
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -309,6 +376,7 @@ mod tests {
     fn gravity_settings() -> ReferenceSolverSettings {
         ReferenceSolverSettings {
             quasi_static_gravity_scale: 0.1,
+            conformity_reach_m: 0.02,
         }
     }
 
@@ -437,6 +505,201 @@ mod tests {
         let result = apply_gravity_response(&input, gravity_settings());
         assert!(result.iter().all(|position| position.is_finite()));
     }
+
+
+    fn conformity_input(conformity: f64) -> ConformityStripInput {
+        ConformityStripInput {
+            positions_m: vec![
+                DVec3::new(-1.0, 0.0, 0.0),
+                DVec3::new(0.0, 0.01, 0.0),
+                DVec3::new(1.0, 0.0, 0.0),
+            ],
+            desired_surface_positions_m: vec![
+                DVec3::new(-1.0, 0.0, 0.0),
+                DVec3::new(0.0, 0.0, 0.0),
+                DVec3::new(1.0, 0.0, 0.0),
+            ],
+            separation_m: vec![0.0, 0.01, 0.0],
+            support: vec![
+                SupportKind::Anchor,
+                SupportKind::Unsupported,
+                SupportKind::Anchor,
+            ],
+            conformity,
+            supported_strip: vec![true, true, true],
+        }
+    }
+
+    #[test]
+    fn conf_001_zero_conformity_has_zero_stage_displacement() {
+        let input = conformity_input(0.0);
+        assert_eq!(
+            apply_conformity_response(&input, gravity_settings()),
+            input.positions_m
+        );
+    }
+
+    #[test]
+    fn conf_002_anchor_displacement_is_zero() {
+        let input = conformity_input(1.0);
+        let result = apply_conformity_response(&input, gravity_settings());
+        assert_eq!(result[0], input.positions_m[0]);
+        assert_eq!(result[2], input.positions_m[2]);
+    }
+
+    #[test]
+    fn conf_003_outside_reach_unsupported_point_is_not_attracted() {
+        let mut input = conformity_input(1.0);
+        input.separation_m[1] = 0.03;
+        let result = apply_conformity_response(&input, gravity_settings());
+        assert_eq!(result[1], input.positions_m[1]);
+    }
+
+    #[test]
+    fn conf_004_eligible_response_increases_with_conformity() {
+        let low = conformity_input(0.5);
+        let high = conformity_input(1.0);
+        let low_result = apply_conformity_response(&low, gravity_settings());
+        let high_result = apply_conformity_response(&high, gravity_settings());
+        let low_delta = (low_result[1] - low.positions_m[1]).length();
+        let high_delta = (high_result[1] - high.positions_m[1]).length();
+        assert!(high_delta > low_delta);
+    }
+
+    #[test]
+    fn conf_005_full_conformity_outside_reach_has_no_attraction() {
+        let mut input = conformity_input(1.0);
+        input.separation_m[1] = gravity_settings().conformity_reach_m;
+        let result = apply_conformity_response(&input, gravity_settings());
+        assert_eq!(result[1], input.positions_m[1]);
+    }
+
+    #[test]
+    fn conf_006_conformity_does_not_replace_collision_response() {
+        let mut input = conformity_input(1.0);
+        input.positions_m[1] = DVec3::new(0.0, -0.01, 0.0);
+        input.desired_surface_positions_m[1] = DVec3::ZERO;
+        input.separation_m[1] = 0.01;
+        let result = apply_conformity_response(&input, gravity_settings());
+        assert!(result[1].y < 0.0);
+    }
+
+    #[test]
+    fn conf_007_shallow_concavity_can_receive_response() {
+        let mut input = conformity_input(1.0);
+        input.desired_surface_positions_m[1] = DVec3::new(0.0, -0.01, 0.0);
+        let result = apply_conformity_response(&input, gravity_settings());
+        assert!(result[1].y < input.positions_m[1].y);
+    }
+
+    #[test]
+    fn conf_008_deep_concavity_does_not_force_bottom_contact() {
+        let mut input = conformity_input(1.0);
+        input.desired_surface_positions_m[1] = DVec3::new(0.0, -0.05, 0.0);
+        input.separation_m[1] = 0.05;
+        let result = apply_conformity_response(&input, gravity_settings());
+        assert_eq!(result[1], input.positions_m[1]);
+    }
+
+    #[test]
+    fn conf_009_completely_unsupported_region_has_no_adhesion() {
+        let mut input = conformity_input(1.0);
+        input.support = vec![SupportKind::Unsupported; 3];
+        input.supported_strip = vec![false; 3];
+        let result = apply_conformity_response(&input, gravity_settings());
+        assert_eq!(result, input.positions_m);
+    }
+
+    #[test]
+    fn conf_010_coordinate_rotation_equivalence() {
+        let input = conformity_input(1.0);
+        let result = apply_conformity_response(&input, gravity_settings());
+
+        let mut rotated = input.clone();
+        rotated.positions_m = input
+            .positions_m
+            .iter()
+            .map(|p| DVec3::new(p.y, -p.x, p.z))
+            .collect();
+        rotated.desired_surface_positions_m = input
+            .desired_surface_positions_m
+            .iter()
+            .map(|p| DVec3::new(p.y, -p.x, p.z))
+            .collect();
+        let rotated_result = apply_conformity_response(&rotated, gravity_settings());
+        let expected: Vec<_> = result
+            .iter()
+            .map(|p| DVec3::new(p.y, -p.x, p.z))
+            .collect();
+        assert_eq!(rotated_result, expected);
+    }
+
+    #[test]
+    fn conf_011_does_not_mutate_external_gravity_state() {
+        let gravity = DVec3::new(0.0, -9.80665, 0.0);
+        let input = conformity_input(1.0);
+        let _ = apply_conformity_response(&input, gravity_settings());
+        assert_eq!(gravity, DVec3::new(0.0, -9.80665, 0.0));
+    }
+
+    #[test]
+    fn conf_012_does_not_mutate_anchor_state() {
+        let input = conformity_input(1.0);
+        let before = input.support.clone();
+        let _ = apply_conformity_response(&input, gravity_settings());
+        assert_eq!(input.support, before);
+    }
+
+    #[test]
+    fn conf_013_is_deterministic() {
+        let input = conformity_input(0.5);
+        assert_eq!(
+            apply_conformity_response(&input, gravity_settings()),
+            apply_conformity_response(&input, gravity_settings())
+        );
+    }
+
+    #[test]
+    fn conf_014_outputs_are_finite() {
+        let input = conformity_input(1.0);
+        let result = apply_conformity_response(&input, gravity_settings());
+        assert!(result.iter().all(|position| position.is_finite()));
+    }
+
+    #[test]
+    fn conf_015_resolution_preserves_center_response() {
+        let low = conformity_input(1.0);
+        let high = ConformityStripInput {
+            positions_m: vec![
+                DVec3::new(-1.0, 0.0, 0.0),
+                DVec3::new(-0.5, 0.01, 0.0),
+                DVec3::new(0.0, 0.01, 0.0),
+                DVec3::new(0.5, 0.01, 0.0),
+                DVec3::new(1.0, 0.0, 0.0),
+            ],
+            desired_surface_positions_m: vec![
+                DVec3::new(-1.0, 0.0, 0.0),
+                DVec3::new(-0.5, 0.0, 0.0),
+                DVec3::new(0.0, 0.0, 0.0),
+                DVec3::new(0.5, 0.0, 0.0),
+                DVec3::new(1.0, 0.0, 0.0),
+            ],
+            separation_m: vec![0.0, 0.01, 0.01, 0.01, 0.0],
+            support: vec![
+                SupportKind::Anchor,
+                SupportKind::Unsupported,
+                SupportKind::Unsupported,
+                SupportKind::Unsupported,
+                SupportKind::Anchor,
+            ],
+            conformity: 1.0,
+            supported_strip: vec![true; 5],
+        };
+        let low_result = apply_conformity_response(&low, gravity_settings());
+        let high_result = apply_conformity_response(&high, gravity_settings());
+        assert_eq!(low_result[1], high_result[2]);
+    }
+
 
     #[test]
     fn support_resolution_preserves_input_positions() {
