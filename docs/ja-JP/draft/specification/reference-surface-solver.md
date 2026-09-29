@@ -93,7 +93,35 @@ Bridge positions
     -> SurfaceResponseResult
 ```
 
-SurfaceQueryの具体的なtrait/API、analytic fixture adapter、mesh/runtime実装は次の実装ステップで確定する。
+Reference v1 の最小 `SurfaceQuery / 表面問い合わせ` は、Cloth Control Point の現在位置と対応する `SurfaceReference / 表面参照` を入力し、次を返す。
+
+- `SurfacePosition / 表面位置` [m]
+- `SurfaceNormal / 表面法線`（outward、unit vector）
+- `SeparationDistance / 表面離隔距離` [m]（normal方向の符号付き距離）
+
+Reference v1 の `Desired Surface Position / 目標布表面位置` は、この `SurfacePosition` を使用する。将来の `ConformityFilterRadius` 等によるfiltered desired surfaceは別レイヤーとして拡張する。
+
+概念API:
+
+```text
+SurfaceQuery.query(
+    current_position_m,
+    surface_reference
+) -> SurfaceQueryResult
+```
+
+`SurfaceReference` はCloth側の論理的対応を維持し、Query結果へ重複格納しない。
+
+Analytic Fixture adapter は `SurfaceReference(U,V)` からanalytic surface position/normalを取得し、
+
+```text
+SeparationDistance
+  = dot(CurrentPosition - SurfacePosition, SurfaceNormal)
+```
+
+で符号付き離隔を算出する。
+
+この定義はSR-001～005用のReference adapterであり、将来のMesh/Runtime Backendが同じ内部実装を使うことは要求しない。
 
 この境界が確定するまで、個別Stage関数を機械的に連結した `solve()` を「統合Solver完成」と扱わない。
 
@@ -220,7 +248,7 @@ Core/Solverに Heel、Breast 等の解剖学固有分岐を導入しない。
 - ConformityReach
 - ConformityFilterRadius
 - CollisionTolerance等の数値
-- SurfaceQuery trait/APIとBody Surface adapter
+- Mesh/Runtime Backend用SurfaceQuery adapter
 - Gravityの物理的MagnitudeをSurfaceDensity等へ接続するモデル
 - Stretchability/Tightness/BendingResponseをConformityへ統合する方法
 - 反復Solverの必要性と収束条件
