@@ -3,7 +3,7 @@
 //! This crate is a correctness and semantic reference implementation. It is
 //! not an engine backend and does not define product performance targets.
 
-use glam::DVec3;
+use glam::{DQuat, DVec3};
 use sansacloth_core::SurfaceReference;
 use sansacloth_fixture::AnalyticFixture;
 
@@ -243,6 +243,61 @@ fn query_surface_points<Q: SurfaceQuery>(
         .zip(surface_references)
         .map(|(&position_m, &surface_reference)| surface_query.query(position_m, surface_reference))
         .collect()
+}
+
+/// Rigid transform used by validation fixtures without changing SurfaceReference semantics.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FixtureTransform {
+    pub rotation: DQuat,
+    pub translation_m: DVec3,
+}
+
+impl FixtureTransform {
+    pub const IDENTITY: Self = Self {
+        rotation: DQuat::IDENTITY,
+        translation_m: DVec3::ZERO,
+    };
+
+    pub fn transform_position(&self, position_m: DVec3) -> DVec3 {
+        self.rotation * position_m + self.translation_m
+    }
+
+    pub fn transform_direction(&self, direction: DVec3) -> DVec3 {
+        self.rotation * direction
+    }
+}
+
+/// Analytic fixture query with a rigid Body transform.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct TransformedAnalyticFixtureSurfaceQuery {
+    pub fixture: AnalyticFixture,
+    pub transform: FixtureTransform,
+}
+
+impl SurfaceQuery for TransformedAnalyticFixtureSurfaceQuery {
+    fn query(
+        &self,
+        current_position_m: DVec3,
+        surface_reference: SurfaceReference,
+    ) -> SurfaceQueryResult {
+        assert!(current_position_m.is_finite());
+
+        let surface_position_m = self.transform.transform_position(
+            self.fixture
+                .position(surface_reference.u, surface_reference.v),
+        );
+        let surface_normal = self
+            .transform
+            .transform_direction(self.fixture.normal(surface_reference.u))
+            .normalize();
+        let separation_m = (current_position_m - surface_position_m).dot(surface_normal);
+
+        SurfaceQueryResult {
+            surface_position_m,
+            surface_normal,
+            separation_m,
+        }
+    }
 }
 
 /// Minimal input state required by Support Resolution / 支持判定.
@@ -570,6 +625,202 @@ mod tests {
 
         assert!(after.separation_m < before.separation_m);
         assert!((after.separation_m - 0.005).abs() <= f64::EPSILON);
+    }
+
+    const BASIC_U_SAMPLES: usize = 21;
+    const BASIC_V_SAMPLES: usize = 7;
+
+    #[derive(Clone, Copy)]
+    enum BasicSurface {
+        Flat,
+        ConvexUp,
+        ConvexSide,
+        ConcaveShallow,
+        ConcaveDeep,
+    }
+
+    fn basic_settings() -> ReferenceSolverSettings {
+        ReferenceSolverSettings {
+            quasi_static_gravity_scale: 0.1,
+            conformity_reach_m: 0.02,
+            collision_tolerance_m: 0.0,
+        }
+    }
+
+    fn basic_cases() -> [(DVec3, f64); 6] {
+        [
+            (DVec3::ZERO, 0.0),
+            (DVec3::ZERO, 0.5),
+            (DVec3::ZERO, 1.0),
+            (DVec3::new(0.0, -9.80665, 0.0), 0.0),
+            (DVec3::new(0.0, -9.80665, 0.0), 0.5),
+            (DVec3::new(0.0, -9.80665, 0.0), 1.0),
+        ]
+    }
+
+    fn run_basic_surface(surface: BasicSurface) -> Vec<SurfaceResponseResult> {
+        let (fixture, transform, anchor_profile, support_layout) = match surface {
+            BasicSurface::Flat => (
+                AnalyticFixture::flat(),
+                FixtureTransform::IDENTITY,
+                AnchorProfile::BothEdgesU,
+                GravitySupportLayout::BothEdges,
+            ),
+            BasicSurface::ConvexUp => (
+                AnalyticFixture::convex(),
+                FixtureTransform::IDENTITY,
+                AnchorProfile::BothEdgesU,
+                GravitySupportLayout::BothEdges,
+            ),
+            BasicSurface::ConvexSide => (
+                AnalyticFixture::convex(),
+                FixtureTransform {
+                    rotation: DQuat::from_rotation_z(-std::f64::consts::FRAC_PI_2),
+                    translation_m: DVec3::ZERO,
+                },
+                AnchorProfile::EdgeU0,
+                GravitySupportLayout::OneEdge,
+            ),
+            BasicSurface::ConcaveShallow => (
+                AnalyticFixture::concave_shallow(),
+                FixtureTransform::IDENTITY,
+                AnchorProfile::BothEdgesU,
+                GravitySupportLayout::BothEdges,
+            ),
+            BasicSurface::ConcaveDeep => (
+                AnalyticFixture::concave_deep(),
+                FixtureTransform::IDENTITY,
+                AnchorProfile::BothEdgesU,
+                GravitySupportLayout::BothEdges,
+            ),
+        };
+        let query = TransformedAnalyticFixtureSurfaceQuery { fixture, transform };
+        let cloth = FlatClothFixture;
+        let control_points = cloth.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES);
+
+        basic_cases()
+            .into_iter()
+            .map(|(gravity_m_per_s2, conformity)| {
+                let mut combined_positions = Vec::with_capacity(control_points.len());
+                let mut combined_references = Vec::with_capacity(control_points.len());
+                let mut combined_surface_positions = Vec::with_capacity(control_points.len());
+                let mut combined_normals = Vec::with_capacity(control_points.len());
+                let mut combined_separation = Vec::with_capacity(control_points.len());
+                let mut combined_support = Vec::with_capacity(control_points.len());
+
+                for row in control_points.chunks_exact(BASIC_U_SAMPLES) {
+                    let positions_m: Vec<_> = row
+                        .iter()
+                        .map(|point| transform.transform_position(point.position_m))
+                        .collect();
+                    let surface_references: Vec<_> = row
+                        .iter()
+                        .map(|point| SurfaceReference::new(1, point.u, point.v).unwrap())
+                        .collect();
+                    let is_anchor: Vec<_> =
+                        row.iter().map(|point| anchor_profile.contains(point)).collect();
+                    let is_contact: Vec<_> = positions_m
+                        .iter()
+                        .zip(&surface_references)
+                        .map(|(&position, &reference)| {
+                            query.query(position, reference).separation_m <= 0.0
+                        })
+                        .collect();
+
+                    let result = ReferenceSurfaceSolver::solve(
+                        &ReferenceSurfaceSolverInput {
+                            positions_m,
+                            surface_references,
+                            is_anchor,
+                            is_contact,
+                            gravity_m_per_s2,
+                            characteristic_length_m: 0.10,
+                            support_layout,
+                            conformity,
+                            supported_strip: vec![true; BASIC_U_SAMPLES],
+                        },
+                        &query,
+                        basic_settings(),
+                    );
+
+                    combined_positions.extend(result.positions_m);
+                    combined_references.extend(result.surface_references);
+                    combined_surface_positions.extend(result.surface_positions_m);
+                    combined_normals.extend(result.surface_normals);
+                    combined_separation.extend(result.separation_m);
+                    combined_support.extend(result.support);
+                }
+
+                SurfaceResponseResult {
+                    positions_m: combined_positions,
+                    surface_references: combined_references,
+                    surface_positions_m: combined_surface_positions,
+                    surface_normals: combined_normals,
+                    separation_m: combined_separation,
+                    support: combined_support,
+                }
+            })
+            .collect()
+    }
+
+    fn assert_basic_results(results: &[SurfaceResponseResult]) {
+        assert_eq!(results.len(), 6);
+        for result in results {
+            assert_eq!(result.positions_m.len(), BASIC_U_SAMPLES * BASIC_V_SAMPLES);
+            assert!(result.positions_m.iter().all(|value| value.is_finite()));
+            assert!(result.surface_normals.iter().all(|value| value.is_finite()));
+            assert!(result.separation_m.iter().all(|value| value.is_finite()));
+            assert!(
+                result
+                    .separation_m
+                    .iter()
+                    .all(|value| *value >= -f64::EPSILON)
+            );
+        }
+    }
+
+    #[test]
+    fn int_sr_001_flat_six_cases() {
+        let results = run_basic_surface(BasicSurface::Flat);
+        assert_basic_results(&results);
+        for result in &results {
+            assert!(
+                result
+                    .positions_m
+                    .iter()
+                    .zip(FlatClothFixture.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES))
+                    .all(|(actual, expected)| (*actual - expected.position_m).length() <= f64::EPSILON)
+            );
+        }
+    }
+
+    #[test]
+    fn int_sr_002_convex_up_six_cases() {
+        assert_basic_results(&run_basic_surface(BasicSurface::ConvexUp));
+    }
+
+    #[test]
+    fn int_sr_003_convex_side_six_cases() {
+        let results = run_basic_surface(BasicSurface::ConvexSide);
+        assert_basic_results(&results);
+        assert!(results.iter().all(|result| {
+            result
+                .support
+                .iter()
+                .filter(|support| **support == SupportKind::Anchor)
+                .count()
+                == BASIC_V_SAMPLES
+        }));
+    }
+
+    #[test]
+    fn int_sr_004_concave_shallow_six_cases() {
+        assert_basic_results(&run_basic_surface(BasicSurface::ConcaveShallow));
+    }
+
+    #[test]
+    fn int_sr_005_concave_deep_six_cases() {
+        assert_basic_results(&run_basic_surface(BasicSurface::ConcaveDeep));
     }
 
     fn integrated_flat_input(gravity_m_per_s2: DVec3) -> ReferenceSurfaceSolverInput {
