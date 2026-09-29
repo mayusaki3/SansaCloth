@@ -235,7 +235,6 @@ pub fn apply_conformity_response(
         .collect()
 }
 
-
 /// Input for CollisionResponse / 衝突応答.
 ///
 /// `separation_m` is signed: negative values are penetration and positive
@@ -748,7 +747,6 @@ mod tests {
         assert_eq!(low_result[1], high_result[2]);
     }
 
-
     fn collision_input(separation_m: f64) -> CollisionResponseInput {
         CollisionResponseInput {
             positions_m: vec![DVec3::new(0.0, separation_m, 0.0)],
@@ -785,7 +783,6 @@ mod tests {
         assert!(final_separation >= settings.collision_tolerance_m);
         assert!((final_separation - settings.collision_tolerance_m).abs() <= f64::EPSILON);
     }
-
 
     #[test]
     fn support_resolution_preserves_input_positions() {
