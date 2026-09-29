@@ -60,6 +60,193 @@ impl SurfaceQuery for AnalyticFixtureSurfaceQuery {
     }
 }
 
+/// Input for the integrated ReferenceSurfaceSolver / 参照表面ソルバー.
+///
+/// Reference v1 integrates one already-ordered cloth strip. Topology discovery
+/// and multi-strip decomposition remain outside this API.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ReferenceSurfaceSolverInput {
+    pub positions_m: Vec<DVec3>,
+    pub surface_references: Vec<SurfaceReference>,
+    pub is_anchor: Vec<bool>,
+    pub is_contact: Vec<bool>,
+    pub gravity_m_per_s2: DVec3,
+    pub characteristic_length_m: f64,
+    pub support_layout: GravitySupportLayout,
+    pub conformity: f64,
+    pub supported_strip: Vec<bool>,
+}
+
+/// Final implemented subset of SurfaceResponseResult / 表面応答結果.
+///
+/// Fields that Reference v1 does not yet compute are intentionally omitted
+/// rather than populated with placeholder values.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SurfaceResponseResult {
+    pub positions_m: Vec<DVec3>,
+    pub surface_references: Vec<SurfaceReference>,
+    pub surface_positions_m: Vec<DVec3>,
+    pub surface_normals: Vec<DVec3>,
+    pub separation_m: Vec<f64>,
+    pub support: Vec<SupportKind>,
+}
+
+/// Validation-only snapshots from each integrated solver stage.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ReferenceSurfaceSolverDebug {
+    pub initial_positions_m: Vec<DVec3>,
+    pub support: Vec<SupportKind>,
+    pub bridge_positions_m: Vec<DVec3>,
+    pub gravity_positions_m: Vec<DVec3>,
+    pub conformity_positions_m: Vec<DVec3>,
+    pub collision_positions_m: Vec<DVec3>,
+    pub final_result: SurfaceResponseResult,
+}
+
+/// Stateless integrated Reference Surface Solver.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ReferenceSurfaceSolver;
+
+impl ReferenceSurfaceSolver {
+    /// Solves one ordered strip and returns only the final SurfaceResponse.
+    pub fn solve<Q: SurfaceQuery>(
+        input: &ReferenceSurfaceSolverInput,
+        surface_query: &Q,
+        settings: ReferenceSolverSettings,
+    ) -> SurfaceResponseResult {
+        Self::solve_with_debug(input, surface_query, settings).final_result
+    }
+
+    /// Solves one ordered strip and retains validation snapshots for all stages.
+    pub fn solve_with_debug<Q: SurfaceQuery>(
+        input: &ReferenceSurfaceSolverInput,
+        surface_query: &Q,
+        settings: ReferenceSolverSettings,
+    ) -> ReferenceSurfaceSolverDebug {
+        let count = input.positions_m.len();
+        assert_eq!(input.surface_references.len(), count);
+        assert_eq!(input.is_anchor.len(), count);
+        assert_eq!(input.is_contact.len(), count);
+        assert_eq!(input.supported_strip.len(), count);
+
+        let support_points: Vec<_> = (0..count)
+            .map(|index| SupportPointInput {
+                position_m: input.positions_m[index],
+                is_anchor: input.is_anchor[index],
+                is_contact: input.is_contact[index],
+            })
+            .collect();
+        let support = resolve_support(&support_points);
+
+        let bridge_positions_m = resolve_bridge(&BridgeStripInput {
+            positions_m: input.positions_m.clone(),
+            support: support.clone(),
+        });
+
+        let gravity_positions_m = apply_gravity_response(
+            &GravityStripInput {
+                positions_m: bridge_positions_m.clone(),
+                support: support.clone(),
+                gravity_m_per_s2: input.gravity_m_per_s2,
+                characteristic_length_m: input.characteristic_length_m,
+                support_layout: input.support_layout,
+            },
+            settings,
+        );
+
+        let after_gravity = query_surface_points(
+            &gravity_positions_m,
+            &input.surface_references,
+            surface_query,
+        );
+        let conformity_positions_m = apply_conformity_response(
+            &ConformityStripInput {
+                positions_m: gravity_positions_m.clone(),
+                desired_surface_positions_m: after_gravity
+                    .iter()
+                    .map(|query| query.surface_position_m)
+                    .collect(),
+                separation_m: after_gravity
+                    .iter()
+                    .map(|query| query.separation_m)
+                    .collect(),
+                support: support.clone(),
+                conformity: input.conformity,
+                supported_strip: input.supported_strip.clone(),
+            },
+            settings,
+        );
+
+        let after_conformity = query_surface_points(
+            &conformity_positions_m,
+            &input.surface_references,
+            surface_query,
+        );
+        let collision_positions_m = apply_collision_response(
+            &CollisionResponseInput {
+                positions_m: conformity_positions_m.clone(),
+                separation_m: after_conformity
+                    .iter()
+                    .map(|query| query.separation_m)
+                    .collect(),
+                surface_normals: after_conformity
+                    .iter()
+                    .map(|query| query.surface_normal)
+                    .collect(),
+            },
+            settings,
+        );
+
+        let final_queries = query_surface_points(
+            &collision_positions_m,
+            &input.surface_references,
+            surface_query,
+        );
+        let final_result = SurfaceResponseResult {
+            positions_m: collision_positions_m.clone(),
+            surface_references: input.surface_references.clone(),
+            surface_positions_m: final_queries
+                .iter()
+                .map(|query| query.surface_position_m)
+                .collect(),
+            surface_normals: final_queries
+                .iter()
+                .map(|query| query.surface_normal)
+                .collect(),
+            separation_m: final_queries
+                .iter()
+                .map(|query| query.separation_m)
+                .collect(),
+            support: support.clone(),
+        };
+
+        ReferenceSurfaceSolverDebug {
+            initial_positions_m: input.positions_m.clone(),
+            support,
+            bridge_positions_m,
+            gravity_positions_m,
+            conformity_positions_m,
+            collision_positions_m,
+            final_result,
+        }
+    }
+}
+
+fn query_surface_points<Q: SurfaceQuery>(
+    positions_m: &[DVec3],
+    surface_references: &[SurfaceReference],
+    surface_query: &Q,
+) -> Vec<SurfaceQueryResult> {
+    assert_eq!(positions_m.len(), surface_references.len());
+    positions_m
+        .iter()
+        .zip(surface_references)
+        .map(|(&position_m, &surface_reference)| {
+            surface_query.query(position_m, surface_reference)
+        })
+        .collect()
+}
+
 /// Minimal input state required by Support Resolution / 支持判定.
 ///
 /// Contact is intentionally separate from Anchor. A contact point is not
@@ -385,6 +572,83 @@ mod tests {
 
         assert!(after.separation_m < before.separation_m);
         assert!((after.separation_m - 0.005).abs() <= f64::EPSILON);
+    }
+
+    fn integrated_flat_input(gravity_m_per_s2: DVec3) -> ReferenceSurfaceSolverInput {
+        let positions_m = vec![
+            DVec3::new(-0.1, 0.0, 0.0),
+            DVec3::new(-0.05, 0.0, 0.0),
+            DVec3::new(0.0, 0.0, 0.0),
+            DVec3::new(0.05, 0.0, 0.0),
+            DVec3::new(0.1, 0.0, 0.0),
+        ];
+        ReferenceSurfaceSolverInput {
+            positions_m,
+            surface_references: (0..5)
+                .map(|index| SurfaceReference::new(1, index as f64 / 4.0, 0.5).unwrap())
+                .collect(),
+            is_anchor: vec![true, false, false, false, true],
+            is_contact: vec![true; 5],
+            gravity_m_per_s2,
+            characteristic_length_m: 0.10,
+            support_layout: GravitySupportLayout::BothEdges,
+            conformity: 0.0,
+            supported_strip: vec![true; 5],
+        }
+    }
+
+    #[test]
+    fn int_solver_001_solve_matches_debug_final_result() {
+        let input = integrated_flat_input(DVec3::ZERO);
+        let query = AnalyticFixtureSurfaceQuery {
+            fixture: AnalyticFixture::flat(),
+        };
+        let direct = ReferenceSurfaceSolver::solve(&input, &query, gravity_settings());
+        let debug =
+            ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
+        assert_eq!(direct, debug.final_result);
+    }
+
+    #[test]
+    fn int_solver_002_flat_zero_gravity_preserves_positions() {
+        let input = integrated_flat_input(DVec3::ZERO);
+        let query = AnalyticFixtureSurfaceQuery {
+            fixture: AnalyticFixture::flat(),
+        };
+        let result = ReferenceSurfaceSolver::solve(&input, &query, gravity_settings());
+        assert_eq!(result.positions_m, input.positions_m);
+        assert!(result.separation_m.iter().all(|value| value.abs() <= f64::EPSILON));
+    }
+
+    #[test]
+    fn int_solver_003_requeries_surface_before_collision() {
+        let input = integrated_flat_input(DVec3::NEG_Y);
+        let query = AnalyticFixtureSurfaceQuery {
+            fixture: AnalyticFixture::flat(),
+        };
+        let debug =
+            ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
+
+        assert!(debug.gravity_positions_m[2].y < 0.0);
+        assert_eq!(debug.collision_positions_m[2].y, 0.0);
+        assert!(debug.final_result.separation_m[2].abs() <= f64::EPSILON);
+    }
+
+    #[test]
+    fn int_solver_004_preserves_anchors_through_all_stages() {
+        let input = integrated_flat_input(DVec3::NEG_Y);
+        let query = AnalyticFixtureSurfaceQuery {
+            fixture: AnalyticFixture::flat(),
+        };
+        let debug =
+            ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
+
+        for &index in &[0, 4] {
+            assert_eq!(debug.bridge_positions_m[index], input.positions_m[index]);
+            assert_eq!(debug.gravity_positions_m[index], input.positions_m[index]);
+            assert_eq!(debug.conformity_positions_m[index], input.positions_m[index]);
+            assert_eq!(debug.collision_positions_m[index], input.positions_m[index]);
+        }
     }
 
     fn point(is_anchor: bool, is_contact: bool) -> SupportPointInput {
