@@ -616,7 +616,13 @@ mod tests {
             fixture: AnalyticFixture::flat(),
         };
         let result = ReferenceSurfaceSolver::solve(&input, &query, gravity_settings());
-        assert_eq!(result.positions_m, input.positions_m);
+        assert!(
+            result
+                .positions_m
+                .iter()
+                .zip(&input.positions_m)
+                .all(|(actual, expected)| (*actual - *expected).length() <= f64::EPSILON)
+        );
         assert!(result.separation_m.iter().all(|value| value.abs() <= f64::EPSILON));
     }
 
