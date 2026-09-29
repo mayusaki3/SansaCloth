@@ -170,7 +170,6 @@ pub fn apply_gravity_response(
     result
 }
 
-
 /// Input for ConformityResponse / 表面追従応答 of one ordered cloth strip.
 ///
 /// `desired_surface_positions_m` is supplied by the fixture/surface layer.
@@ -228,8 +227,7 @@ pub fn apply_conformity_response(
                 return position;
             }
 
-            let distance_weight =
-                (1.0 - separation / settings.conformity_reach_m).clamp(0.0, 1.0);
+            let distance_weight = (1.0 - separation / settings.conformity_reach_m).clamp(0.0, 1.0);
             let effective = input.conformity * distance_weight;
             position.lerp(input.desired_surface_positions_m[index], effective)
         })
@@ -506,7 +504,6 @@ mod tests {
         assert!(result.iter().all(|position| position.is_finite()));
     }
 
-
     fn conformity_input(conformity: f64) -> ConformityStripInput {
         ConformityStripInput {
             positions_m: vec![
@@ -627,10 +624,7 @@ mod tests {
             .map(|p| DVec3::new(p.y, -p.x, p.z))
             .collect();
         let rotated_result = apply_conformity_response(&rotated, gravity_settings());
-        let expected: Vec<_> = result
-            .iter()
-            .map(|p| DVec3::new(p.y, -p.x, p.z))
-            .collect();
+        let expected: Vec<_> = result.iter().map(|p| DVec3::new(p.y, -p.x, p.z)).collect();
         assert_eq!(rotated_result, expected);
     }
 
@@ -699,7 +693,6 @@ mod tests {
         let high_result = apply_conformity_response(&high, gravity_settings());
         assert_eq!(low_result[1], high_result[2]);
     }
-
 
     #[test]
     fn support_resolution_preserves_input_positions() {
