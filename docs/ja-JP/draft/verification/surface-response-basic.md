@@ -162,6 +162,17 @@ Aggregate:
 - MaxPositionDeviation
 - RMSPositionDeviation
 
+Reference Basic v1での集計定義:
+- ContactCount: Final SeparationDistance <= CollisionTolerance のCP数
+- SupportCount: Final Support != Unsupported のCP数
+- MeanSeparation: Final SeparationDistanceの算術平均 [m]
+- MaxSeparation: Final SeparationDistanceの最大値 [m]
+- MaxPenetration: max(0, -Final SeparationDistance) の最大値 [m]
+- MaxPositionDeviation: Initial PlacementからFinal Positionまでの距離の最大値 [m]
+- RMSPositionDeviation: Initial PlacementからFinal Positionまでの距離のRMS [m]
+
+ContactCountの上記定義はReference Basic v1の測定規約であり、将来の独立したContact Stateを置き換えるCore定義ではない。
+
 Reference Stage:
 - Initial
 - Support
