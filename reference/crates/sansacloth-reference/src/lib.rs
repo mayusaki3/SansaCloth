@@ -634,8 +634,7 @@ mod tests {
         let query = AnalyticFixtureSurfaceQuery {
             fixture: AnalyticFixture::flat(),
         };
-        let debug =
-            ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
+        let debug = ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
 
         assert!(debug.gravity_positions_m[2].y < 0.0);
         assert_eq!(debug.collision_positions_m[2].y, 0.0);
@@ -648,8 +647,7 @@ mod tests {
         let query = AnalyticFixtureSurfaceQuery {
             fixture: AnalyticFixture::flat(),
         };
-        let debug =
-            ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
+        let debug = ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
 
         for &index in &[0, 4] {
             assert_eq!(debug.bridge_positions_m[index], input.positions_m[index]);
