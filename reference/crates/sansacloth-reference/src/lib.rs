@@ -241,9 +241,7 @@ fn query_surface_points<Q: SurfaceQuery>(
     positions_m
         .iter()
         .zip(surface_references)
-        .map(|(&position_m, &surface_reference)| {
-            surface_query.query(position_m, surface_reference)
-        })
+        .map(|(&position_m, &surface_reference)| surface_query.query(position_m, surface_reference))
         .collect()
 }
 
@@ -604,8 +602,7 @@ mod tests {
             fixture: AnalyticFixture::flat(),
         };
         let direct = ReferenceSurfaceSolver::solve(&input, &query, gravity_settings());
-        let debug =
-            ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
+        let debug = ReferenceSurfaceSolver::solve_with_debug(&input, &query, gravity_settings());
         assert_eq!(direct, debug.final_result);
     }
 
@@ -623,7 +620,12 @@ mod tests {
                 .zip(&input.positions_m)
                 .all(|(actual, expected)| (*actual - *expected).length() <= f64::EPSILON)
         );
-        assert!(result.separation_m.iter().all(|value| value.abs() <= f64::EPSILON));
+        assert!(
+            result
+                .separation_m
+                .iter()
+                .all(|value| value.abs() <= f64::EPSILON)
+        );
     }
 
     #[test]
@@ -652,7 +654,10 @@ mod tests {
         for &index in &[0, 4] {
             assert_eq!(debug.bridge_positions_m[index], input.positions_m[index]);
             assert_eq!(debug.gravity_positions_m[index], input.positions_m[index]);
-            assert_eq!(debug.conformity_positions_m[index], input.positions_m[index]);
+            assert_eq!(
+                debug.conformity_positions_m[index],
+                input.positions_m[index]
+            );
             assert_eq!(debug.collision_positions_m[index], input.positions_m[index]);
         }
     }
