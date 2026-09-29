@@ -5,7 +5,7 @@
 
 use glam::{DQuat, DVec3};
 use sansacloth_core::SurfaceReference;
-use sansacloth_fixture::{AnalyticFixture, AnchorProfile, FlatClothFixture};
+use sansacloth_fixture::AnalyticFixture;
 
 /// Local Body Surface information required by the Reference solver.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -584,6 +584,7 @@ pub fn apply_collision_response(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use sansacloth_fixture::{AnchorProfile, FlatClothFixture};
 
     #[test]
     fn surface_query_001_flat_surface_reports_signed_separation() {
@@ -791,11 +792,9 @@ mod tests {
                     .positions_m
                     .iter()
                     .zip(FlatClothFixture.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES))
-                    .all(
-                        |(actual, expected)| {
-                            (*actual - expected.position_m).length() <= f64::EPSILON
-                        },
-                    )
+                    .all(|(actual, expected)| {
+                        (*actual - expected.position_m).length() <= f64::EPSILON
+                    },)
             );
         }
     }
