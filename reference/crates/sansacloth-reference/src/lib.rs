@@ -5,7 +5,7 @@
 
 use glam::{DQuat, DVec3};
 use sansacloth_core::SurfaceReference;
-use sansacloth_fixture::AnalyticFixture;
+use sansacloth_fixture::{AnalyticFixture, AnchorProfile, FlatClothFixture};
 
 /// Local Body Surface information required by the Reference solver.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -717,8 +717,10 @@ mod tests {
                         .iter()
                         .map(|point| SurfaceReference::new(1, point.u, point.v).unwrap())
                         .collect();
-                    let is_anchor: Vec<_> =
-                        row.iter().map(|point| anchor_profile.contains(point)).collect();
+                    let is_anchor: Vec<_> = row
+                        .iter()
+                        .map(|point| anchor_profile.contains(point))
+                        .collect();
                     let is_contact: Vec<_> = positions_m
                         .iter()
                         .zip(&surface_references)
@@ -789,7 +791,11 @@ mod tests {
                     .positions_m
                     .iter()
                     .zip(FlatClothFixture.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES))
-                    .all(|(actual, expected)| (*actual - expected.position_m).length() <= f64::EPSILON)
+                    .all(
+                        |(actual, expected)| {
+                            (*actual - expected.position_m).length() <= f64::EPSILON
+                        },
+                    )
             );
         }
     }
