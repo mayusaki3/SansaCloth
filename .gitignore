@@ -18,3 +18,6 @@ user/
 .project.json
 .venv/
 venv/
+
+# --- Rust / Cargo ---
+**/target/
