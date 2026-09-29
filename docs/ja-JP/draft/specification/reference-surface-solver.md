@@ -57,6 +57,46 @@ v1 は 1-pass とする。反復Solver化は SR-001～005 の測定結果から�
 
 初期v1では未実装の出力があってよいが、未実装値を実値として偽装しない。
 
+## 3.1 Integrated API Boundary / 統合API境界
+
+通常利用者は個別Stageを直接連結せず、`ReferenceSurfaceSolver.solve(input)` を使用する。
+
+`solve_with_debug(input)` は検証専用とし、次のStage snapshotを返す。
+
+- Initial
+- Support
+- Bridge
+- GravityResponse
+- ConformityResponse
+- CollisionResponse
+- Final
+
+`SurfaceResponseResult` は最終的な共通結果を表し、BakeやValidationは個別Stage実装ではなくこの結果/将来の共通IRへ依存する。
+
+### Surface Query / 表面問い合わせ
+
+Conformity と Collision に必要な `SeparationDistance`、`Desired Surface Position`、`Surface Normal` は、各Stageで位置が変化した後にBody Surfaceに対して再評価しなければならない。
+
+したがって統合Solverは、初期入力で固定されたSeparation配列を全Stageで使い回してはならない。
+
+概念境界:
+
+```text
+Bridge positions
+    -> SurfaceQuery
+    -> GravityResponse
+    -> SurfaceQuery
+    -> ConformityResponse
+    -> SurfaceQuery
+    -> CollisionResponse
+    -> SurfaceQuery
+    -> SurfaceResponseResult
+```
+
+SurfaceQueryの具体的なtrait/API、analytic fixture adapter、mesh/runtime実装は次の実装ステップで確定する。
+
+この境界が確定するまで、個別Stage関数を機械的に連結した `solve()` を「統合Solver完成」と扱わない。
+
 ## 4. Support Resolution / 支持判定
 
 - Anchor は強い Support とする。
@@ -153,6 +193,7 @@ Reference v1 固有の近似設定:
 | QuasiStaticGravityScale | 準静的重力スケール | dimensionless | TBD |
 | ConformityReach | 表面追従範囲 | m | TBD |
 | ConformityFilterRadius | 表面追従フィルター半径 | m | TBD |
+| CollisionTolerance | 衝突許容誤差 | m | Reference v1 implemented; value TBD |
 
 これらは現時点で SansaCloth Core Property ではない。実測前に根拠なく数値を固定しない。
 
@@ -179,6 +220,7 @@ Core/Solverに Heel、Breast 等の解剖学固有分岐を導入しない。
 - ConformityReach
 - ConformityFilterRadius
 - CollisionTolerance等の数値
+- SurfaceQuery trait/APIとBody Surface adapter
 - Gravityの物理的MagnitudeをSurfaceDensity等へ接続するモデル
 - Stretchability/Tightness/BendingResponseをConformityへ統合する方法
 - 反復Solverの必要性と収束条件
