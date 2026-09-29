@@ -97,6 +97,7 @@ pub fn resolve_bridge(input: &BridgeStripInput) -> Vec<DVec3> {
 pub struct ReferenceSolverSettings {
     pub quasi_static_gravity_scale: f64,
     pub conformity_reach_m: f64,
+    pub collision_tolerance_m: f64,
 }
 
 /// Support layout used by the fixture-specific Reference-v1 gravity weighting.
@@ -230,6 +231,58 @@ pub fn apply_conformity_response(
             let distance_weight = (1.0 - separation / settings.conformity_reach_m).clamp(0.0, 1.0);
             let effective = input.conformity * distance_weight;
             position.lerp(input.desired_surface_positions_m[index], effective)
+        })
+        .collect()
+}
+
+
+/// Input for CollisionResponse / 衝突応答.
+///
+/// `separation_m` is signed: negative values are penetration and positive
+/// values are outside the body surface. `surface_normals` point outward.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CollisionResponseInput {
+    pub positions_m: Vec<DVec3>,
+    pub separation_m: Vec<f64>,
+    pub surface_normals: Vec<DVec3>,
+}
+
+/// Applies the Reference-v1 collision constraint.
+///
+/// A point whose signed separation is below `collision_tolerance_m` is moved
+/// outward along the supplied surface normal by exactly the amount required to
+/// reach the tolerance. Other points are unchanged. This stage does not model
+/// cloth thickness, friction, gravity, conformity, slip, or softness.
+///
+/// # Panics
+/// Panics for mismatched array lengths, invalid tolerance/separation values, or
+/// a non-normalizable surface normal on a point that requires correction.
+pub fn apply_collision_response(
+    input: &CollisionResponseInput,
+    settings: ReferenceSolverSettings,
+) -> Vec<DVec3> {
+    let count = input.positions_m.len();
+    assert_eq!(input.separation_m.len(), count);
+    assert_eq!(input.surface_normals.len(), count);
+    assert!(settings.collision_tolerance_m.is_finite() && settings.collision_tolerance_m >= 0.0);
+
+    input
+        .positions_m
+        .iter()
+        .enumerate()
+        .map(|(index, &position)| {
+            let separation = input.separation_m[index];
+            assert!(separation.is_finite());
+
+            if separation >= settings.collision_tolerance_m {
+                return position;
+            }
+
+            let normal = input.surface_normals[index]
+                .try_normalize()
+                .expect("collision correction requires a finite non-zero surface normal");
+            let correction_m = settings.collision_tolerance_m - separation;
+            position + normal * correction_m
         })
         .collect()
 }
@@ -375,6 +428,7 @@ mod tests {
         ReferenceSolverSettings {
             quasi_static_gravity_scale: 0.1,
             conformity_reach_m: 0.02,
+            collision_tolerance_m: 0.0,
         }
     }
 
@@ -693,6 +747,45 @@ mod tests {
         let high_result = apply_conformity_response(&high, gravity_settings());
         assert_eq!(low_result[1], high_result[2]);
     }
+
+
+    fn collision_input(separation_m: f64) -> CollisionResponseInput {
+        CollisionResponseInput {
+            positions_m: vec![DVec3::new(0.0, separation_m, 0.0)],
+            separation_m: vec![separation_m],
+            surface_normals: vec![DVec3::Y],
+        }
+    }
+
+    #[test]
+    fn ref_col_001_non_penetrating_point_is_not_unnecessarily_moved() {
+        let input = collision_input(0.01);
+        assert_eq!(
+            apply_collision_response(&input, gravity_settings()),
+            input.positions_m
+        );
+    }
+
+    #[test]
+    fn ref_col_002_penetrating_point_is_corrected_outward() {
+        let input = collision_input(-0.01);
+        let result = apply_collision_response(&input, gravity_settings());
+        assert_eq!(result[0], DVec3::ZERO);
+        assert!(result[0].y > input.positions_m[0].y);
+    }
+
+    #[test]
+    fn ref_col_003_final_penetration_is_within_configured_tolerance() {
+        let mut settings = gravity_settings();
+        settings.collision_tolerance_m = 0.002;
+        let input = collision_input(-0.01);
+        let result = apply_collision_response(&input, settings);
+        let correction = result[0] - input.positions_m[0];
+        let final_separation = input.separation_m[0] + correction.dot(DVec3::Y);
+        assert!(final_separation >= settings.collision_tolerance_m);
+        assert!((final_separation - settings.collision_tolerance_m).abs() <= f64::EPSILON);
+    }
+
 
     #[test]
     fn support_resolution_preserves_input_positions() {
