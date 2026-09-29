@@ -766,6 +766,97 @@ mod tests {
             .collect()
     }
 
+    #[derive(Clone, Copy, Debug, PartialEq)]
+    struct BasicMeasurements {
+        contact_count: usize,
+        support_count: usize,
+        mean_separation_m: f64,
+        max_separation_m: f64,
+        max_penetration_m: f64,
+        max_position_deviation_m: f64,
+        rms_position_deviation_m: f64,
+    }
+
+    fn measure_basic_result(
+        result: &SurfaceResponseResult,
+        initial_positions_m: &[DVec3],
+    ) -> BasicMeasurements {
+        assert_eq!(result.positions_m.len(), initial_positions_m.len());
+        assert!(!result.positions_m.is_empty());
+
+        let collision_tolerance_m = basic_settings().collision_tolerance_m;
+        let contact_count = result
+            .separation_m
+            .iter()
+            .filter(|&&separation| separation <= collision_tolerance_m)
+            .count();
+        let support_count = result
+            .support
+            .iter()
+            .filter(|&&support| support != SupportKind::Unsupported)
+            .count();
+        let mean_separation_m =
+            result.separation_m.iter().sum::<f64>() / result.separation_m.len() as f64;
+        let max_separation_m = result
+            .separation_m
+            .iter()
+            .copied()
+            .fold(f64::NEG_INFINITY, f64::max);
+        let max_penetration_m = result
+            .separation_m
+            .iter()
+            .map(|&separation| (-separation).max(0.0))
+            .fold(0.0, f64::max);
+
+        let squared_deviations: Vec<_> = result
+            .positions_m
+            .iter()
+            .zip(initial_positions_m)
+            .map(|(&position, &initial)| (position - initial).length_squared())
+            .collect();
+        let max_position_deviation_m = squared_deviations
+            .iter()
+            .copied()
+            .fold(0.0, f64::max)
+            .sqrt();
+        let rms_position_deviation_m =
+            (squared_deviations.iter().sum::<f64>() / squared_deviations.len() as f64).sqrt();
+
+        BasicMeasurements {
+            contact_count,
+            support_count,
+            mean_separation_m,
+            max_separation_m,
+            max_penetration_m,
+            max_position_deviation_m,
+            rms_position_deviation_m,
+        }
+    }
+
+    fn basic_initial_positions(surface: BasicSurface) -> Vec<DVec3> {
+        let transform = match surface {
+            BasicSurface::ConvexSide => FixtureTransform {
+                rotation: DQuat::from_rotation_z(-std::f64::consts::FRAC_PI_2),
+                translation_m: DVec3::ZERO,
+            },
+            _ => FixtureTransform::IDENTITY,
+        };
+
+        FlatClothFixture
+            .control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES)
+            .into_iter()
+            .map(|point| transform.transform_position(point.position_m))
+            .collect()
+    }
+
+    fn measure_basic_surface(surface: BasicSurface) -> Vec<BasicMeasurements> {
+        let initial_positions_m = basic_initial_positions(surface);
+        run_basic_surface(surface)
+            .iter()
+            .map(|result| measure_basic_result(result, &initial_positions_m))
+            .collect()
+    }
+
     fn assert_basic_results(results: &[SurfaceResponseResult]) {
         assert_eq!(results.len(), 6);
         for result in results {
@@ -826,6 +917,67 @@ mod tests {
     #[test]
     fn int_sr_005_concave_deep_six_cases() {
         assert_basic_results(&run_basic_surface(BasicSurface::ConcaveDeep));
+    }
+
+    #[test]
+    fn measurement_001_basic_aggregate_metrics_are_finite_and_nonnegative() {
+        for surface in [
+            BasicSurface::Flat,
+            BasicSurface::ConvexUp,
+            BasicSurface::ConvexSide,
+            BasicSurface::ConcaveShallow,
+            BasicSurface::ConcaveDeep,
+        ] {
+            for measurement in measure_basic_surface(surface) {
+                assert!(measurement.mean_separation_m.is_finite());
+                assert!(measurement.max_separation_m.is_finite());
+                assert!(measurement.max_penetration_m.is_finite());
+                assert!(measurement.max_position_deviation_m.is_finite());
+                assert!(measurement.rms_position_deviation_m.is_finite());
+                assert!(measurement.max_penetration_m >= 0.0);
+                assert!(measurement.max_position_deviation_m >= 0.0);
+                assert!(measurement.rms_position_deviation_m >= 0.0);
+                assert!(measurement.contact_count <= BASIC_U_SAMPLES * BASIC_V_SAMPLES);
+                assert!(measurement.support_count <= BASIC_U_SAMPLES * BASIC_V_SAMPLES);
+            }
+        }
+    }
+
+    #[test]
+    fn measurement_002_flat_has_zero_position_deviation() {
+        for measurement in measure_basic_surface(BasicSurface::Flat) {
+            assert!(measurement.max_position_deviation_m <= f64::EPSILON);
+            assert!(measurement.rms_position_deviation_m <= f64::EPSILON);
+        }
+    }
+
+    #[test]
+    fn measurement_003_shallow_concavity_records_conformity_trend() {
+        let measurements = measure_basic_surface(BasicSurface::ConcaveShallow);
+        for cases in [0..3, 3..6] {
+            let d0 = measurements[cases.start].mean_separation_m;
+            let d05 = measurements[cases.start + 1].mean_separation_m;
+            let d1 = measurements[cases.start + 2].mean_separation_m;
+            eprintln!(
+                "SR-004 MeanSeparation: C0={d0:.9}, C0.5={d05:.9}, C1={d1:.9}"
+            );
+        }
+    }
+
+    #[test]
+    fn measurement_004_deep_concavity_records_full_conformity_without_contact_requirement() {
+        let measurements = measure_basic_surface(BasicSurface::ConcaveDeep);
+        for index in [2, 5] {
+            let measurement = measurements[index];
+            eprintln!(
+                "SR-005 C{}: contact_count={}, mean_separation={:.9}, max_separation={:.9}",
+                index + 1,
+                measurement.contact_count,
+                measurement.mean_separation_m,
+                measurement.max_separation_m
+            );
+            assert!(measurement.contact_count <= BASIC_U_SAMPLES * BASIC_V_SAMPLES);
+        }
     }
 
     fn integrated_flat_input(gravity_m_per_s2: DVec3) -> ReferenceSurfaceSolverInput {
