@@ -18,6 +18,14 @@ Basic Suiteは正しさを優先し、性能値や未確定な物理品質へ根
 - Gravity: Off / On
 - Gravity On baseline environment: (0, -9.80665, 0) m/s²
 - Gravity Off: zero vector
+- Basic Validation暫定Execution Profile:
+  - QuasiStaticGravityScale / 準静的重力スケール = 0.1
+  - ConformityReach / 表面追従範囲 = 0.02 m
+  - CollisionTolerance / 衝突許容誤差 = 0 m
+
+上記3値は30 Basic Runsを再現可能にするためのReference Validation専用暫定値であり、Core Property、製品既定値、最終推奨値ではない。Basic測定結果に基づき変更してよい。
+
+CF-FLAT-001の21 x 7 CPは、Reference v1のordered-strip Solverへ147点を1本として入力しない。V一定の21点stripを7本生成して個別に解き、Validation Resultで147 CPへ再結合する。これはReference v1のFixture Runner責務とする。
 
 Gravity magnitudeをReference v1の変位へ直接変換しない。準静的近似はReferenceSolverSettingsで扱う。
 
