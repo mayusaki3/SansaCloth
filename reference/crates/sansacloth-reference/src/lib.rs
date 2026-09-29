@@ -4,6 +4,61 @@
 //! not an engine backend and does not define product performance targets.
 
 use glam::DVec3;
+use sansacloth_core::SurfaceReference;
+use sansacloth_fixture::AnalyticFixture;
+
+/// Local Body Surface information required by the Reference solver.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SurfaceQueryResult {
+    pub surface_position_m: DVec3,
+    pub surface_normal: DVec3,
+    pub separation_m: f64,
+}
+
+/// Boundary used by the integrated solver to re-evaluate Body Surface data.
+///
+/// The query receives the current cloth position because separation must be
+/// recomputed after stages that move the cloth. SurfaceReference preserves the
+/// logical Body Surface location independently from runtime triangle identity.
+pub trait SurfaceQuery {
+    fn query(
+        &self,
+        current_position_m: DVec3,
+        surface_reference: SurfaceReference,
+    ) -> SurfaceQueryResult;
+}
+
+/// SR-001..005 adapter from analytic validation fixtures to SurfaceQuery.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct AnalyticFixtureSurfaceQuery {
+    pub fixture: AnalyticFixture,
+}
+
+impl SurfaceQuery for AnalyticFixtureSurfaceQuery {
+    fn query(
+        &self,
+        current_position_m: DVec3,
+        surface_reference: SurfaceReference,
+    ) -> SurfaceQueryResult {
+        assert!(current_position_m.is_finite());
+
+        let surface_position_m = self
+            .fixture
+            .position(surface_reference.u, surface_reference.v);
+        let surface_normal = self.fixture.normal(surface_reference.u);
+        let separation_m = (current_position_m - surface_position_m).dot(surface_normal);
+
+        assert!(surface_position_m.is_finite());
+        assert!(surface_normal.is_finite());
+        assert!(separation_m.is_finite());
+
+        SurfaceQueryResult {
+            surface_position_m,
+            surface_normal,
+            separation_m,
+        }
+    }
+}
 
 /// Minimal input state required by Support Resolution / 支持判定.
 ///
@@ -289,6 +344,48 @@ pub fn apply_collision_response(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn surface_query_001_flat_surface_reports_signed_separation() {
+        let query = AnalyticFixtureSurfaceQuery {
+            fixture: AnalyticFixture::flat(),
+        };
+        let reference = SurfaceReference::new(1, 0.5, 0.5).unwrap();
+
+        let above = query.query(DVec3::new(0.0, 0.01, 0.0), reference);
+        let below = query.query(DVec3::new(0.0, -0.01, 0.0), reference);
+
+        assert_eq!(above.surface_position_m, DVec3::ZERO);
+        assert_eq!(above.surface_normal, DVec3::Y);
+        assert!((above.separation_m - 0.01).abs() <= f64::EPSILON);
+        assert!((below.separation_m + 0.01).abs() <= f64::EPSILON);
+    }
+
+    #[test]
+    fn surface_query_002_uses_surface_reference_for_analytic_fixture() {
+        let fixture = AnalyticFixture::convex();
+        let query = AnalyticFixtureSurfaceQuery { fixture };
+        let reference = SurfaceReference::new(1, 0.5, 0.5).unwrap();
+        let result = query.query(DVec3::new(0.0, 0.04, 0.0), reference);
+
+        assert_eq!(result.surface_position_m, fixture.position(0.5, 0.5));
+        assert_eq!(result.surface_normal, fixture.normal(0.5));
+        assert!((result.separation_m - 0.01).abs() <= f64::EPSILON);
+    }
+
+    #[test]
+    fn surface_query_003_recomputes_separation_after_position_change() {
+        let query = AnalyticFixtureSurfaceQuery {
+            fixture: AnalyticFixture::flat(),
+        };
+        let reference = SurfaceReference::new(1, 0.5, 0.5).unwrap();
+
+        let before = query.query(DVec3::new(0.0, 0.02, 0.0), reference);
+        let after = query.query(DVec3::new(0.0, 0.005, 0.0), reference);
+
+        assert!(after.separation_m < before.separation_m);
+        assert!((after.separation_m - 0.005).abs() <= f64::EPSILON);
+    }
 
     fn point(is_anchor: bool, is_contact: bool) -> SupportPointInput {
         SupportPointInput {
