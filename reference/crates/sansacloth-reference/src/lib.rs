@@ -709,7 +709,11 @@ mod tests {
                 let mut combined_separation = Vec::with_capacity(control_points.len());
                 let mut combined_support = Vec::with_capacity(control_points.len());
 
-                for row in control_points.chunks_exact(BASIC_U_SAMPLES) {
+                for row_index in 0..BASIC_V_SAMPLES {
+                    let row_start = row_index * BASIC_U_SAMPLES;
+                    let row_end = row_start + BASIC_U_SAMPLES;
+                    let row = &control_points[row_start..row_end];
+
                     let positions_m: Vec<_> = row
                         .iter()
                         .map(|point| transform.transform_position(point.position_m))
@@ -958,9 +962,7 @@ mod tests {
             let d0 = measurements[cases.start].mean_separation_m;
             let d05 = measurements[cases.start + 1].mean_separation_m;
             let d1 = measurements[cases.start + 2].mean_separation_m;
-            eprintln!(
-                "SR-004 MeanSeparation: C0={d0:.9}, C0.5={d05:.9}, C1={d1:.9}"
-            );
+            eprintln!("SR-004 MeanSeparation: C0={d0:.9}, C0.5={d05:.9}, C1={d1:.9}");
         }
     }
 
