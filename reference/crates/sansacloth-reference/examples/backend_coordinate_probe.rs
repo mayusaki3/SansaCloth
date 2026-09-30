@@ -9,6 +9,14 @@ fn print_scalar(key: &str, value: f64) {
     println!("SANSA_REF|{key}|{value:.17}");
 }
 
+fn print_u64(key: &str, value: u64) {
+    println!("SANSA_REF|{key}|{value}");
+}
+
+fn print_uv(key: &str, u: f64, v: f64) {
+    println!("SANSA_REF|{key}|{u:.17},{v:.17}");
+}
+
 fn print_vector(key: &str, value: DVec3) {
     println!(
         "SANSA_REF|{key}|{:.17},{:.17},{:.17}",
@@ -63,9 +71,12 @@ fn main() {
         identity_surface.surface_position_m + identity_surface.surface_normal * 0.01;
     let identity_result = identity_query.query(identity_current, surface_reference);
 
-    print_scalar("BF-003.DOMAIN_ID", surface_reference.domain_id as f64);
-    print_scalar("BF-003.SURFACE_REFERENCE_U", surface_reference.u);
-    print_scalar("BF-003.SURFACE_REFERENCE_V", surface_reference.v);
+    print_u64("BF-003.DOMAIN_ID", surface_reference.domain_id);
+    print_uv(
+        "BF-003.SURFACE_REFERENCE_UV",
+        surface_reference.u,
+        surface_reference.v,
+    );
     print_vector(
         "BF-004.IDENTITY_SURFACE_POSITION",
         identity_result.surface_position_m,
@@ -92,16 +103,13 @@ fn main() {
     let transformed_result =
         transformed_query.query(transformed_current, surface_reference);
 
-    print_scalar(
+    print_u64(
         "BF-003.TRANSFORMED_DOMAIN_ID",
-        surface_reference.domain_id as f64,
+        surface_reference.domain_id,
     );
-    print_scalar(
-        "BF-003.TRANSFORMED_SURFACE_REFERENCE_U",
+    print_uv(
+        "BF-003.TRANSFORMED_SURFACE_REFERENCE_UV",
         surface_reference.u,
-    );
-    print_scalar(
-        "BF-003.TRANSFORMED_SURFACE_REFERENCE_V",
         surface_reference.v,
     );
     print_vector(
