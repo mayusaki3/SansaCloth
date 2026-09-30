@@ -396,7 +396,7 @@ Stage MeasurementはReferenceの `solve_with_debug` が既に保持しているP
 実装対象:
 - Final CP: Position / Normal / SurfaceReference / derived Contact / SeparationDistance / Support
 - Aggregate: ContactCount / SupportCount / MeanSeparation / MaxSeparation / MaxPenetration / MaxPositionDeviation / RMSPositionDeviation
-- Debug Stage: Initial->Bridge / Bridge->Gravity / Gravity->Conformity / Conformity->Collision のPosition Displacement
+- Debug Stage: Initial->Bridge / Bridge->Gravity / Gravity->Conformity / Conformity->Collision / Collision->Final のPosition Displacement
 
 Basic v1非対象:
 - 完全なSurfaceOffset
@@ -404,6 +404,17 @@ Basic v1非対象:
 - Stage time / TotalSolverTime / PeakMemoryの自動収集
 
 Performance Measurementは実行環境依存性が高いため、機能Measurementと同じ構造体には含めない。
+
+Measurement実装確認:
+- MEAS-001 Aggregate値がfiniteで、非負であるべき値が非負
+- MEAS-002 FlatのPositionDeviationが0
+- MEAS-003 SR-004 Conformity Trendを記録
+- MEAS-004 SR-005 Full Conformity時の非完全Contactを記録
+- MEAS-005 Final CP MeasurementがSurfaceResponseResultと1:1で一致
+- MEAS-006 Stage Displacementがfinite、Collision->Final Position Displacementが0
+- MEAS-007 Gravity=0でBridge->Gravity Displacement=0、Conformity=0でGravity->Conformity Displacement=0
+
+MEAS-006のCollision->Final=0は、Final StageがCollision後のSurfaceQuery再評価でありPositionを変更しない現行pipelineを確認する。
 
 ## 18. 未確定事項
 
