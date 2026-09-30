@@ -362,7 +362,92 @@ Unity Probeはvalidation専用であり、Production SurfaceQuery Backendでは�
 
 BF-003/004のProduction拡張課題を解決するためだけにCheckpointを停止しない。Skinned/deformed mesh、stable mapping lifecycleは後続Backend実装課題として保持する。
 
-## 12. 未確定事項
+## 12. Unity PC BF-005 / BF-006 SR-001 End-to-End Probe
+
+### 12.1 Case
+
+Probe Case ID: `UNITY-SR-001-C0-G0`
+
+Reference Basic SR-001 Flatの6 casesのうち、最小境界確認として以下を使用する。
+
+- Body Surface: SF-FLAT-001
+- Cloth: CF-FLAT-001
+- Control Points: 21 x 7 = 147
+- Placement: PL-CONTACT-001
+- Anchor: AF-BOTH-EDGES-001
+- Gravity: Off = (0,0,0)
+- Conformity: 0
+- CollisionTolerance: 0m
+- DomainId: 1
+- Expected deformation: none
+
+このCaseではSurfaceResponse algorithmの一致ではなく、入力意味論と最終出力意味論のend-to-end mappingを確認する。
+
+### 12.2 BF-005 Input Semantics
+
+Probe:
+- ISF-001: 147 CPを構成できる。
+- ISF-002: U=0およびU=1の14 CPだけがAnchor。
+- ISF-003: Flat contact状態の全147 CPをContactとして表現できる。
+- ISF-004: Contact=trueでもAnchor=falseの133 CPをpin/supportへ昇格しない。
+- ISF-005: Gravity=(0,0,0)をWorld Space入力として保持する。
+- ISF-006: Conformity=0を入力として保持する。
+- ISF-007: SurfaceReference DomainId=1とnormalized U/Vを各CPへ保持する。
+
+Expected:
+- AnchorCount = 14
+- ContactInputCount = 147
+- DirectSupportCount = 14
+- ContactOnlyUnsupportedCount = 133
+
+BF-005 status: **OPEN / probe defined**。
+
+### 12.3 BF-006 Output Semantics
+
+各CPについて検証用共通結果を次の意味で出力する。
+
+- StableControlPointId
+- Final Position [m]
+- SurfaceReference
+- Surface Normal
+- SeparationDistance [m]
+- Support
+
+Contact出力はBasic v1 measurement conventionに従い、`SeparationDistance <= CollisionTolerance` からValidation側で導出できるため、Backend固有Contact stateを必須出力にしない。
+
+Probe:
+- OSF-001: Final Positionを147 CP取得。
+- OSF-002: SurfaceReferenceを147 CP保持。
+- OSF-003: Surface Normalを147 CP取得。
+- OSF-004: SeparationDistanceを147 CP取得。
+- OSF-005: Supportを147 CP取得。
+- OSF-006: Final PositionはInitial Positionと一致。
+- OSF-007: Normal=(0,+1,0)。
+- OSF-008: SeparationDistance=0m。
+- OSF-009: SupportCount=14。
+- OSF-010: derived ContactCount=147。
+
+BF-006 status: **OPEN / probe defined**。
+
+### 12.4 Probe Result Format
+
+Console出力は個別147 CPを常時展開せず、まずaggregateを出力する。
+
+```text
+SANSA_BF|SR-001.CP_COUNT|147
+SANSA_BF|SR-001.ANCHOR_COUNT|14
+SANSA_BF|SR-001.CONTACT_INPUT_COUNT|147
+SANSA_BF|SR-001.DIRECT_SUPPORT_COUNT|14
+SANSA_BF|SR-001.CONTACT_ONLY_UNSUPPORTED_COUNT|133
+SANSA_BF|SR-001.FINAL_POSITION_DEVIATION_MAX_M|0
+SANSA_BF|SR-001.NORMAL_DEVIATION_MAX|0
+SANSA_BF|SR-001.SEPARATION_ABS_MAX_M|0
+SANSA_BF|SR-001.DERIVED_CONTACT_COUNT|147
+```
+
+加えて代表CPとしてcorner / center / opposite cornerの3点を出力し、SurfaceReferenceとPositionを確認する。
+
+## 13. 未確定事項
 
 - Unity側の具体的なmesh/deformation API
 - Unityでのstable SurfaceReference保持方式
