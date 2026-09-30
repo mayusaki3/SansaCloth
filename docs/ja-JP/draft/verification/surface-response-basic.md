@@ -354,7 +354,7 @@ Conformity=1.0でも全CP Contactにはならず、深い凹面底への完全Co
 
 30 Basic Runs、Aggregate Measurement tests、既存Core/Fixture/Reference testsは機能テストとしてPASSした。品質ゲートで検出されたrustfmt差分および現行Clippyの `chunks_exact_to_as_chunks` 指摘は実装修正対象とし、測定結果そのものとは分離して扱う。
 
-## 14. Collision専用Suiteとの分離
+## 15. Collision専用Suiteとの分離
 
 PL-PENETRATING-001は30 Basic Runsへ混ぜず、別の `SurfaceResponse.Collision` Suiteで使用する。
 
