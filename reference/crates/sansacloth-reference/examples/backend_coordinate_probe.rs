@@ -1,4 +1,9 @@
 use glam::{DQuat, DVec3};
+use sansacloth_core::SurfaceReference;
+use sansacloth_fixture::AnalyticFixture;
+use sansacloth_reference::{
+    FixtureTransform, SurfaceQuery, TransformedAnalyticFixtureSurfaceQuery,
+};
 
 fn print_scalar(key: &str, value: f64) {
     println!("SANSA_REF|{key}|{value:.17}");
@@ -46,5 +51,69 @@ fn main() {
     print_vector(
         "CBF-008.BODY_ROTATED_GRAVITY_REFERENCE",
         body_rotation * reference_gravity,
+    );
+
+    let surface_reference = SurfaceReference::new(1, 0.25, 0.75).unwrap();
+    let identity_query = TransformedAnalyticFixtureSurfaceQuery {
+        fixture: AnalyticFixture::flat(),
+        transform: FixtureTransform::IDENTITY,
+    };
+    let identity_surface = identity_query.query(DVec3::ZERO, surface_reference);
+    let identity_current =
+        identity_surface.surface_position_m + identity_surface.surface_normal * 0.01;
+    let identity_result = identity_query.query(identity_current, surface_reference);
+
+    print_scalar("BF-003.DOMAIN_ID", surface_reference.domain_id as f64);
+    print_scalar("BF-003.SURFACE_REFERENCE_U", surface_reference.u);
+    print_scalar("BF-003.SURFACE_REFERENCE_V", surface_reference.v);
+    print_vector(
+        "BF-004.IDENTITY_SURFACE_POSITION",
+        identity_result.surface_position_m,
+    );
+    print_vector(
+        "BF-004.IDENTITY_SURFACE_NORMAL",
+        identity_result.surface_normal,
+    );
+    print_scalar(
+        "BF-004.IDENTITY_SEPARATION_M",
+        identity_result.separation_m,
+    );
+
+    let transformed_query = TransformedAnalyticFixtureSurfaceQuery {
+        fixture: AnalyticFixture::flat(),
+        transform: FixtureTransform {
+            rotation: DQuat::from_rotation_z(-std::f64::consts::FRAC_PI_2),
+            translation_m: DVec3::new(0.30, 0.20, -0.10),
+        },
+    };
+    let transformed_surface = transformed_query.query(DVec3::ZERO, surface_reference);
+    let transformed_current =
+        transformed_surface.surface_position_m + transformed_surface.surface_normal * 0.01;
+    let transformed_result =
+        transformed_query.query(transformed_current, surface_reference);
+
+    print_scalar(
+        "BF-003.TRANSFORMED_DOMAIN_ID",
+        surface_reference.domain_id as f64,
+    );
+    print_scalar(
+        "BF-003.TRANSFORMED_SURFACE_REFERENCE_U",
+        surface_reference.u,
+    );
+    print_scalar(
+        "BF-003.TRANSFORMED_SURFACE_REFERENCE_V",
+        surface_reference.v,
+    );
+    print_vector(
+        "BF-004.TRANSFORMED_SURFACE_POSITION",
+        transformed_result.surface_position_m,
+    );
+    print_vector(
+        "BF-004.TRANSFORMED_SURFACE_NORMAL",
+        transformed_result.surface_normal,
+    );
+    print_scalar(
+        "BF-004.TRANSFORMED_SEPARATION_M",
+        transformed_result.separation_m,
     );
 }
