@@ -330,6 +330,30 @@ Reference Geometry Bake開始時に以下を必須化する。
 
 Bake実装はReference Solverの内部Stageへ直接依存せず、共通SurfaceResponseResult/IRを入力とする。
 
+## 14. Basic Measurement実測記録
+
+2026-09-30のReference Basic 21 x 7 CP / 暫定Execution Profileで、30 Basic RunsおよびAggregate Measurementを実行した。
+
+SR-004 Concave-ShallowのMeanSeparation実測:
+
+| Gravity | Conformity 0.0 | Conformity 0.5 | Conformity 1.0 |
+|---|---:|---:|---:|
+| Off | 0.004374254 m | 0.003741016 m | 0.003107777 m |
+| On | 0.001493235 m | 0.001027579 m | 0.000561923 m |
+
+両Gravity条件で、観測対象としていた `D(1.0) <= D(0.5) <= D(0.0)` が成立した。ただし、現段階ではMeasurementでありHard Assertionへ昇格しない。
+
+SR-005 Concave-DeepのConformity=1.0実測:
+
+| Case | Gravity | ContactCount | MeanSeparation | MaxSeparation |
+|---|---|---:|---:|---:|
+| C03 | Off | 84 / 147 | 0.007621851 m | 0.050000000 m |
+| C06 | On | 98 / 147 | 0.005263063 m | 0.040000000 m |
+
+Conformity=1.0でも全CP Contactにはならず、深い凹面底への完全Contactを要求しない現行意味論と整合した。この結果だけを根拠にNoConformityAdhesionの一般Hard Assertion式は確定しない。
+
+30 Basic Runs、Aggregate Measurement tests、既存Core/Fixture/Reference testsは機能テストとしてPASSした。品質ゲートで検出されたrustfmt差分および現行Clippyの `chunks_exact_to_as_chunks` 指摘は実装修正対象とし、測定結果そのものとは分離して扱う。
+
 ## 14. Collision専用Suiteとの分離
 
 PL-PENETRATING-001は30 Basic Runsへ混ぜず、別の `SurfaceResponse.Collision` Suiteで使用する。
@@ -343,11 +367,11 @@ SurfaceResponse.Resolution
 SurfaceResponse.Performance
 ```
 
-## 15. Coverage
+## 16. Coverage
 
 Core / Reference / Bakeの対象コードはUnit Test Coverage 100%を完了条件とする。到達不能分岐等を除外する場合は理由を文書化する。利用可能ならBranch Coverageも確認する。
 
-## 16. 未確定事項
+## 17. 未確定事項
 
 - AnchorTolerance
 - CollisionTolerance
