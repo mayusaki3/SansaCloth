@@ -400,7 +400,18 @@ Expected:
 - DirectSupportCount = 14
 - ContactOnlyUnsupportedCount = 133
 
-BF-005 status: **OPEN / probe defined**。
+BF-005 status: **PASS (runtime confirmed, 2026-10-01)**。
+
+Unity実測:
+- CPCount = 147
+- AnchorCount = 14
+- ContactInputCount = 147
+- DirectSupportCount = 14
+- ContactOnlyUnsupportedCount = 133
+- World Gravity input = (0,0,0)
+- Conformity input = 0
+
+Contact=trueの133 non-anchor CPがUnsupportedのままであり、ContactをAnchor/Supportへ暗黙昇格しない意味論を確認した。
 
 ### 12.3 BF-006 Output Semantics
 
@@ -427,7 +438,19 @@ Probe:
 - OSF-009: SupportCount=14。
 - OSF-010: derived ContactCount=147。
 
-BF-006 status: **OPEN / probe defined**。
+BF-006 status: **PASS (runtime confirmed, 2026-10-01)**。
+
+Unity実測:
+- Final Position deviation max = 0m
+- Normal deviation max = 0
+- Separation absolute max = 0m
+- SupportCount = 14
+- derived ContactCount = 147
+- representative CP id = 0 / 73 / 146
+- representative SurfaceReference = DomainId 1 + normalized UV
+- center CP id=73 is Contact相当かつUnsupported
+
+SR-001 C=0/G=0の境界でFinal Position / SurfaceReference / Surface Normal / Separation / Supportを共通意味へ戻せることを確認した。
 
 ### 12.4 Probe Result Format
 
@@ -447,7 +470,55 @@ SANSA_BF|SR-001.DERIVED_CONTACT_COUNT|147
 
 加えて代表CPとしてcorner / center / opposite cornerの3点を出力し、SurfaceReferenceとPositionを確認する。
 
-## 13. 未確定事項
+## 13. Unity PC BF-007 Basic Fixture Mapping Probe
+
+### 13.1 Fixture Definition
+
+Unity側でReference fixtureと同じanalytic definitionを構成する。
+
+Common:
+- width = 0.20m
+- depth = 0.10m
+- feature width = 0.10m
+- U samples = 21
+- V samples = 7
+- CP/vertex count = 147
+- fixed diagonal = V00 -> V11
+- triangle count = 20 x 6 x 2 = 240
+
+Fixtures:
+- SR-001 Flat: height 0
+- SR-002 Convex-Up: raised cosine height +0.03m
+- SR-003 Convex-Side: SR-002 shapeをZ axis -90 degree rigid rotation
+- SR-004 Concave-Shallow: raised cosine depth -0.02m
+- SR-005 Concave-Deep: raised cosine depth -0.05m
+
+Anchor:
+- SR-001/002/004/005: AF-BOTH-EDGES-001 => 14 anchors
+- SR-003: AF-EDGE-001 => 7 anchors
+
+### 13.2 Probe
+
+- FMF-001: 5 fixtureすべて147 vertices / 240 triangles。
+- FMF-002: Flat center=(0,0,0)。
+- FMF-003: Convex-Up center=(0,+0.03,0)。
+- FMF-004: Convex-Side center=(+0.03,0,0) within float tolerance。
+- FMF-005: Concave-Shallow center=(0,-0.02,0)。
+- FMF-006: Concave-Deep center=(0,-0.05,0)。
+- FMF-007: non-side fixtureのcenter normal=(0,+1,0)。
+- FMF-008: Convex-Side center normal=(+1,0,0) within float tolerance。
+- FMF-009: fixed windingのfirst triangle outward normalはnon-sideで+Y、sideで+X。
+- FMF-010: AnchorCountはSR-003のみ7、他は14。
+
+BF-007 status: **OPEN / probe implemented**。
+
+### 13.3 Implementation
+
+- Unity: `engines/unity/pc/probe/SansaClothBasicFixtureProbe.cs`
+
+このProbeはFixture Mappingのみを検証し、30 Basic RunsのSurfaceResponse数値一致を要求しない。
+
+## 14. 未確定事項
 
 - Unity側の具体的なmesh/deformation API
 - Unityでのstable SurfaceReference保持方式
