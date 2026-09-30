@@ -235,6 +235,11 @@ Unity側で以下だけを生成・観測できる最小Harnessとする:
 
 結果はReference側の既知vector/rotation結果と比較できるテキストまたは機械可読値として取得する。
 
+初期Probe実装:
+- `engines/unity/pc/probe/SansaClothCoordinateProbe.cs`
+- `engines/unity/pc/probe/README.md`
+- 出力prefix: `SANSA_BF|`
+
 これにより、SurfaceQueryやSR-001の実装前にcoordinate/unit contractの誤りを分離する。
 
 ## 10. 未確定事項
