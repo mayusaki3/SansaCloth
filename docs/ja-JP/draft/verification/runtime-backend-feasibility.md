@@ -163,7 +163,81 @@ Checkpoint通過条件:
 
 Unity固有設計を先に共通抽象化しない。2つ目のBackendで共通性が確認されてから抽象化する。
 
-## 9. 未確定事項
+## 9. Unity PC BF-001 / BF-002 Probe Definition
+
+### 9.1 Unity側確認事項
+
+Unity公式仕様で以下を確認した。
+
+- Unityはleft-handed coordinate systemを使用する。
+- Unity world axisは +X=right、+Y=up、+Z=forward。
+- Unity Physicsはdefaultでworld spaceの1 unit = 1 meterを前提とする。
+- World SpaceとSelf/Local Spaceは明示的に区別できる。
+
+Reference:
+- Unity Manual, Rotation and orientation: https://docs.unity3d.com/ja/current/Manual/QuaternionAndEulerRotationsInUnity.html
+- Unity Manual, Transform: https://docs.unity3d.com/ja/current/Manual/class-Transform.html
+- Unity Scripting API, Space.World: https://docs.unity3d.com/cn/6000.0/ScriptReference/Space.World.html
+
+### 9.2 BF-001 Unit Mapping
+
+Unity PC Probe Contract:
+- 1 Unity world unit = 1 canonical meterとして扱う。
+- Backend boundaryでPosition/Lengthに追加scaleを掛けない。
+- imported assetのScale Factor / Convert Units / Transform scaleは入力データ準備側の責務とし、SansaCloth canonical unitを変更しない。
+- non-unit Transform scaleを許容する場合のSurface Query挙動は後続Probeで別途確認する。
+
+Probe:
+- UBF-001: Unity (1,0,0) -> canonical (1m,0,0)
+- UBF-002: canonical 0.20m cloth width -> Unity 0.20 world unit
+- UBF-003: round-trip Position/Lengthが許容誤差内で一致
+- UBF-004: Gravity magnitudeをlength scale変換の対象にしない。Unity world gravityをcanonical m/s^2として明示取得する。
+
+BF-001 status: **PASS (design mapping)**。
+Unity実行環境でUBF-001～004を確認後、runtime-confirmed PASSへ更新する。
+
+### 9.3 BF-002 Coordinate Mapping
+
+SansaClothで既定済みのaxis meaning:
+- +X = right
+- +Y = up
+- +Z = forward
+
+Unityのaxis directionは上記と一致するため、Position/Directionのcomponent permutationやaxis sign flipは現時点では不要な候補である。
+
+ただしSansaCloth canonical handednessは未確定である。したがってaxis direction一致だけを根拠にrotation mappingをidentityと確定しない。
+
+Probe:
+- CBF-001: basis Position (+X,+Y,+Z) mapping
+- CBF-002: basis Direction (+X,+Y,+Z) mapping
+- CBF-003: Surface Normal mapping
+- CBF-004: World GravityはBody rotation後もWorld Spaceで同方向
+- CBF-005: +90/-90 degree rotationの意味をReferenceとUnityで比較
+- CBF-006: triangle windingから得るgeometric normalの向きを比較
+- CBF-007: cross-product orientationを比較
+- CBF-008: Body+Gravityを同一rigid transformしたcoordinate-rotation equivalence
+
+CBF-005～007の結果からcanonical handednessとBackend rotation conversionを明示する。
+
+BF-002 status: **OPEN**。
+Position/Direction axis mappingはidentity候補。Rotation/handedness mappingはProbe完了まで未確定。
+
+### 9.4 Probe実装境界
+
+最初のUnity probeはSansaCloth solverをUnityへ移植しない。
+
+Unity側で以下だけを生成・観測できる最小Harnessとする:
+- known Position/Direction/Normal
+- known Transform rotation
+- World Gravity
+- known triangle winding
+- round-trip measurement output
+
+結果はReference側の既知vector/rotation結果と比較できるテキストまたは機械可読値として取得する。
+
+これにより、SurfaceQueryやSR-001の実装前にcoordinate/unit contractの誤りを分離する。
+
+## 10. 未確定事項
 
 - Unity側の具体的なmesh/deformation API
 - Unityでのstable SurfaceReference保持方式
