@@ -510,7 +510,17 @@ Anchor:
 - FMF-009: fixed windingのfirst triangle outward normalはnon-sideで+Y、sideで+X。
 - FMF-010: AnchorCountはSR-003のみ7、他は14。
 
-BF-007 status: **OPEN / probe implemented**。
+BF-007 status: **PASS (runtime confirmed, 2026-10-01)**。
+
+Unity実測:
+- 全5 fixtures: VertexCount=147 / TriangleCount=240 / CPCount=147
+- SR-001 Flat: center=(0,0,0), AnchorCount=14, center/first triangle normal=+Y
+- SR-002 Convex-Up: local max=+0.03m, center=(0,+0.03,0), AnchorCount=14, center/first triangle normal=+Y
+- SR-003 Convex-Side: local max=+0.03m, center≈(+0.03,0,0), AnchorCount=7, center/first triangle normal≈+X
+- SR-004 Concave-Shallow: local min=-0.02m, center=(0,-0.02,0), AnchorCount=14, center/first triangle normal=+Y
+- SR-005 Concave-Deep: local min=-0.05m, center=(0,-0.05,0), AnchorCount=14, center/first triangle normal=+Y
+
+SR-003の約1e-9～1e-8級の残差はUnity float/quaternion計算による丸め差であり、fixture mappingの不一致ではない。
 
 ### 13.3 Implementation
 
@@ -518,7 +528,60 @@ BF-007 status: **OPEN / probe implemented**。
 
 このProbeはFixture Mappingのみを検証し、30 Basic RunsのSurfaceResponse数値一致を要求しない。
 
-## 14. 未確定事項
+## 14. Unity PC BF-008 Validation Capture Probe
+
+### 14.1 Capture Scope
+
+CheckpointではProduction serializationを定義しない。Validation専用の一時captureとして、SR-001 C=0/G=0から以下を取得する。
+
+Metadata:
+- EventId
+- TimestampUtc
+- TestId
+- Backend
+- CPCount
+
+Final CP Measurement:
+- StableControlPointId
+- Final Position [m]
+- SurfaceReference DomainId/U/V
+- Surface Normal
+- SeparationDistance [m]
+- Support
+- derived Contact
+
+Aggregate Measurement:
+- ContactCount
+- SupportCount
+- MeanSeparation
+- MaxSeparation
+- MaxPenetration
+- MaxPositionDeviation
+- RMSPositionDeviation
+
+Stage MeasurementはReference専用debug情報のため必須としない。
+
+### 14.2 Capture Transport
+
+ProbeはJSON Lines validation artifactをUnity `Application.temporaryCachePath` 以下へ書き出し、保存先をConsoleへ出力する。
+
+これはBackend-neutral serialization formatの決定ではない。Checkpointで「共通意味の測定結果をBackend実行から外部取得できる」ことだけを確認する。
+
+Expected:
+- header 1 record
+- final CP 147 records
+- aggregate 1 record
+- total 149 JSONL records
+- file pathをConsoleから取得可能
+- aggregate: ContactCount=147, SupportCount=14, separation/deviation metrics=0
+
+BF-008 status: **OPEN / probe implemented**。
+
+### 14.3 Implementation
+
+- Unity: `engines/unity/pc/probe/SansaClothValidationCaptureProbe.cs`
+
+## 15. 未確定事項
 
 - Unity側の具体的なmesh/deformation API
 - Unityでのstable SurfaceReference保持方式
