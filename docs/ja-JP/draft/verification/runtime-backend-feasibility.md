@@ -193,8 +193,15 @@ Probe:
 - UBF-003: round-trip Position/Lengthが許容誤差内で一致
 - UBF-004: Gravity magnitudeをlength scale変換の対象にしない。Unity world gravityをcanonical m/s^2として明示取得する。Reference Basicの既定値 -9.80665 m/s^2 とUnity ProjectのPhysics.gravity既定値そのものの一致は要求せず、Backend入力として明示的に受け渡せることを確認する。
 
-BF-001 status: **PASS (design mapping)**。
-Unity実行環境でUBF-001～004を確認後、runtime-confirmed PASSへ更新する。
+BF-001 status: **PASS (runtime confirmed, 2026-10-01)**。
+
+Unity実測:
+- Unity +X = (1,0,0)
+- cloth width 0.20m = 0.2 Unity world unit
+- Unity Physics.gravity = (0,-9.81,0)
+- Reference Basic gravity = (0,-9.80665,0)
+
+Gravity既定値の差はmapping scaleではなく入力値の差として扱えるため、unit contractを阻害しない。
 
 ### 9.3 BF-002 Coordinate Mapping
 
@@ -217,10 +224,25 @@ Probe:
 - CBF-007: cross-product orientationを比較
 - CBF-008: Body+Gravityを同一rigid transformしたcoordinate-rotation equivalence
 
-CBF-005～007の結果からcanonical handednessとBackend rotation conversionを明示する。
+CBF-005～007の結果からBackend rotation conversionを明示する。canonical handednessそのものは別途Core設計事項として扱う。
 
-BF-002 status: **OPEN**。
-Position/Direction axis mappingはidentity候補。Rotation/handedness mappingはProbe完了まで未確定。
+BF-002 status: **PASS (runtime confirmed, 2026-10-01)**。
+
+Unity/Reference実測比較:
+- Basis X/Y/Z: 一致
+- Surface Normal +Y: 一致
+- +90 degree Z applied to +X: 約(0,+1,0)で一致
+- -90 degree Z applied to +X: 約(0,-1,0)で一致
+- V00,V01,V11 winding normal: +Yで一致
+- Cross(X,Y)=+Z / Cross(Y,Z)=+X / Cross(Z,X)=+Y: 一致
+- Body +90 degree Z rotation applied to +X: 約(0,+1,0)で一致
+- World Gravity: Body rotationによって暗黙回転しない
+
+Unity floatの約5.96e-8級の丸め差は方向の不一致ではない。
+
+Unity PC Backendでは、現ReferenceとのPosition / Direction / Normal / rigid Rotation mappingにcomponent permutationまたはaxis sign flipを追加しない。
+
+このPASSはSansaCloth canonical handednessをUnityのhandednessへ固定する決定ではない。現ReferenceとUnity PC Backend境界がidentity mappingで成立することの確認である。
 
 ### 9.4 Probe実装境界
 
@@ -285,8 +307,15 @@ Probe:
 - SRF-003: Body rigid transform後もDomainId/UVを変更せず同じ論理点を解決できる。
 - SRF-004: resolved runtime triangle indexは観測してよいがSurfaceReference semanticsへ含めない。
 
-BF-003 status: **OPEN / probe implemented**。
-Unity実行結果とProduction stable mapping設計を分離して評価する。
+BF-003 status: **PASS for rigid single-domain probe (runtime confirmed, 2026-10-01)**。
+
+実測:
+- DomainId=1を維持
+- UV=(0.25,0.75)を維持
+- identity / rigid transformの双方でresolved triangle=0
+- Body rigid transform後もDomainId/UVを変更せず同じ論理表面を解決
+
+ProductionのUV seam / overlap / multiple domain / topology updateに対するstable mappingは未確定であり、本PASSには含めない。
 
 ### 10.2 BF-004 SurfaceQuery Feasibility
 
@@ -301,7 +330,17 @@ Probe:
 
 Unity 6にはMesh UV/triangle/read-only mesh data取得APIがあり、SkinnedMeshRendererにはdeformed mesh snapshot取得APIも存在する。このためstatic fixtureを超える実装経路は存在するが、CPU BakeMeshをProduction Runtime方式として採用することは本Checkpointでは決定しない。
 
-BF-004 status: **OPEN / static probe implemented**。
+BF-004 status: **PASS for static rigid fixture (runtime confirmed, 2026-10-01)**。
+
+Reference / Unity実測比較:
+- Identity Surface Position: (-0.05,0,0.025)で一致
+- Identity Surface Normal: (0,1,0)で一致
+- Identity Separation: +0.01mで一致
+- Transformed Surface Position: (0.30,0.25,-0.075)で一致
+- Transformed Surface Normal: 約(+1,0,0)で一致
+- Transformed Separation: 約+0.01mで一致
+
+Unity floatによる微小差は許容される。deformed/skinned mesh SurfaceQueryは後続Probe対象であり、このPASSには含めない。
 
 ### 10.3 Probe実装
 
@@ -310,7 +349,20 @@ BF-004 status: **OPEN / static probe implemented**。
 
 Unity Probeはvalidation専用であり、Production SurfaceQuery Backendではない。
 
-## 11. 未確定事項
+## 11. BF-001～004 Runtime Result Summary
+
+| Gate | Unity PC result | Scope |
+|---|---|---|
+| BF-001 Unit Mapping | PASS | 1 world unit = 1 canonical m |
+| BF-002 Coordinate Mapping | PASS | Current Reference <-> Unity PC rigid mapping |
+| BF-003 SurfaceReference Mapping | PASS | Rigid single-domain fixture |
+| BF-004 SurfaceQuery Feasibility | PASS | Static rigid fixture |
+
+次段階ではBF-005 Input SemanticsとBF-006 Output Semanticsを、SR-001 Flatの単一Case end-to-end probeとしてまとめて確認する。
+
+BF-003/004のProduction拡張課題を解決するためだけにCheckpointを停止しない。Skinned/deformed mesh、stable mapping lifecycleは後続Backend実装課題として保持する。
+
+## 12. 未確定事項
 
 - Unity側の具体的なmesh/deformation API
 - Unityでのstable SurfaceReference保持方式
