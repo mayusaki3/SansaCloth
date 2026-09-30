@@ -153,6 +153,22 @@ Per Control Point:
 - SeparationDistance [m]
 - Support (Reference debug)
 
+Reference Basic v1のPer-Control-Point Measurement責務:
+- Final Position: SurfaceResponseResult.positions_mから取得する。
+- Final Normal: SurfaceResponseResult.surface_normalsから取得する。
+- SurfaceReference: SurfaceResponseResult.surface_referencesから取得する。
+- SeparationDistance: SurfaceResponseResult.separation_mから取得する。
+- Contact: Basic v1では SeparationDistance <= CollisionTolerance から測定用boolを導出する。Core Contact Stateの定義ではない。
+- Support: SurfaceResponseResult.supportから取得する。
+- SurfaceOffset: 現行SurfaceQueryResultがSurface tangent U/Vを返さず、完全なSurfaceFrameを再構成できないためBasic v1ではNOT MEASUREDとする。Normal成分をSeparationDistanceで代用して完全なSurfaceOffsetとして扱ってはならない。
+
+Stage Measurement責務:
+- Initial / Bridge / GravityResponse / ConformityResponse / CollisionResponse / FinalについてPosition [m]を保持できる。
+- 各Stage Displacement [m]は隣接Stage Positionの差からValidation側で導出する。
+- Support StageはPositionを変更しないため、Support値を保持し、独立したSupport Position snapshotは追加しない。
+- Surface Position / Normal / SeparationのStage別履歴は現行Debug APIへ追加しない。必要性が確認された場合にSurfaceQuery snapshotの設計として別途検討する。
+- Stage Measurementは原因解析用Debug Measurementであり、SurfaceResponseResultへ追加しない。
+
 Aggregate:
 - ContactCount
 - SupportCount
@@ -371,7 +387,25 @@ SurfaceResponse.Performance
 
 Core / Reference / Bakeの対象コードはUnit Test Coverage 100%を完了条件とする。到達不能分岐等を除外する場合は理由を文書化する。利用可能ならBranch Coverageも確認する。
 
-## 17. 未確定事項
+## 17. Measurement実装範囲
+
+Basic Validation v1では、最終CP MeasurementとAggregate Measurementを正式な検証出力とする。
+
+Stage MeasurementはReferenceの `solve_with_debug` が既に保持しているPosition snapshotを利用し、Validation側でStage間Displacementを算出する。これによりReference Solverの通常出力を肥大化させない。
+
+実装対象:
+- Final CP: Position / Normal / SurfaceReference / derived Contact / SeparationDistance / Support
+- Aggregate: ContactCount / SupportCount / MeanSeparation / MaxSeparation / MaxPenetration / MaxPositionDeviation / RMSPositionDeviation
+- Debug Stage: Initial->Bridge / Bridge->Gravity / Gravity->Conformity / Conformity->Collision のPosition Displacement
+
+Basic v1非対象:
+- 完全なSurfaceOffset
+- Stage別SurfaceQuery snapshot
+- Stage time / TotalSolverTime / PeakMemoryの自動収集
+
+Performance Measurementは実行環境依存性が高いため、機能Measurementと同じ構造体には含めない。
+
+## 18. 未確定事項
 
 - AnchorTolerance
 - CollisionTolerance
