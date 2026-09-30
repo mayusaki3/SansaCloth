@@ -696,8 +696,7 @@ mod tests {
             ),
         };
         let query = TransformedAnalyticFixtureSurfaceQuery { fixture, transform };
-        let control_points =
-            FlatClothFixture.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES);
+        let control_points = FlatClothFixture.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES);
 
         basic_cases()
             .into_iter()
@@ -856,10 +855,7 @@ mod tests {
             .collect()
     }
 
-    fn measure_displacement(
-        before_m: &[DVec3],
-        after_m: &[DVec3],
-    ) -> BasicDisplacementMeasurement {
+    fn measure_displacement(before_m: &[DVec3], after_m: &[DVec3]) -> BasicDisplacementMeasurement {
         assert_eq!(before_m.len(), after_m.len());
         assert!(!before_m.is_empty());
 
@@ -1099,7 +1095,6 @@ mod tests {
             assert!(measurement.contact_count <= BASIC_U_SAMPLES * BASIC_V_SAMPLES);
         }
     }
-
 
     #[test]
     fn measurement_005_final_control_points_match_surface_response() {
