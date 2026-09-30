@@ -659,7 +659,7 @@ mod tests {
         ]
     }
 
-    fn run_basic_surface(surface: BasicSurface) -> Vec<SurfaceResponseResult> {
+    fn run_basic_surface_with_debug(surface: BasicSurface) -> Vec<ReferenceSurfaceSolverDebug> {
         let (fixture, transform, anchor_profile, support_layout) = match surface {
             BasicSurface::Flat => (
                 AnalyticFixture::flat(),
@@ -696,18 +696,24 @@ mod tests {
             ),
         };
         let query = TransformedAnalyticFixtureSurfaceQuery { fixture, transform };
-        let cloth = FlatClothFixture;
-        let control_points = cloth.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES);
+        let control_points =
+            FlatClothFixture.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES);
 
         basic_cases()
             .into_iter()
             .map(|(gravity_m_per_s2, conformity)| {
-                let mut combined_positions = Vec::with_capacity(control_points.len());
-                let mut combined_references = Vec::with_capacity(control_points.len());
-                let mut combined_surface_positions = Vec::with_capacity(control_points.len());
-                let mut combined_normals = Vec::with_capacity(control_points.len());
-                let mut combined_separation = Vec::with_capacity(control_points.len());
-                let mut combined_support = Vec::with_capacity(control_points.len());
+                let capacity = control_points.len();
+                let mut combined_initial = Vec::with_capacity(capacity);
+                let mut combined_support = Vec::with_capacity(capacity);
+                let mut combined_bridge = Vec::with_capacity(capacity);
+                let mut combined_gravity = Vec::with_capacity(capacity);
+                let mut combined_conformity = Vec::with_capacity(capacity);
+                let mut combined_collision = Vec::with_capacity(capacity);
+                let mut combined_positions = Vec::with_capacity(capacity);
+                let mut combined_references = Vec::with_capacity(capacity);
+                let mut combined_surface_positions = Vec::with_capacity(capacity);
+                let mut combined_normals = Vec::with_capacity(capacity);
+                let mut combined_separation = Vec::with_capacity(capacity);
 
                 for row_index in 0..BASIC_V_SAMPLES {
                     let row_start = row_index * BASIC_U_SAMPLES;
@@ -734,7 +740,7 @@ mod tests {
                         })
                         .collect();
 
-                    let result = ReferenceSurfaceSolver::solve(
+                    let debug = ReferenceSurfaceSolver::solve_with_debug(
                         &ReferenceSurfaceSolverInput {
                             positions_m,
                             surface_references,
@@ -750,23 +756,45 @@ mod tests {
                         basic_settings(),
                     );
 
-                    combined_positions.extend(result.positions_m);
-                    combined_references.extend(result.surface_references);
-                    combined_surface_positions.extend(result.surface_positions_m);
-                    combined_normals.extend(result.surface_normals);
-                    combined_separation.extend(result.separation_m);
-                    combined_support.extend(result.support);
+                    combined_initial.extend(debug.initial_positions_m);
+                    combined_support.extend(debug.support);
+                    combined_bridge.extend(debug.bridge_positions_m);
+                    combined_gravity.extend(debug.gravity_positions_m);
+                    combined_conformity.extend(debug.conformity_positions_m);
+                    combined_collision.extend(debug.collision_positions_m);
+
+                    let final_result = debug.final_result;
+                    combined_positions.extend(final_result.positions_m);
+                    combined_references.extend(final_result.surface_references);
+                    combined_surface_positions.extend(final_result.surface_positions_m);
+                    combined_normals.extend(final_result.surface_normals);
+                    combined_separation.extend(final_result.separation_m);
                 }
 
-                SurfaceResponseResult {
-                    positions_m: combined_positions,
-                    surface_references: combined_references,
-                    surface_positions_m: combined_surface_positions,
-                    surface_normals: combined_normals,
-                    separation_m: combined_separation,
-                    support: combined_support,
+                ReferenceSurfaceSolverDebug {
+                    initial_positions_m: combined_initial,
+                    support: combined_support.clone(),
+                    bridge_positions_m: combined_bridge,
+                    gravity_positions_m: combined_gravity,
+                    conformity_positions_m: combined_conformity,
+                    collision_positions_m: combined_collision,
+                    final_result: SurfaceResponseResult {
+                        positions_m: combined_positions,
+                        surface_references: combined_references,
+                        surface_positions_m: combined_surface_positions,
+                        surface_normals: combined_normals,
+                        separation_m: combined_separation,
+                        support: combined_support,
+                    },
                 }
             })
+            .collect()
+    }
+
+    fn run_basic_surface(surface: BasicSurface) -> Vec<SurfaceResponseResult> {
+        run_basic_surface_with_debug(surface)
+            .into_iter()
+            .map(|debug| debug.final_result)
             .collect()
     }
 
