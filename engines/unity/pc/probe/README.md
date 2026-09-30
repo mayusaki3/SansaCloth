@@ -55,3 +55,32 @@ handednessはProbe結果を確認する前に確定しない。
 - LOD
 - Performance
 - Bake
+
+
+## BF-005 / BF-006 SR-001 Boundary Probe
+
+BF-001～004確認後、`SansaClothSr001BoundaryProbe.cs` も同じUnity Projectの `Assets/SansaCloth/Probe/` へコピーする。
+
+1. `SansaClothBackendProbe` GameObjectへ `Sansa Cloth Sr001 Boundary Probe` を追加する。
+2. Component context menuから `Run SansaCloth SR-001 Boundary Probe` を実行する。
+3. Consoleの `SANSA_BF|SR-001.` で始まる行を保存する。
+
+Expected aggregate:
+
+```text
+SR-001.CP_COUNT = 147
+SR-001.ANCHOR_COUNT = 14
+SR-001.CONTACT_INPUT_COUNT = 147
+SR-001.DIRECT_SUPPORT_COUNT = 14
+SR-001.CONTACT_ONLY_UNSUPPORTED_COUNT = 133
+SR-001.FINAL_POSITION_DEVIATION_MAX_M = 0
+SR-001.NORMAL_DEVIATION_MAX = 0
+SR-001.SEPARATION_ABS_MAX_M = 0
+SR-001.DERIVED_CONTACT_COUNT = 147
+SR-001.WORLD_GRAVITY_INPUT = 0,0,0
+SR-001.CONFORMITY_INPUT = 0
+```
+
+代表CPとしてstable id 0 / 73 / 146も出力する。
+
+このProbeはReference SolverのUnity移植ではない。C=0/G=0/Flatで変形不要なCaseを使い、Input/Output semantic boundaryだけを検証する。
