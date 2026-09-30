@@ -809,6 +809,96 @@ mod tests {
         rms_position_deviation_m: f64,
     }
 
+    #[derive(Clone, Copy, Debug, PartialEq)]
+    struct BasicControlPointMeasurement {
+        position_m: DVec3,
+        normal: DVec3,
+        surface_reference: SurfaceReference,
+        contact: bool,
+        separation_m: f64,
+        support: SupportKind,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq)]
+    struct BasicDisplacementMeasurement {
+        max_m: f64,
+        rms_m: f64,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq)]
+    struct BasicStageMeasurements {
+        initial_to_bridge: BasicDisplacementMeasurement,
+        bridge_to_gravity: BasicDisplacementMeasurement,
+        gravity_to_conformity: BasicDisplacementMeasurement,
+        conformity_to_collision: BasicDisplacementMeasurement,
+        collision_to_final: BasicDisplacementMeasurement,
+    }
+
+    fn measure_basic_control_points(
+        result: &SurfaceResponseResult,
+    ) -> Vec<BasicControlPointMeasurement> {
+        let count = result.positions_m.len();
+        assert_eq!(result.surface_normals.len(), count);
+        assert_eq!(result.surface_references.len(), count);
+        assert_eq!(result.separation_m.len(), count);
+        assert_eq!(result.support.len(), count);
+
+        let collision_tolerance_m = basic_settings().collision_tolerance_m;
+        (0..count)
+            .map(|index| BasicControlPointMeasurement {
+                position_m: result.positions_m[index],
+                normal: result.surface_normals[index],
+                surface_reference: result.surface_references[index],
+                contact: result.separation_m[index] <= collision_tolerance_m,
+                separation_m: result.separation_m[index],
+                support: result.support[index],
+            })
+            .collect()
+    }
+
+    fn measure_displacement(
+        before_m: &[DVec3],
+        after_m: &[DVec3],
+    ) -> BasicDisplacementMeasurement {
+        assert_eq!(before_m.len(), after_m.len());
+        assert!(!before_m.is_empty());
+
+        let squared: Vec<_> = before_m
+            .iter()
+            .zip(after_m)
+            .map(|(&before, &after)| (after - before).length_squared())
+            .collect();
+        BasicDisplacementMeasurement {
+            max_m: squared.iter().copied().fold(0.0, f64::max).sqrt(),
+            rms_m: (squared.iter().sum::<f64>() / squared.len() as f64).sqrt(),
+        }
+    }
+
+    fn measure_basic_stages(debug: &ReferenceSurfaceSolverDebug) -> BasicStageMeasurements {
+        BasicStageMeasurements {
+            initial_to_bridge: measure_displacement(
+                &debug.initial_positions_m,
+                &debug.bridge_positions_m,
+            ),
+            bridge_to_gravity: measure_displacement(
+                &debug.bridge_positions_m,
+                &debug.gravity_positions_m,
+            ),
+            gravity_to_conformity: measure_displacement(
+                &debug.gravity_positions_m,
+                &debug.conformity_positions_m,
+            ),
+            conformity_to_collision: measure_displacement(
+                &debug.conformity_positions_m,
+                &debug.collision_positions_m,
+            ),
+            collision_to_final: measure_displacement(
+                &debug.collision_positions_m,
+                &debug.final_result.positions_m,
+            ),
+        }
+    }
+
     fn measure_basic_result(
         result: &SurfaceResponseResult,
         initial_positions_m: &[DVec3],
@@ -1007,6 +1097,89 @@ mod tests {
                 measurement.max_separation_m
             );
             assert!(measurement.contact_count <= BASIC_U_SAMPLES * BASIC_V_SAMPLES);
+        }
+    }
+
+
+    #[test]
+    fn measurement_005_final_control_points_match_surface_response() {
+        for surface in [
+            BasicSurface::Flat,
+            BasicSurface::ConvexUp,
+            BasicSurface::ConvexSide,
+            BasicSurface::ConcaveShallow,
+            BasicSurface::ConcaveDeep,
+        ] {
+            for result in run_basic_surface(surface) {
+                let measurements = measure_basic_control_points(&result);
+                assert_eq!(measurements.len(), BASIC_U_SAMPLES * BASIC_V_SAMPLES);
+                for (index, measurement) in measurements.iter().enumerate() {
+                    assert_eq!(measurement.position_m, result.positions_m[index]);
+                    assert_eq!(measurement.normal, result.surface_normals[index]);
+                    assert_eq!(
+                        measurement.surface_reference,
+                        result.surface_references[index]
+                    );
+                    assert_eq!(measurement.separation_m, result.separation_m[index]);
+                    assert_eq!(measurement.support, result.support[index]);
+                    assert_eq!(
+                        measurement.contact,
+                        result.separation_m[index] <= basic_settings().collision_tolerance_m
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn measurement_006_stage_displacements_are_finite() {
+        for surface in [
+            BasicSurface::Flat,
+            BasicSurface::ConvexUp,
+            BasicSurface::ConvexSide,
+            BasicSurface::ConcaveShallow,
+            BasicSurface::ConcaveDeep,
+        ] {
+            for debug in run_basic_surface_with_debug(surface) {
+                let stages = measure_basic_stages(&debug);
+                for displacement in [
+                    stages.initial_to_bridge,
+                    stages.bridge_to_gravity,
+                    stages.gravity_to_conformity,
+                    stages.conformity_to_collision,
+                    stages.collision_to_final,
+                ] {
+                    assert!(displacement.max_m.is_finite());
+                    assert!(displacement.rms_m.is_finite());
+                    assert!(displacement.max_m >= 0.0);
+                    assert!(displacement.rms_m >= 0.0);
+                }
+                assert!(stages.collision_to_final.max_m <= f64::EPSILON);
+                assert!(stages.collision_to_final.rms_m <= f64::EPSILON);
+            }
+        }
+    }
+
+    #[test]
+    fn measurement_007_zero_inputs_have_zero_stage_response() {
+        for surface in [
+            BasicSurface::Flat,
+            BasicSurface::ConvexUp,
+            BasicSurface::ConvexSide,
+            BasicSurface::ConcaveShallow,
+            BasicSurface::ConcaveDeep,
+        ] {
+            let debug = run_basic_surface_with_debug(surface);
+            for index in [0, 1, 2] {
+                let stages = measure_basic_stages(&debug[index]);
+                assert!(stages.bridge_to_gravity.max_m <= f64::EPSILON);
+                assert!(stages.bridge_to_gravity.rms_m <= f64::EPSILON);
+            }
+            for index in [0, 3] {
+                let stages = measure_basic_stages(&debug[index]);
+                assert!(stages.gravity_to_conformity.max_m <= f64::EPSILON);
+                assert!(stages.gravity_to_conformity.rms_m <= f64::EPSILON);
+            }
         }
     }
 
