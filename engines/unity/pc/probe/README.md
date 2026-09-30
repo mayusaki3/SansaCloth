@@ -84,3 +84,24 @@ SR-001.CONFORMITY_INPUT = 0
 代表CPとしてstable id 0 / 73 / 146も出力する。
 
 このProbeはReference SolverのUnity移植ではない。C=0/G=0/Flatで変形不要なCaseを使い、Input/Output semantic boundaryだけを検証する。
+
+
+## BF-007 Basic Fixture Mapping Probe
+
+`SansaClothBasicFixtureProbe.cs` を同じUnity Projectの `Assets/SansaCloth/Probe/` へコピーする。
+
+1. `SansaClothBackendProbe` GameObjectへ `Sansa Cloth Basic Fixture Probe` を追加する。
+2. Component context menuから `Run SansaCloth Basic Fixture Probe` を実行する。
+3. Consoleの `SANSA_BF|SR-00` で始まるfixture出力を保存する。
+
+Expected:
+- 全fixture: VERTEX_COUNT=147, TRIANGLE_COUNT=240, CP_COUNT=147
+- SR-001 Flat: center=(0,0,0), anchors=14
+- SR-002 Convex-Up: center=(0,0.03,0), anchors=14
+- SR-003 Convex-Side: center=(0.03,0,0)近傍, anchors=7
+- SR-004 Concave-Shallow: center=(0,-0.02,0), anchors=14
+- SR-005 Concave-Deep: center=(0,-0.05,0), anchors=14
+- non-side center/first-triangle normal: +Y
+- Convex-Side center/first-triangle normal: +X
+
+Unity floatの丸め差は許容する。
