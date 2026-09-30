@@ -191,7 +191,7 @@ Probe:
 - UBF-001: Unity (1,0,0) -> canonical (1m,0,0)
 - UBF-002: canonical 0.20m cloth width -> Unity 0.20 world unit
 - UBF-003: round-trip Position/Lengthが許容誤差内で一致
-- UBF-004: Gravity magnitudeをlength scale変換の対象にしない。Unity world gravityをcanonical m/s^2として明示取得する。
+- UBF-004: Gravity magnitudeをlength scale変換の対象にしない。Unity world gravityをcanonical m/s^2として明示取得する。Reference Basicの既定値 -9.80665 m/s^2 とUnity ProjectのPhysics.gravity既定値そのものの一致は要求せず、Backend入力として明示的に受け渡せることを確認する。
 
 BF-001 status: **PASS (design mapping)**。
 Unity実行環境でUBF-001～004を確認後、runtime-confirmed PASSへ更新する。
@@ -236,9 +236,26 @@ Unity側で以下だけを生成・観測できる最小Harnessとする:
 結果はReference側の既知vector/rotation結果と比較できるテキストまたは機械可読値として取得する。
 
 初期Probe実装:
-- `engines/unity/pc/probe/SansaClothCoordinateProbe.cs`
-- `engines/unity/pc/probe/README.md`
-- 出力prefix: `SANSA_BF|`
+- Unity: `engines/unity/pc/probe/SansaClothCoordinateProbe.cs`
+- Unity手順: `engines/unity/pc/probe/README.md`
+- Reference: `reference/crates/sansacloth-reference/examples/backend_coordinate_probe.rs`
+- Unity出力prefix: `SANSA_BF|`
+- Reference出力prefix: `SANSA_REF|`
+
+Reference Probe実行:
+
+```powershell
+cd reference
+cargo run -p sansacloth-reference --example backend_coordinate_probe
+```
+
+比較規約:
+- UBF-001/002は1 Unity world unit = 1 canonical mのmapping contractを確認する。
+- CBF-001/003はbasis/normalの成分対応を比較する。
+- CBF-004はGravityの数値既定値ではなく、world-space vectorとして明示的に扱えることを確認する。
+- CBF-005～007はReference実装とUnityのrotation/winding/cross-product結果を比較し、変換要否を決める。
+- CBF-008はBody rotationがWorld Gravityを暗黙に回転させないことを確認する。
+- Reference Probeのglam挙動をcanonical handednessの定義として扱わない。これは現Reference実装との比較基準である。
 
 これにより、SurfaceQueryやSR-001の実装前にcoordinate/unit contractの誤りを分離する。
 
