@@ -1,6 +1,6 @@
 # Unity PC Coordinate Probe
 
-Runtime Backend Feasibility CheckpointのBF-001 Unit Mapping / BF-002 Coordinate Mappingを確認する最小Probe。
+Runtime Backend Feasibility CheckpointのBF-001 Unit Mapping / BF-002 Coordinate Mapping / BF-003 SurfaceReference Mapping / BF-004 SurfaceQuery Feasibilityを確認する最小Probe。
 
 これはSansaCloth SolverのUnity移植ではない。
 
@@ -8,15 +8,18 @@ Runtime Backend Feasibility CheckpointのBF-001 Unit Mapping / BF-002 Coordinate
 
 - UBF-001～004
 - CBF-001～008
+- BF-003 single-domain SurfaceReference
+- BF-004 static fixture SurfaceQuery
 - Unity PC
 
 ## 実行
 
 1. Unity PC用の空Projectを作成する。
-2. `SansaClothCoordinateProbe.cs` をProjectの `Assets/` 以下へコピーする。
-3. 空GameObjectへ `SansaClothCoordinateProbe` を追加する。
+2. `SansaClothCoordinateProbe.cs` と `SansaClothSurfaceQueryProbe.cs` をProjectの `Assets/` 以下へコピーする。
+3. 空GameObjectへ両Componentを追加する。
 4. Componentのcontext menuから `Run SansaCloth Coordinate Probe` を実行する。
-5. Consoleの `SANSA_BF|` で始まる行を保存する。
+5. 続けて `Run SansaCloth Surface Query Probe` を実行する。
+6. Consoleの `SANSA_BF|` で始まる行を保存する。
 
 Scene assetやPrefabをrepositoryへ追加する必要はない。
 
@@ -37,6 +40,10 @@ Reference側の既知basis/rotation/windingと比較する。
 - V00,V01,V11 windingのgeometric normal
 - basis cross products
 - Body rotationとWorld Gravityの独立性
+- domain_id + UVがBody Transform後も同じ論理表面を参照すること
+- Surface Position / Surface Normal / signed Separationを取得できること
+
+BF-003/004の初期Probeは単一domain・重複なしUV・static fixtureに限定する。Productionのskinned/deformed mesh mappingを完成させるものではない。
 
 handednessはProbe結果を確認する前に確定しない。
 
