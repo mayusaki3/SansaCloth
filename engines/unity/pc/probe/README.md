@@ -105,3 +105,25 @@ Expected:
 - Convex-Side center/first-triangle normal: +X
 
 Unity floatの丸め差は許容する。
+
+
+## BF-008 Validation Capture Probe
+
+`SansaClothValidationCaptureProbe.cs` を同じUnity Projectの `Assets/SansaCloth/Probe/` へコピーする。
+
+1. `SansaClothBackendProbe` GameObjectへ `Sansa Cloth Validation Capture Probe` を追加する。
+2. Component context menuから `Run SansaCloth Validation Capture Probe` を実行する。
+3. Consoleの `SANSA_BF|BF-008.` 行を確認する。
+4. `CAPTURE_PATH` に出力された `SansaClothValidationCapture.jsonl` を確認する。
+
+Expected:
+- RECORD_COUNT=149
+- CP_COUNT=147
+- CONTACT_COUNT=147
+- SUPPORT_COUNT=14
+- Mean/Max Separation=0
+- Max Penetration=0
+- Max Position Deviation=0
+- JSONL = header 1 + final_cp 147 + aggregate 1
+
+Capture fileは `Application.temporaryCachePath` に置くvalidation-only artifactであり、Production serialization formatではない。
