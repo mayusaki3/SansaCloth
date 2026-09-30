@@ -259,7 +259,58 @@ cargo run -p sansacloth-reference --example backend_coordinate_probe
 
 これにより、SurfaceQueryやSR-001の実装前にcoordinate/unit contractの誤りを分離する。
 
-## 10. 未確定事項
+## 10. Unity PC BF-003 / BF-004 Probe Definition
+
+### 10.1 BF-003 SurfaceReference Mapping
+
+初期Unity Probeでは、Reference Fixtureと同じ0.20m x 0.10m flat meshを使用し、単一domainを次のように扱う。
+
+- DomainId = 1
+- U/V = mesh UV0
+- UV範囲 = [0,1] x [0,1]
+- fixed diagonal = V00 -> V11
+- triangle winding = (V00,V01,V11), (V00,V11,V10)
+
+UnityのMesh APIはUV channelとtriangle vertex indexを取得できる。UVはvertex indexと対応するため、単一domain・重複なしUVのProbeではSurfaceReferenceからsurface triangle/barycentric positionを解決できる。
+
+ただしProductionではUV seam、UV overlap、複数domain、topology更新があり得る。したがって:
+- Texture UVそのものを永続SurfaceReference IDとは定義しない。
+- Runtime triangle indexをSurfaceReferenceへ保存しない。
+- `domain_id + (u,v)` が論理参照であり、Backendがruntime meshへ解決する。
+- Production stable mapping方式は本Probeの結果だけでは確定しない。
+
+Probe:
+- SRF-001: DomainId=1, UV=(0.25,0.75)を解決できる。
+- SRF-002: identity placementで同じSurfaceReferenceを再解決できる。
+- SRF-003: Body rigid transform後もDomainId/UVを変更せず同じ論理点を解決できる。
+- SRF-004: resolved runtime triangle indexは観測してよいがSurfaceReference semanticsへ含めない。
+
+BF-003 status: **OPEN / probe implemented**。
+Unity実行結果とProduction stable mapping設計を分離して評価する。
+
+### 10.2 BF-004 SurfaceQuery Feasibility
+
+初期ProbeのSurfaceQueryは、SurfaceReferenceをUV triangleへ解決し、barycentric interpolationでSurface Positionを得る。geometric Surface NormalとCurrent Positionからsigned Separationを計算する。
+
+Probe:
+- SQF-001: identity flat fixtureでSurface Positionを取得。
+- SQF-002: outward Surface Normalを取得。
+- SQF-003: Surface + Normal * 0.01m のCurrent PositionでSeparation = +0.01m。
+- SQF-004: rigid transform後も同じSurfaceReferenceでSurface Position/Normalを再評価。
+- SQF-005: rigid transform後もNormal方向+0.01mでSeparation = +0.01m。
+
+Unity 6にはMesh UV/triangle/read-only mesh data取得APIがあり、SkinnedMeshRendererにはdeformed mesh snapshot取得APIも存在する。このためstatic fixtureを超える実装経路は存在するが、CPU BakeMeshをProduction Runtime方式として採用することは本Checkpointでは決定しない。
+
+BF-004 status: **OPEN / static probe implemented**。
+
+### 10.3 Probe実装
+
+- Unity: `engines/unity/pc/probe/SansaClothSurfaceQueryProbe.cs`
+- Reference baseline: `reference/crates/sansacloth-reference/examples/backend_coordinate_probe.rs`
+
+Unity Probeはvalidation専用であり、Production SurfaceQuery Backendではない。
+
+## 11. 未確定事項
 
 - Unity側の具体的なmesh/deformation API
 - Unityでのstable SurfaceReference保持方式
