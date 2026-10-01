@@ -138,3 +138,61 @@ Capture fileは `Application.temporaryCachePath` に置くvalidation-only artifa
 2026-10-01 Unity PC実測でBF-001～008はすべてPASS。
 
 次段階ではこのProbe群をProduction Backendとして拡張せず、Reference BasicとBackend間の最小fixture exchange formatを先に定義する。
+
+
+## Fixture Exchange Import Probe
+
+Rust Reference exporterで生成した `reference/validation/fixture-exchange/SR-001-C0-G0.json` をUnityへ渡し、FXE-011～013を確認する。
+
+追加packageは不要。ImporterはValidation-onlyであり、Product serialization format/APIではない。
+
+Unity Projectへ以下をコピーする:
+
+- `SansaClothFixtureExchangeJson.cs`
+- `SansaClothFixtureExchangeProbe.cs`
+- `reference/validation/fixture-exchange/SR-001-C0-G0.json`
+
+推奨配置:
+
+```text
+Assets/SansaCloth/Probe/SansaClothFixtureExchangeJson.cs
+Assets/SansaCloth/Probe/SansaClothFixtureExchangeProbe.cs
+Assets/SansaCloth/Probe/Fixtures/SR-001-C0-G0.json
+```
+
+実行:
+
+1. Unityのcompile errorが0件であることを確認する。
+2. `SansaClothBackendProbe` GameObjectへ `Sansa Cloth Fixture Exchange Probe` を追加する。
+3. Inspectorの `Fixture Exchange Json` に `SR-001-C0-G0` TextAssetを割り当てる。
+4. Component context menuから `Run SansaCloth Fixture Exchange Probe` を実行する。
+5. Consoleの `SANSA_FXE|` 行を保存する。
+
+Expected final:
+
+```text
+SANSA_FXE|FXE-011.RESULT|PASS
+SANSA_FXE|FXE-011.VERTEX_COUNT|147
+SANSA_FXE|FXE-011.TRIANGLE_COUNT|240
+SANSA_FXE|FXE-011.CP_COUNT|147
+SANSA_FXE|FXE-011.WIDTH_M|0.2
+SANSA_FXE|FXE-011.DEPTH_M|0.1
+SANSA_FXE|FXE-011.MAX_ABS_HEIGHT_M|0
+SANSA_FXE|FXE-011.MAX_NORMAL_DEVIATION|0
+SANSA_FXE|FXE-012.RESULT|PASS
+SANSA_FXE|FXE-012.ANCHOR_COUNT|14
+SANSA_FXE|FXE-012.CONTACT_INPUT_COUNT|147
+SANSA_FXE|FXE-012.DIRECT_SUPPORT_COUNT|14
+SANSA_FXE|FXE-012.CONTACT_ONLY_UNSUPPORTED_COUNT|133
+SANSA_FXE|FXE-012.STRIP_COUNT|7
+SANSA_FXE|FXE-012.STRIP_LENGTH|21
+SANSA_FXE|FXE-012.WORLD_GRAVITY_M_PER_S2|0,0,0
+SANSA_FXE|FXE-012.CONFORMITY|0
+SANSA_FXE|FXE-012.COLLISION_TOLERANCE_M|0
+SANSA_FXE|FXE-013.RESULT|PASS
+SANSA_FXE|FXE-013.REJECTED_CASE_COUNT|12
+```
+
+FXE-013では各invalid caseについて `SANSA_FXE|FXE-013.<case>|REJECTED` も出力する。
+
+このProbeがPASSしてから、同じimported SR-001を実Solver end-to-end入力へ接続する。
