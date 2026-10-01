@@ -607,4 +607,47 @@ mod tests {
         let actual = FixtureExchange::from_json(&json).unwrap();
         assert_eq!(actual, expected);
     }
+
+    #[test]
+    fn fxe_013_invalid_semantic_data_is_rejected() {
+        let base = sr001();
+
+        let mut invalid = base.clone();
+        invalid.body_surface.vertices[0].uv = [-0.1, 0.0];
+        assert!(invalid.validate().is_err());
+
+        let mut invalid = base.clone();
+        invalid.body_surface.vertices[0].normal = [0.0; 3];
+        assert!(invalid.validate().is_err());
+
+        let mut invalid = base.clone();
+        invalid.body_surface.triangles[0][0] = invalid.body_surface.vertices.len();
+        assert!(invalid.validate().is_err());
+
+        let mut invalid = base.clone();
+        invalid.cloth.control_points[1].stable_id = invalid.cloth.control_points[0].stable_id;
+        assert!(invalid.validate().is_err());
+
+        let mut invalid = base.clone();
+        invalid.cloth.control_points[1].strip_id = invalid.cloth.control_points[0].strip_id;
+        invalid.cloth.control_points[1].strip_order =
+            invalid.cloth.control_points[0].strip_order;
+        assert!(invalid.validate().is_err());
+
+        let mut invalid = base.clone();
+        invalid.cloth.control_points[0].surface_reference.domain_id = 999;
+        assert!(invalid.validate().is_err());
+
+        let mut invalid = base.clone();
+        invalid.cloth.control_points[0].surface_reference.u = 1.1;
+        assert!(invalid.validate().is_err());
+
+        let mut invalid = base.clone();
+        invalid.inputs.conformity = 1.1;
+        assert!(invalid.validate().is_err());
+
+        let mut invalid = base;
+        invalid.inputs.collision_tolerance_m = -0.001;
+        assert!(invalid.validate().is_err());
+    }
 }
