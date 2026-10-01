@@ -224,6 +224,7 @@ Exporter/Importer実装前に以下をテストIDとして固定する。
 - FXE-011 Unity Import: SR-001 imported fixtureがBF-007 geometry/countと一致する。
 - FXE-012 Unity SR-001 Boundary: imported SR-001 C0/G0がBF-005/006の147/14/147 semantic countsを再現する。
 - FXE-013 Invalid Data: malformed domain/UV/index/id/normal/scalarを拒否する。
+- FXE-014 Unity Imported SR-001 Solver E2E: imported `SR-001-C0-G0`だけを入力源としてUnity SurfaceQuery/Response経路を実行し、147 CPすべてについて最終Separation=0、Support=14、Contact=147、max position deviation=0（Unity float tolerance内）を再現する。
 
 FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項目をUnity integration validationとする。
 
@@ -235,7 +236,7 @@ FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項
 4. `SR-001-C0-G0` JSONをReferenceから生成。
 5. Unity PC importer probeを追加。
 6. FXE-011/012/013をUnityで確認。
-7. imported SR-001を使用して実Solver end-to-endへ進む。
+7. FXE-014を実装し、imported SR-001だけを入力源として実Solver end-to-endを確認する。
 8. SR-002～005 / 30 casesへ拡張する。
 
 ## 12. 未確定事項
@@ -284,6 +285,7 @@ FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項
   - 12/12 invalid cases rejected.
   - format/domain/UV/triangle index/stable ID/strip order/normal/conformity/collision tolerance.
   - unknown field/invalid vector length/non-finite numeric value.
+- Unity FXE-014 Imported SR-001 Solver E2E: **SPECIFIED / IMPLEMENTATION OPEN**.
 
 Rust exporter:
 
