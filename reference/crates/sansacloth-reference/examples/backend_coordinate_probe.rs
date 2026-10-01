@@ -85,10 +85,7 @@ fn main() {
         "BF-004.IDENTITY_SURFACE_NORMAL",
         identity_result.surface_normal,
     );
-    print_scalar(
-        "BF-004.IDENTITY_SEPARATION_M",
-        identity_result.separation_m,
-    );
+    print_scalar("BF-004.IDENTITY_SEPARATION_M", identity_result.separation_m);
 
     let transformed_query = TransformedAnalyticFixtureSurfaceQuery {
         fixture: AnalyticFixture::flat(),
@@ -100,13 +97,9 @@ fn main() {
     let transformed_surface = transformed_query.query(DVec3::ZERO, surface_reference);
     let transformed_current =
         transformed_surface.surface_position_m + transformed_surface.surface_normal * 0.01;
-    let transformed_result =
-        transformed_query.query(transformed_current, surface_reference);
+    let transformed_result = transformed_query.query(transformed_current, surface_reference);
 
-    print_u64(
-        "BF-003.TRANSFORMED_DOMAIN_ID",
-        surface_reference.domain_id,
-    );
+    print_u64("BF-003.TRANSFORMED_DOMAIN_ID", surface_reference.domain_id);
     print_uv(
         "BF-003.TRANSFORMED_SURFACE_REFERENCE_UV",
         surface_reference.u,
