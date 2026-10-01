@@ -503,6 +503,16 @@ namespace SansaCloth.Validation
             }
         }
 
+        private sealed class JsonNumber
+        {
+            internal JsonNumber(string token)
+            {
+                this.token = token;
+            }
+
+            internal readonly string token;
+        }
+
         private sealed class JsonReader
         {
             private readonly string text;
@@ -735,8 +745,10 @@ namespace SansaCloth.Validation
 
                 if (TryConsume('e') || TryConsume('E'))
                 {
-                    TryConsume('+');
-                    TryConsume('-');
+                    if (!TryConsume('+'))
+                    {
+                        TryConsume('-');
+                    }
                     ReadDigits(true);
                 }
 
