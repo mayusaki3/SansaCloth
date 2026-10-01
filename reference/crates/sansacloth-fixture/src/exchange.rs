@@ -328,7 +328,10 @@ fn vec3_array(value: DVec3) -> [f64; 3] {
 }
 
 fn validate_exchange(exchange: &FixtureExchange) -> Result<(), FixtureExchangeError> {
-    validation(\n        exchange.format == FIXTURE_EXCHANGE_FORMAT,\n        "unsupported format",\n    )?;
+    validation(
+        exchange.format == FIXTURE_EXCHANGE_FORMAT,
+        "unsupported format",
+    )?;
     validation(!exchange.case_id.is_empty(), "case_id must not be empty")?;
     validation(
         exchange.coordinate == ExchangeCoordinate::default(),
