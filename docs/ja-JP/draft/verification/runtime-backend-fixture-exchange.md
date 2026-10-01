@@ -268,8 +268,22 @@ FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項
   - Cloth = 147 CP / Anchor 14 / Contact 147.
   - stable_id = 0..146, 7 strips x 21 order.
   - DomainId=1, canonical coordinate/unit declaration, Gravity/Conformity/CollisionTolerance verified.
-- Unity validation-only JSON reader: **IMPLEMENTED / runtime OPEN**.
-- Unity FXE-011/012/013 probe: **IMPLEMENTED / runtime OPEN**.
+- Unity validation-only JSON reader: **PASS**.
+- Unity FXE-011 Import: **PASS**.
+  - Body = 147 vertices / 240 triangles.
+  - Cloth = 147 CP.
+  - width = 0.20 m / depth = 0.10 m.
+  - max absolute height = 0 / max normal deviation = 0.
+  - fixed-diagonal topology and Unity mesh first-triangle normal verified by probe.
+- Unity FXE-012 SR-001 Boundary: **PASS**.
+  - Anchor = 14 / Contact input = 147.
+  - Direct Support = 14 / Contact-only unsupported = 133.
+  - strip topology = 7 x 21.
+  - World Gravity = (0,0,0), Conformity = 0, CollisionTolerance = 0.
+- Unity FXE-013 Invalid Data: **PASS**.
+  - 12/12 invalid cases rejected.
+  - format/domain/UV/triangle index/stable ID/strip order/normal/conformity/collision tolerance.
+  - unknown field/invalid vector length/non-finite numeric value.
 
 Rust exporter:
 
@@ -303,4 +317,4 @@ Unity runtime確認対象:
 - FXE-012: stable ID、7 x 21 strip、Anchor/Contact、Direct Support boundary、case inputs。
 - FXE-013: format/domain/UV/index/stable ID/strip order/normal/scalarに加え、unknown field、invalid vector length、non-finite相当JSON numberを拒否する。
 
-Unity runtime確認がPASSするまではFXE-011～013をPASS扱いしない。
+Unity runtime確認は2026-10-01にFXE-011～013すべてPASSし、Fixture Exchange importer validationをクローズした。
