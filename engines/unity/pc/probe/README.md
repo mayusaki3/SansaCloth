@@ -47,13 +47,17 @@ BF-003/004の初期Probeは単一domain・重複なしUV・static fixtureに限�
 
 handednessはProbe結果を確認する前に確定しない。
 
-## 非対象
+## Checkpoint全体の非対象
 
-- SurfaceQuery
-- Mesh deformation
-- SR-001～005
+BF-001～008 ProbeでSurfaceQueryとSR-001～005 fixture mappingまでは検証する。
+
+以下はCheckpoint全体の非対象:
+- Production Backend実装
+- Skinned/deformed mesh production mapping
+- 30 Basic Runsの数値一致
 - LOD
-- Performance
+- Performance threshold
+- Mobile/Quest最適化
 - Bake
 
 
@@ -127,3 +131,10 @@ Expected:
 - JSONL = header 1 + final_cp 147 + aggregate 1
 
 Capture fileは `Application.temporaryCachePath` に置くvalidation-only artifactであり、Production serialization formatではない。
+
+
+## Checkpoint Result
+
+2026-10-01 Unity PC実測でBF-001～008はすべてPASS。
+
+次段階ではこのProbe群をProduction Backendとして拡張せず、Reference BasicとBackend間の最小fixture exchange formatを先に定義する。
