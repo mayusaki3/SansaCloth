@@ -259,9 +259,17 @@ FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項
 - FXE-001～010: Rust tests implemented.
 - FXE-013 invalid semantic data rejection: Rust test implemented in advance of Unity importer validation.
 - SR-001-C0-G0 exporter example: implemented.
-- Cargo.lock update and local Rust quality gate: **OPEN**.
-- Generated SR-001-C0-G0 JSON verification: **OPEN**.
-- Unity FXE-011/012/013: **OPEN**.
+- Cargo.lock update and local Rust quality gate: **PASS**.
+  - cargo fmt --check: PASS.
+  - cargo clippy --workspace --all-targets -- -D warnings: PASS.
+  - cargo test --workspace: PASS, 88/88 tests (Core 7 + Fixture 24 + Reference 57).
+- Generated SR-001-C0-G0 JSON verification: **PASS**.
+  - Body = 147 vertices / 240 triangles.
+  - Cloth = 147 CP / Anchor 14 / Contact 147.
+  - stable_id = 0..146, 7 strips x 21 order.
+  - DomainId=1, canonical coordinate/unit declaration, Gravity/Conformity/CollisionTolerance verified.
+- Unity validation-only JSON reader: **IMPLEMENTED / runtime OPEN**.
+- Unity FXE-011/012/013 probe: **IMPLEMENTED / runtime OPEN**.
 
 Rust exporter:
 
@@ -286,4 +294,13 @@ SANSA_FXE|CONTACT_INPUT_COUNT|147
 SANSA_FXE|OUTPUT|validation\fixture-exchange\SR-001-C0-G0.json
 ```
 
-OPEN項目はローカルCargo実行結果を確認してからPASSへ変更する。依存追加に伴う`Cargo.lock`はCargoで生成し、手編集しない。
+Rust側のOPEN項目は2026-10-01に実行確認してクローズした。依存追加に伴う`Cargo.lock`とbaseline JSONはCargo/Exporterの実生成物を使用し、手編集していない。
+
+Unity importerは追加packageへ依存せず、Validation-only readerでJSON syntaxとexchange semanticsを検証する。Product serialization実装ではない。
+
+Unity runtime確認対象:
+- FXE-011: imported SR-001 geometry/count、fixed-diagonal topology、Unity mesh normal。
+- FXE-012: stable ID、7 x 21 strip、Anchor/Contact、Direct Support boundary、case inputs。
+- FXE-013: format/domain/UV/index/stable ID/strip order/normal/scalarに加え、unknown field、invalid vector length、non-finite相当JSON numberを拒否する。
+
+Unity runtime確認がPASSするまではFXE-011～013をPASS扱いしない。
