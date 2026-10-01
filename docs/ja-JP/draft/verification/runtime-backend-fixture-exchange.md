@@ -245,3 +245,45 @@ FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項
 - Body Surfaceのmultiple domain / seam / overlapはBasic v1の対象外。
 - Skinned/deformed mesh stable SurfaceReference lifecycleは本形式では解決しない。
 - O3DE検証前にBackend-neutral contractへ昇格しない。
+
+
+## 13. Implementation Status
+
+2026-10-01:
+
+- Rust validation exchange model: implemented in `sansacloth-fixture::exchange`.
+- JSON serialization/deserialization: implemented with Serde / serde_json.
+- Basic resolved fixture generator: SR-001～005 supported.
+- Basic case selector: Gravity Off/On × Conformity 0/0.5/1 supported.
+- SR-003 rigid transform: baked into exported Body/Cloth coordinates.
+- FXE-001～010: Rust tests implemented.
+- FXE-013 invalid semantic data rejection: Rust test implemented in advance of Unity importer validation.
+- SR-001-C0-G0 exporter example: implemented.
+- Cargo.lock update and local Rust quality gate: **OPEN**.
+- Generated SR-001-C0-G0 JSON verification: **OPEN**.
+- Unity FXE-011/012/013: **OPEN**.
+
+Rust exporter:
+
+```powershell
+cd reference
+cargo run -p sansacloth-fixture --example export_fixture_exchange
+```
+
+Default output:
+
+`reference/validation/fixture-exchange/SR-001-C0-G0.json`
+
+Expected exporter summary:
+
+```text
+SANSA_FXE|CASE_ID|SR-001-C0-G0
+SANSA_FXE|BODY_VERTEX_COUNT|147
+SANSA_FXE|BODY_TRIANGLE_COUNT|240
+SANSA_FXE|CP_COUNT|147
+SANSA_FXE|ANCHOR_COUNT|14
+SANSA_FXE|CONTACT_INPUT_COUNT|147
+SANSA_FXE|OUTPUT|validation\fixture-exchange\SR-001-C0-G0.json
+```
+
+OPEN項目はローカルCargo実行結果を確認してからPASSへ変更する。依存追加に伴う`Cargo.lock`はCargoで生成し、手編集しない。
