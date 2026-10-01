@@ -55,12 +55,13 @@ namespace SansaCloth.Validation
                 positions[i] = initial[i];
                 support[i] = point.anchor;
 
-                if (!indexByStableId.TryAdd(point.stableId, i))
+                if (indexByStableId.ContainsKey(point.stableId))
                 {
                     throw new FixtureExchangeException(
                         $"duplicate stable_id {point.stableId}"
                     );
                 }
+                indexByStableId.Add(point.stableId, i);
 
                 if (
                     !strips.TryGetValue(
@@ -72,12 +73,13 @@ namespace SansaCloth.Validation
                     strip = new SortedDictionary<ulong, int>();
                     strips.Add(point.stripId, strip);
                 }
-                if (!strip.TryAdd(point.stripOrder, i))
+                if (strip.ContainsKey(point.stripOrder))
                 {
                     throw new FixtureExchangeException(
                         $"duplicate strip/order {point.stripId}/{point.stripOrder}"
                     );
                 }
+                strip.Add(point.stripOrder, i);
             }
 
             // Bridge: interpolate only when both strip endpoints have direct support.
