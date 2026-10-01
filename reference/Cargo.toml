@@ -13,3 +13,5 @@ repository = "https://github.com/mayusaki3/SansaCloth"
 
 [workspace.dependencies]
 glam = "0.30"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
