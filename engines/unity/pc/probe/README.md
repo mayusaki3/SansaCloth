@@ -196,3 +196,49 @@ SANSA_FXE|FXE-013.REJECTED_CASE_COUNT|12
 FXE-013では各invalid caseについて `SANSA_FXE|FXE-013.<case>|REJECTED` も出力する。
 
 このProbeがPASSしてから、同じimported SR-001を実Solver end-to-end入力へ接続する。
+
+
+## FXE-014 Imported SR-001 SurfaceResponse E2E
+
+FXE-011～013 PASS後、同じ `SR-001-C0-G0.json` を入力源として、resolved mesh SurfaceQueryとValidation-only SurfaceResponse経路を実行する。
+
+追加ファイル:
+
+- `SansaClothResolvedMeshSurfaceQuery.cs`
+- `SansaClothImportedSurfaceResponse.cs`
+- 更新版 `SansaClothFixtureExchangeProbe.cs`
+
+`SansaClothFixtureExchangeProbe` の同じcontext menuを再実行すると、FXE-011～013に続いてFXE-014も実行される。
+
+FXE-014 stage order:
+
+```text
+Support
+-> Bridge
+-> Gravity
+-> SurfaceQuery
+-> Conformity
+-> SurfaceQuery
+-> Collision
+-> SurfaceQuery
+```
+
+今回のscopeは `SR-001-C0-G0` のみ。Gravity=0とConformity=0はidentity stageとして扱い、非zero値は未検証のため明示的に拒否する。
+
+Expected:
+
+```text
+SANSA_FXE|FXE-014.RESULT|PASS
+SANSA_FXE|FXE-014.CP_COUNT|147
+SANSA_FXE|FXE-014.SUPPORT_COUNT|14
+SANSA_FXE|FXE-014.DERIVED_CONTACT_COUNT|147
+SANSA_FXE|FXE-014.MEAN_SEPARATION_M|0
+SANSA_FXE|FXE-014.MAX_ABS_SEPARATION_M|0
+SANSA_FXE|FXE-014.MAX_PENETRATION_M|0
+SANSA_FXE|FXE-014.MAX_POSITION_DEVIATION_M|0
+SANSA_FXE|FXE-014.RMS_POSITION_DEVIATION_M|0
+```
+
+Unity floatによる丸めについてはmax separation / penetration / position deviation <= 1e-6 mをPASS範囲とする。ログには実測値を出力する。
+
+これはValidation-only E2Eであり、Production Runtime Backend完成を意味しない。
