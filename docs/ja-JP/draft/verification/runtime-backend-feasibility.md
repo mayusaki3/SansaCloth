@@ -575,13 +575,71 @@ Expected:
 - file pathをConsoleから取得可能
 - aggregate: ContactCount=147, SupportCount=14, separation/deviation metrics=0
 
-BF-008 status: **OPEN / probe implemented**。
+BF-008 status: **PASS (runtime confirmed, 2026-10-01)**。
+
+Unity実測:
+- EventId = 7de6bb81-db2b-4eaf-bf1d-8efacb220d02
+- TestId = UNITY-SR-001-C0-G0
+- JSONL RecordCount = 149
+- Header = 1
+- Final CP Measurement = 147
+- Aggregate Measurement = 1
+- StableControlPointId = 0..146, unique and contiguous
+- SurfaceReference DomainId = 1 for all CP
+- Support = Anchor 14 / Unsupported 133
+- derived ContactCount = 147
+- Surface Normal = (0,+1,0) for all CP
+- SeparationDistance = 0m for all CP
+- Aggregate ContactCount = 147
+- Aggregate SupportCount = 14
+- MeanSeparation / MaxSeparation / MaxPenetration = 0m
+- MaxPositionDeviation / RMSPositionDeviation = 0m
+
+UVから期待Positionを再構成した場合の実測最大差は約1.03e-8mで、Unity float精度による丸め範囲である。
+
+Validation実行結果からFinal CP MeasurementとAggregate Measurementを外部JSONL artifactとして取得できることを確認した。
 
 ### 14.3 Implementation
 
 - Unity: `engines/unity/pc/probe/SansaClothValidationCaptureProbe.cs`
 
-## 15. 未確定事項
+## 15. Unity PC Runtime Backend Feasibility Checkpoint Result
+
+2026-10-01のUnity PC実測結果:
+
+| Gate | Result | Confirmed scope |
+|---|---|---|
+| BF-001 Unit Mapping | PASS | canonical m <-> Unity world unit |
+| BF-002 Coordinate Mapping | PASS | Position / Direction / Normal / rigid Rotation |
+| BF-003 SurfaceReference Mapping | PASS | rigid single-domain fixture |
+| BF-004 SurfaceQuery Feasibility | PASS | static rigid fixture |
+| BF-005 Input Semantics | PASS | SR-001 C=0/G=0 semantic boundary |
+| BF-006 Output Semantics | PASS | Final common-semantic result |
+| BF-007 Basic Fixture Mapping | PASS | SR-001..005 analytic fixtures and anchors |
+| BF-008 Validation Capture | PASS | Final CP + Aggregate JSONL capture |
+
+判定: **Unity PC Runtime Backend Feasibility Checkpoint PASS**。
+
+BF-001～008にBLOCKEDまたはOPENは残らない。
+
+このPASSが意味するもの:
+- 現Reference semanticsをUnity PC Backendへ写像できる実装経路を確認した。
+- Unity固有の座標/単位都合でCore semanticsを変更する必要は現時点で認められない。
+- SR-001～005の入力fixtureをUnity側へ構成できる。
+- Backend結果をBasic Validationの共通測定意味へ戻す経路を確認した。
+
+このPASSが意味しないもの:
+- Unity Production Backend完成
+- Reference SolverとUnity Backendの30 Runs数値一致
+- Skinned/deformed mesh stable SurfaceReference完成
+- Runtime性能保証
+- Simulation LOD完成
+- Mobile/Quest対応
+- Bake対応
+
+次段階はProbe順序に従い、Reference BasicとBackend間の最小fixture exchange formatを定義してから、Unity PC SR-001 Flatの実solver end-to-end実装へ進む。
+
+## 16. 未確定事項
 
 - Unity側の具体的なmesh/deformation API
 - Unityでのstable SurfaceReference保持方式
