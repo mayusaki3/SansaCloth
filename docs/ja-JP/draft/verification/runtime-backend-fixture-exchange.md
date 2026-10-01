@@ -285,7 +285,11 @@ FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項
   - 12/12 invalid cases rejected.
   - format/domain/UV/triangle index/stable ID/strip order/normal/conformity/collision tolerance.
   - unknown field/invalid vector length/non-finite numeric value.
-- Unity FXE-014 Imported SR-001 Solver E2E: **SPECIFIED / IMPLEMENTATION OPEN**.
+- Unity FXE-014 Imported SR-001 Solver E2E: **IMPLEMENTED / RUNTIME OPEN**.
+  - resolved Body mesh SurfaceQuery implemented from imported domain_id + UV.
+  - validation SurfaceResponse stage order mirrors Reference: Support -> Bridge -> Gravity -> Query -> Conformity -> Query -> Collision -> Query.
+  - FXE-014 scope is intentionally SR-001-C0-G0 only; non-zero Gravity/Conformity are rejected until separately validated.
+  - this remains Validation-only and is not a Production Runtime Backend implementation.
 
 Rust exporter:
 
