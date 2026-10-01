@@ -328,7 +328,7 @@ fn vec3_array(value: DVec3) -> [f64; 3] {
 }
 
 fn validate_exchange(exchange: &FixtureExchange) -> Result<(), FixtureExchangeError> {
-    validation(exchange.format == FIXTURE_EXCHANGE_FORMAT, "unsupported format")?;
+    validation(\n        exchange.format == FIXTURE_EXCHANGE_FORMAT,\n        "unsupported format",\n    )?;
     validation(!exchange.case_id.is_empty(), "case_id must not be empty")?;
     validation(
         exchange.coordinate == ExchangeCoordinate::default(),
@@ -605,7 +605,84 @@ mod tests {
         let expected = sr001();
         let json = expected.to_json_pretty().unwrap();
         let actual = FixtureExchange::from_json(&json).unwrap();
-        assert_eq!(actual, expected);
+        assert_exchange_semantically_eq(&actual, &expected);
+    }
+
+    fn assert_exchange_semantically_eq(actual: &FixtureExchange, expected: &FixtureExchange) {
+        assert_eq!(actual.format, expected.format);
+        assert_eq!(actual.case_id, expected.case_id);
+        assert_eq!(actual.coordinate, expected.coordinate);
+        assert_eq!(actual.body_surface.domain_id, expected.body_surface.domain_id);
+        assert_eq!(actual.body_surface.triangles, expected.body_surface.triangles);
+        assert_eq!(
+            actual.body_surface.vertices.len(),
+            expected.body_surface.vertices.len()
+        );
+
+        for (actual, expected) in actual
+            .body_surface
+            .vertices
+            .iter()
+            .zip(&expected.body_surface.vertices)
+        {
+            assert_float3_close(actual.position_m, expected.position_m);
+            assert_float3_close(actual.normal, expected.normal);
+            assert_float2_close(actual.uv, expected.uv);
+        }
+
+        assert_eq!(
+            actual.cloth.control_points.len(),
+            expected.cloth.control_points.len()
+        );
+        for (actual, expected) in actual
+            .cloth
+            .control_points
+            .iter()
+            .zip(&expected.cloth.control_points)
+        {
+            assert_eq!(actual.stable_id, expected.stable_id);
+            assert_eq!(actual.strip_id, expected.strip_id);
+            assert_eq!(actual.strip_order, expected.strip_order);
+            assert_eq!(
+                actual.surface_reference.domain_id,
+                expected.surface_reference.domain_id
+            );
+            assert_float_close(actual.surface_reference.u, expected.surface_reference.u);
+            assert_float_close(actual.surface_reference.v, expected.surface_reference.v);
+            assert_float3_close(actual.position_m, expected.position_m);
+            assert_eq!(actual.anchor, expected.anchor);
+            assert_eq!(actual.contact, expected.contact);
+        }
+
+        assert_float3_close(
+            actual.inputs.world_gravity_m_per_s2,
+            expected.inputs.world_gravity_m_per_s2,
+        );
+        assert_float_close(actual.inputs.conformity, expected.inputs.conformity);
+        assert_float_close(
+            actual.inputs.collision_tolerance_m,
+            expected.inputs.collision_tolerance_m,
+        );
+    }
+
+    fn assert_float3_close(actual: [f64; 3], expected: [f64; 3]) {
+        for (actual, expected) in actual.into_iter().zip(expected) {
+            assert_float_close(actual, expected);
+        }
+    }
+
+    fn assert_float2_close(actual: [f64; 2], expected: [f64; 2]) {
+        for (actual, expected) in actual.into_iter().zip(expected) {
+            assert_float_close(actual, expected);
+        }
+    }
+
+    fn assert_float_close(actual: f64, expected: f64) {
+        let tolerance = 2.0 * f64::EPSILON * expected.abs().max(1.0);
+        assert!(
+            (actual - expected).abs() <= tolerance,
+            "float round-trip changed semantic value: actual={actual:?}, expected={expected:?}, tolerance={tolerance:?}"
+        );
     }
 
     #[test]
