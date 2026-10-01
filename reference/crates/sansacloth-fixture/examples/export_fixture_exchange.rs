@@ -12,14 +12,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let json = exchange.to_json_pretty()?;
 
-    let output = env::args_os()
-        .nth(1)
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from("validation")
-                .join("fixture-exchange")
-                .join("SR-001-C0-G0.json")
-        });
+    let output = env::args_os().nth(1).map(PathBuf::from).unwrap_or_else(|| {
+        PathBuf::from("validation")
+            .join("fixture-exchange")
+            .join("SR-001-C0-G0.json")
+    });
 
     if let Some(parent) = output.parent() {
         fs::create_dir_all(parent)?;
@@ -35,10 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "SANSA_FXE|BODY_TRIANGLE_COUNT|{}",
         exchange.body_surface.triangles.len()
     );
-    println!(
-        "SANSA_FXE|CP_COUNT|{}",
-        exchange.cloth.control_points.len()
-    );
+    println!("SANSA_FXE|CP_COUNT|{}", exchange.cloth.control_points.len());
     println!(
         "SANSA_FXE|ANCHOR_COUNT|{}",
         exchange
