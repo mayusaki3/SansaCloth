@@ -45,6 +45,7 @@ namespace SansaCloth.Validation
                 RunFxe011(document);
                 RunFxe012(document);
                 RunFxe013(fixtureExchangeJson.text);
+                RunFxe014(document);
             }
             catch (Exception error)
             {
@@ -262,6 +263,112 @@ namespace SansaCloth.Validation
             LogDouble(
                 "FXE-012.COLLISION_TOLERANCE_M",
                 document.inputs.collisionToleranceM
+            );
+        }
+
+        private static void RunFxe014(FixtureExchangeDocument document)
+        {
+            var surfaceQuery = new SansaClothResolvedMeshSurfaceQuery(
+                document.bodySurface
+            );
+            ImportedSurfaceResponseResult result =
+                SansaClothImportedSurfaceResponse.SolveSr001C0G0(
+                    document,
+                    surfaceQuery
+                );
+
+            int cpCount = result.positionsM.Length;
+            int supportCount = 0;
+            int derivedContactCount = 0;
+            double separationSumM = 0.0;
+            float maxAbsSeparationM = 0.0f;
+            float maxPenetrationM = 0.0f;
+            float maxPositionDeviationM = 0.0f;
+            double squaredPositionDeviationSum = 0.0;
+            float collisionToleranceM =
+                (float)document.inputs.collisionToleranceM;
+
+            for (int i = 0; i < cpCount; ++i)
+            {
+                if (result.support[i])
+                {
+                    supportCount++;
+                }
+
+                float separationM = result.finalQueries[i].separationM;
+                if (separationM <= collisionToleranceM)
+                {
+                    derivedContactCount++;
+                }
+
+                separationSumM += separationM;
+                maxAbsSeparationM = Mathf.Max(
+                    maxAbsSeparationM,
+                    Mathf.Abs(separationM)
+                );
+                maxPenetrationM = Mathf.Max(
+                    maxPenetrationM,
+                    Mathf.Max(0.0f, -separationM)
+                );
+
+                float positionDeviationM = Vector3.Distance(
+                    result.initialPositionsM[i],
+                    result.positionsM[i]
+                );
+                maxPositionDeviationM = Mathf.Max(
+                    maxPositionDeviationM,
+                    positionDeviationM
+                );
+                squaredPositionDeviationSum +=
+                    (double)positionDeviationM * positionDeviationM;
+            }
+
+            double meanSeparationM =
+                cpCount == 0 ? 0.0 : separationSumM / cpCount;
+            double rmsPositionDeviationM =
+                cpCount == 0
+                    ? 0.0
+                    : Math.Sqrt(squaredPositionDeviationSum / cpCount);
+
+            Require(
+                cpCount == ExpectedControlPointCount,
+                "FXE-014 control point count mismatch"
+            );
+            Require(
+                supportCount == ExpectedAnchorCount,
+                "FXE-014 support count mismatch"
+            );
+            Require(
+                derivedContactCount == ExpectedContactCount,
+                "FXE-014 derived contact count mismatch"
+            );
+            Require(
+                maxAbsSeparationM <= UnityTolerance,
+                "FXE-014 separation exceeds Unity tolerance"
+            );
+            Require(
+                maxPenetrationM <= UnityTolerance,
+                "FXE-014 penetration exceeds Unity tolerance"
+            );
+            Require(
+                maxPositionDeviationM <= UnityTolerance,
+                "FXE-014 position deviation exceeds Unity tolerance"
+            );
+
+            Log("FXE-014.RESULT", "PASS");
+            LogInt("FXE-014.CP_COUNT", cpCount);
+            LogInt("FXE-014.SUPPORT_COUNT", supportCount);
+            LogInt("FXE-014.DERIVED_CONTACT_COUNT", derivedContactCount);
+            LogDouble("FXE-014.MEAN_SEPARATION_M", meanSeparationM);
+            LogDouble("FXE-014.MAX_ABS_SEPARATION_M", maxAbsSeparationM);
+            LogDouble("FXE-014.MAX_PENETRATION_M", maxPenetrationM);
+            LogDouble(
+                "FXE-014.MAX_POSITION_DEVIATION_M",
+                maxPositionDeviationM
+            );
+            LogDouble(
+                "FXE-014.RMS_POSITION_DEVIATION_M",
+                rmsPositionDeviationM
             );
         }
 
