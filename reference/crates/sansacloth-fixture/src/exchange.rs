@@ -410,8 +410,7 @@ fn validate_exchange(exchange: &FixtureExchange) -> Result<(), FixtureExchangeEr
         "world gravity is not finite",
     )?;
     validation(
-        exchange.inputs.conformity.is_finite()
-            && (0.0..=1.0).contains(&exchange.inputs.conformity),
+        exchange.inputs.conformity.is_finite() && (0.0..=1.0).contains(&exchange.inputs.conformity),
         "conformity must be finite and in [0,1]",
     )?;
     validation(
@@ -615,8 +614,14 @@ mod tests {
         assert_eq!(actual.format, expected.format);
         assert_eq!(actual.case_id, expected.case_id);
         assert_eq!(actual.coordinate, expected.coordinate);
-        assert_eq!(actual.body_surface.domain_id, expected.body_surface.domain_id);
-        assert_eq!(actual.body_surface.triangles, expected.body_surface.triangles);
+        assert_eq!(
+            actual.body_surface.domain_id,
+            expected.body_surface.domain_id
+        );
+        assert_eq!(
+            actual.body_surface.triangles,
+            expected.body_surface.triangles
+        );
         assert_eq!(
             actual.body_surface.vertices.len(),
             expected.body_surface.vertices.len()
@@ -710,8 +715,7 @@ mod tests {
 
         let mut invalid = base.clone();
         invalid.cloth.control_points[1].strip_id = invalid.cloth.control_points[0].strip_id;
-        invalid.cloth.control_points[1].strip_order =
-            invalid.cloth.control_points[0].strip_order;
+        invalid.cloth.control_points[1].strip_order = invalid.cloth.control_points[0].strip_order;
         assert!(invalid.validate().is_err());
 
         let mut invalid = base.clone();
