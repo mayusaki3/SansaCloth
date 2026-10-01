@@ -326,13 +326,101 @@ namespace SansaCloth.Validation
                 document => document.inputs.collisionToleranceM = -0.001
             );
 
-            const int expectedRejected = 9;
+            rejected += RejectJsonText(
+                "UNKNOWN_FIELD",
+                validJson.Insert(validJson.IndexOf('{') + 1, "\"unexpected\":0,")
+            );
+            rejected += RejectJsonText(
+                "VECTOR_LENGTH",
+                ReplaceArrayForKey(
+                    validJson,
+                    "world_gravity_m_per_s2",
+                    "[0.0,0.0]"
+                )
+            );
+            rejected += RejectJsonText(
+                "NONFINITE_NUMBER",
+                ReplaceScalarForKey(validJson, "conformity", "1e999")
+            );
+
+            const int expectedRejected = 12;
             Require(
                 rejected == expectedRejected,
                 $"FXE-013 rejection count mismatch: {rejected}/{expectedRejected}"
             );
             Log("FXE-013.RESULT", "PASS");
             LogInt("FXE-013.REJECTED_CASE_COUNT", rejected);
+        }
+
+        private static int RejectJsonText(string key, string invalidJson)
+        {
+            try
+            {
+                SansaClothFixtureExchangeJson.Parse(invalidJson);
+            }
+            catch (FixtureExchangeException)
+            {
+                Log($"FXE-013.{key}", "REJECTED");
+                return 1;
+            }
+
+            throw new FixtureExchangeException(
+                $"FXE-013 {key} invalid JSON data was accepted"
+            );
+        }
+
+        private static string ReplaceArrayForKey(
+            string json,
+            string key,
+            string replacement
+        )
+        {
+            int keyIndex = json.IndexOf(
+                $"\"{key}\"",
+                StringComparison.Ordinal
+            );
+            Require(keyIndex >= 0, $"FXE-013 JSON key not found: {key}");
+            int start = json.IndexOf('[', keyIndex);
+            int end = json.IndexOf(']', start);
+            Require(start >= 0 && end >= start, $"FXE-013 array not found: {key}");
+            return json.Substring(0, start)
+                + replacement
+                + json.Substring(end + 1);
+        }
+
+        private static string ReplaceScalarForKey(
+            string json,
+            string key,
+            string replacement
+        )
+        {
+            int keyIndex = json.IndexOf(
+                $"\"{key}\"",
+                StringComparison.Ordinal
+            );
+            Require(keyIndex >= 0, $"FXE-013 JSON key not found: {key}");
+            int colon = json.IndexOf(':', keyIndex);
+            Require(colon >= 0, $"FXE-013 scalar colon not found: {key}");
+            int start = colon + 1;
+            while (start < json.Length && char.IsWhiteSpace(json[start]))
+            {
+                start++;
+            }
+            int end = start;
+            while (
+                end < json.Length
+                && json[end] != ','
+                && json[end] != '}'
+                && json[end] != '\r'
+                && json[end] != '\n'
+            )
+            {
+                end++;
+            }
+            Require(end > start, $"FXE-013 scalar value not found: {key}");
+            return json.Substring(0, start)
+                + replacement
+                + json.Substring(end);
         }
 
         private static int RejectMutation(
