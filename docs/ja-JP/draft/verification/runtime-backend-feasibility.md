@@ -637,7 +637,16 @@ BF-001～008にBLOCKEDまたはOPENは残らない。
 - Mobile/Quest対応
 - Bake対応
 
+Checkpoint後のRust quality gate (2026-10-01):
+- `cargo fmt --check`: PASS
+- `cargo clippy --workspace --all-targets -- -D warnings`: PASS
+- `cargo test --workspace`: PASS (Core 7 / Fixture 13 / Reference 57 = 77 tests)
+- `git status`: clean
+
 次段階はProbe順序に従い、Reference BasicとBackend間の最小fixture exchange formatを定義してから、Unity PC SR-001 Flatの実solver end-to-end実装へ進む。
+
+Fixture exchange設計:
+- `docs/ja-JP/draft/verification/runtime-backend-fixture-exchange.md`
 
 ## 16. 未確定事項
 
