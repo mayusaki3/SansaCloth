@@ -6,6 +6,8 @@ use std::f64::consts::PI;
 
 use glam::DVec3;
 
+pub mod exchange;
+
 pub const FIXTURE_WIDTH_M: f64 = 0.20;
 pub const FIXTURE_DEPTH_M: f64 = 0.10;
 pub const FEATURE_WIDTH_M: f64 = 0.10;
