@@ -8,3 +8,5 @@ repository.workspace = true
 [dependencies]
 glam.workspace = true
 sansacloth-core = { path = "../sansacloth-core" }
+serde.workspace = true
+serde_json.workspace = true
