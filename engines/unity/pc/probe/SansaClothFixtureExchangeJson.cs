@@ -390,9 +390,17 @@ namespace SansaCloth.Validation
         )
         {
             object value = Require(obj, key, path);
-            Check(value is double, $"{path}.{key} must be a number");
-            double result = (double)value;
-            Check(IsFinite(result), $"{path}.{key} must be finite");
+            Check(value is JsonNumber, $"{path}.{key} must be a number");
+            string token = ((JsonNumber)value).token;
+            Check(
+                double.TryParse(
+                    token,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out double result
+                ) && IsFinite(result),
+                $"{path}.{key} must be finite"
+            );
             return result;
         }
 
@@ -402,14 +410,19 @@ namespace SansaCloth.Validation
             string path
         )
         {
-            double value = RequireDouble(obj, key, path);
+            object value = Require(obj, key, path);
+            Check(value is JsonNumber, $"{path}.{key} must be a number");
+            string token = ((JsonNumber)value).token;
             Check(
-                value >= 0.0
-                    && value <= ulong.MaxValue
-                    && Math.Truncate(value) == value,
+                ulong.TryParse(
+                    token,
+                    NumberStyles.None,
+                    CultureInfo.InvariantCulture,
+                    out ulong result
+                ),
                 $"{path}.{key} must be a non-negative integer"
             );
-            return checked((ulong)value);
+            return result;
         }
 
         private static double[] RequireDoubleArray(
@@ -423,26 +436,39 @@ namespace SansaCloth.Validation
             var result = new double[count];
             for (int i = 0; i < count; ++i)
             {
-                Check(array[i] is double, $"{path}[{i}] must be a number");
-                result[i] = (double)array[i];
-                Check(IsFinite(result[i]), $"{path}[{i}] must be finite");
+                Check(array[i] is JsonNumber, $"{path}[{i}] must be a number");
+                string token = ((JsonNumber)array[i]).token;
+                Check(
+                    double.TryParse(
+                        token,
+                        NumberStyles.Float,
+                        CultureInfo.InvariantCulture,
+                        out result[i]
+                    ) && IsFinite(result[i]),
+                    $"{path}[{i}] must be finite"
+                );
             }
             return result;
         }
 
         private static int[] RequireIntArray(object value, int count, string path)
         {
-            double[] values = RequireDoubleArray(value, count, path);
+            List<object> values = RequireArray(value, path);
+            Check(values.Count == count, $"{path} must contain {count} values");
             var result = new int[count];
             for (int i = 0; i < count; ++i)
             {
+                Check(values[i] is JsonNumber, $"{path}[{i}] must be a number");
+                string token = ((JsonNumber)values[i]).token;
                 Check(
-                    values[i] >= 0.0
-                        && values[i] <= int.MaxValue
-                        && Math.Truncate(values[i]) == values[i],
+                    int.TryParse(
+                        token,
+                        NumberStyles.None,
+                        CultureInfo.InvariantCulture,
+                        out result[i]
+                    ) && result[i] >= 0,
                     $"{path}[{i}] must be a non-negative integer"
                 );
-                result[i] = checked((int)values[i]);
             }
             return result;
         }
@@ -719,12 +745,10 @@ namespace SansaCloth.Validation
                 return (char)value;
             }
 
-            private double ReadNumber()
+            private object ReadNumber()
             {
                 int start = index;
-                if (TryConsume('-'))
-                {
-                }
+                TryConsume('-');
 
                 if (TryConsume('0'))
                 {
@@ -753,19 +777,7 @@ namespace SansaCloth.Validation
                 }
 
                 string token = text.Substring(start, index - start);
-                if (
-                    !double.TryParse(
-                        token,
-                        NumberStyles.Float,
-                        CultureInfo.InvariantCulture,
-                        out double value
-                    )
-                    || !IsFinite(value)
-                )
-                {
-                    Fail($"invalid number '{token}'");
-                }
-                return value;
+                return new JsonNumber(token);
             }
 
             private void ReadDigits(bool requireOne)
