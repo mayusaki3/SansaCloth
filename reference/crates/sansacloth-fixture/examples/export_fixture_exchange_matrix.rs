@@ -6,7 +6,9 @@ use sansacloth_fixture::exchange::{
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output_dir = env::args_os().nth(1).map(PathBuf::from).unwrap_or_else(|| {
-        PathBuf::from("validation").join("fixture-exchange").join("basic-v1")
+        PathBuf::from("validation")
+            .join("fixture-exchange")
+            .join("basic-v1")
     });
 
     fs::create_dir_all(&output_dir)?;
@@ -50,11 +52,7 @@ fn write_and_verify(
     let written_json = fs::read_to_string(&output)?;
     let imported = FixtureExchange::from_json(&written_json)?;
     if !imported.semantically_equivalent(exchange) {
-        return Err(format!(
-            "round-trip semantic mismatch for {}",
-            exchange.case_id
-        )
-        .into());
+        return Err(format!("round-trip semantic mismatch for {}", exchange.case_id).into());
     }
 
     println!("SANSA_FXE|MATRIX_CASE|{}|PASS", exchange.case_id);
