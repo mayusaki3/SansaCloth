@@ -206,9 +206,8 @@ pub const BASIC_CONFORMITY_CASES: [BasicConformityCase; 3] = [
     BasicConformityCase::C1,
 ];
 
-pub const BASIC_EXCHANGE_CASE_COUNT: usize = BASIC_EXCHANGE_SCENARIOS.len()
-    * BASIC_GRAVITY_CASES.len()
-    * BASIC_CONFORMITY_CASES.len();
+pub const BASIC_EXCHANGE_CASE_COUNT: usize =
+    BASIC_EXCHANGE_SCENARIOS.len() * BASIC_GRAVITY_CASES.len() * BASIC_CONFORMITY_CASES.len();
 
 impl BasicConformityCase {
     fn id(self) -> &'static str {
