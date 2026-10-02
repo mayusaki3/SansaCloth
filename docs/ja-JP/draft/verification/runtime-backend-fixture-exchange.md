@@ -225,8 +225,11 @@ Exporter/Importer実装前に以下をテストIDとして固定する。
 - FXE-012 Unity SR-001 Boundary: imported SR-001 C0/G0がBF-005/006の147/14/147 semantic countsを再現する。
 - FXE-013 Invalid Data: malformed domain/UV/index/id/normal/scalarを拒否する。
 - FXE-014 Unity Imported SR-001 Solver E2E: imported `SR-001-C0-G0`だけを入力源としてUnity SurfaceQuery/Response経路を実行し、147 CPすべてについて最終Separation=0、Support=14、Contact=147、max position deviation=0（Unity float tolerance内）を再現する。
+- FXE-015 Rust 30-Case Matrix Export: SR-001～005 × Gravity Off/On × Conformity 0/0.5/1の30 case_idがuniqueで、30 JSON filesを生成し、各fileを再importしてsemantic round-tripできる。
+- FXE-016 Unity 30-Case Matrix Import: 30 JSON filesをすべて受理し、各Scenario内6 casesでresolved Body/Cloth geometry・SurfaceReference・Anchor/Contactが不変、Gravity/Conformityだけがcase_idどおり変化することを確認する。SR-003 Anchor=7とbaked Convex-Side geometryもここで再確認する。
+- FXE-017 Unity Nonzero SurfaceResponse: FXE-016完了後にGravity On / Conformity 0.5/1.0をValidation-only SurfaceResponseへ段階的に追加し、Referenceの同一case出力と比較する。Reference固有の未交換settingをFixture Exchangeへ追加して合わせてはならない。
 
-FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項目をUnity integration validationとする。
+FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 Unity integration validationとする。30-case拡張ではFXE-015 → FXE-016 → FXE-017の順に進め、入力交換とSurfaceResponse差異を分離する。
 
 ## 11. Implementation Order
 
@@ -237,7 +240,10 @@ FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項
 5. Unity PC importer probeを追加。
 6. FXE-011/012/013をUnityで確認。
 7. FXE-014を実装し、imported SR-001だけを入力源として実Solver end-to-endを確認する。
-8. SR-002～005 / 30 casesへ拡張する。
+8. FXE-015でRust exporterを30 casesへ拡張する。
+9. FXE-016でUnity importerの30-case matrixを確認する。
+10. FXE-017で非zero Gravity / Conformity SurfaceResponseをReference出力と比較する。
+11. 30 cases完了後にO3DE PC検証へ進む。
 
 ## 12. 未確定事項
 
@@ -294,6 +300,9 @@ FXE-001～010をRust側実装の最低テスト、FXE-011～013のUnity該当項
   - RMS Position Deviation=3.0006734076066516e-9 m.
   - Unity validation tolerance 1e-6 m以内。
   - this remains Validation-only and is not a Production Runtime Backend implementation.
+- FXE-015 Rust 30-Case Matrix Export: **SPECIFIED / IMPLEMENTATION OPEN**.
+- FXE-016 Unity 30-Case Matrix Import: **SPECIFIED / IMPLEMENTATION OPEN**.
+- FXE-017 Unity Nonzero SurfaceResponse: **SPECIFIED / IMPLEMENTATION OPEN**.
 
 Rust exporter:
 
