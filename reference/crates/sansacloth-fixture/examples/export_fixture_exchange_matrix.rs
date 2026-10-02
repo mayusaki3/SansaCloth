@@ -1,4 +1,4 @@
-use std::{env, fs, path::PathBuf};
+use std::{collections::HashSet, env, fs, path::PathBuf};
 
 use sansacloth_fixture::exchange::{
     BASIC_EXCHANGE_CASE_COUNT, FixtureExchange, generate_basic_exchange_matrix,
@@ -21,8 +21,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .into());
     }
 
+    let mut case_ids = HashSet::with_capacity(BASIC_EXCHANGE_CASE_COUNT);
     let mut written = 0usize;
     for exchange in &exchanges {
+        if !case_ids.insert(exchange.case_id.clone()) {
+            return Err(format!("duplicate matrix case_id: {}", exchange.case_id).into());
+        }
         write_and_verify(&output_dir, exchange)?;
         written += 1;
     }
