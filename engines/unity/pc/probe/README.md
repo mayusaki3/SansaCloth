@@ -242,3 +242,42 @@ SANSA_FXE|FXE-014.RMS_POSITION_DEVIATION_M|0
 Unity floatによる丸めについてはmax separation / penetration / position deviation <= 1e-6 mをPASS範囲とする。ログには実測値を出力する。
 
 これはValidation-only E2Eであり、Production Runtime Backend完成を意味しない。
+
+
+## FXE-016 30-Case Fixture Exchange Matrix Import
+
+Reference baseline `reference/validation/fixture-exchange/basic-v1/` の30 JSONをUnityへコピーし、`SansaClothFixtureExchangeMatrixProbe`へまとめて割り当てる。
+
+追加ファイル:
+
+- `SansaClothFixtureExchangeMatrixProbe.cs`
+
+Unity側の例:
+
+```text
+Assets/SansaCloth/Probe/Fixtures/BasicV1/
+  SR-001-C0-G0.json
+  ...
+  SR-005-C1-G1.json
+```
+
+空のGameObjectへ `SansaClothFixtureExchangeMatrixProbe` を追加し、`Fixture Exchange Matrix Json` 配列へ30 TextAssetsを割り当てる。配列順は検証に使用しない。case_idで識別する。
+
+Context menu:
+
+```text
+Run SansaCloth Fixture Exchange Matrix Probe
+```
+
+Expected final summary:
+
+```text
+SANSA_FXE|FXE-016.CASE_COUNT|30
+SANSA_FXE|FXE-016.SCENARIO_COUNT|5
+SANSA_FXE|FXE-016.SR003_BAKED_CONVEX_SIDE|PASS
+SANSA_FXE|FXE-016.RESULT|PASS
+```
+
+各30 caseについて `FXE-016.CASE.<case_id>|PASS`、各5 scenarioについて6 casesとscenario PASSも出力する。
+
+FXE-016はimport/input matrix検証であり、非zero Gravity / ConformityのSurfaceResponse実行はFXE-017で扱う。
