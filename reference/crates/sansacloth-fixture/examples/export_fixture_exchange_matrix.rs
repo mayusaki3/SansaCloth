@@ -45,10 +45,10 @@ fn write_and_verify(
 
     let written_json = fs::read_to_string(&output)?;
     let imported = FixtureExchange::from_json(&written_json)?;
-    if imported.case_id != exchange.case_id {
+    if !imported.semantically_equivalent(exchange) {
         return Err(format!(
-            "round-trip case_id mismatch: {} != {}",
-            imported.case_id, exchange.case_id
+            "round-trip semantic mismatch for {}",
+            exchange.case_id
         )
         .into());
     }
