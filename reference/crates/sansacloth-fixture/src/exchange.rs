@@ -189,6 +189,27 @@ pub enum BasicConformityCase {
     C1,
 }
 
+pub const BASIC_EXCHANGE_SCENARIOS: [BasicExchangeScenario; 5] = [
+    BasicExchangeScenario::Sr001Flat,
+    BasicExchangeScenario::Sr002ConvexUp,
+    BasicExchangeScenario::Sr003ConvexSide,
+    BasicExchangeScenario::Sr004ConcaveShallow,
+    BasicExchangeScenario::Sr005ConcaveDeep,
+];
+
+pub const BASIC_GRAVITY_CASES: [BasicGravityCase; 2] =
+    [BasicGravityCase::Off, BasicGravityCase::On];
+
+pub const BASIC_CONFORMITY_CASES: [BasicConformityCase; 3] = [
+    BasicConformityCase::C0,
+    BasicConformityCase::C05,
+    BasicConformityCase::C1,
+];
+
+pub const BASIC_EXCHANGE_CASE_COUNT: usize = BASIC_EXCHANGE_SCENARIOS.len()
+    * BASIC_GRAVITY_CASES.len()
+    * BASIC_CONFORMITY_CASES.len();
+
 impl BasicConformityCase {
     fn id(self) -> &'static str {
         match self {
@@ -254,6 +275,18 @@ impl FixtureExchange {
     pub fn validate(&self) -> Result<(), FixtureExchangeError> {
         validate_exchange(self)
     }
+}
+
+pub fn generate_basic_exchange_matrix() -> Vec<FixtureExchange> {
+    let mut exchanges = Vec::with_capacity(BASIC_EXCHANGE_CASE_COUNT);
+    for scenario in BASIC_EXCHANGE_SCENARIOS {
+        for gravity in BASIC_GRAVITY_CASES {
+            for conformity in BASIC_CONFORMITY_CASES {
+                exchanges.push(generate_basic_exchange(scenario, gravity, conformity));
+            }
+        }
+    }
+    exchanges
 }
 
 pub fn generate_basic_exchange(
@@ -691,6 +724,36 @@ mod tests {
             (actual - expected).abs() <= tolerance,
             "float round-trip changed semantic value: actual={actual:?}, expected={expected:?}, tolerance={tolerance:?}"
         );
+    }
+
+    #[test]
+    fn fxe_015_basic_matrix_has_thirty_unique_round_trip_cases() {
+        let exchanges = generate_basic_exchange_matrix();
+        assert_eq!(exchanges.len(), BASIC_EXCHANGE_CASE_COUNT);
+        assert_eq!(BASIC_EXCHANGE_CASE_COUNT, 30);
+
+        let mut case_ids = HashSet::new();
+        for expected in &exchanges {
+            assert!(
+                case_ids.insert(expected.case_id.clone()),
+                "duplicate case_id {}",
+                expected.case_id
+            );
+            let json = expected.to_json_pretty().unwrap();
+            let actual = FixtureExchange::from_json(&json).unwrap();
+            assert_exchange_semantically_eq(&actual, expected);
+        }
+
+        for scenario in ["SR-001", "SR-002", "SR-003", "SR-004", "SR-005"] {
+            for gravity in ["G0", "G1"] {
+                for conformity in ["C0", "C05", "C1"] {
+                    assert!(
+                        case_ids.contains(&format!("{scenario}-{conformity}-{gravity}")),
+                        "missing matrix case {scenario}-{conformity}-{gravity}"
+                    );
+                }
+            }
+        }
     }
 
     #[test]
