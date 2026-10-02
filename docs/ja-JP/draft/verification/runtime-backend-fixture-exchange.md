@@ -300,14 +300,20 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - RMS Position Deviation=3.0006734076066516e-9 m.
   - Unity validation tolerance 1e-6 m以内。
   - this remains Validation-only and is not a Production Runtime Backend implementation.
-- FXE-015 Rust 30-Case Matrix Export: **IMPLEMENTED / LOCAL QUALITY GATE OPEN**.
+- FXE-015 Rust 30-Case Matrix Export: **PASS**.
   - `generate_basic_exchange_matrix()` enumerates 5 scenarios x 2 gravity cases x 3 conformity cases = 30.
-  - test verifies exactly 30 unique case_id values and semantic JSON round-trip for every case.
-  - `export_fixture_exchange_matrix` writes one JSON file per case and re-imports the written file for semantic equivalence.
-  - duplicate case_id is rejected before overwrite.
-  - default output directory: `validation/fixture-exchange/basic-v1/`.
-  - PASS requires local fmt/clippy/test plus exporter summary 30/30/30.
-- FXE-016 Unity 30-Case Matrix Import: **SPECIFIED / IMPLEMENTATION OPEN**.
+  - exactly 30 unique case_id values and semantic JSON round-trip verified.
+  - `export_fixture_exchange_matrix` wrote and re-imported all 30 files: 30/30/30 PASS.
+  - local quality gate: fmt PASS / clippy PASS / tests 89/89 PASS (Core 7 + Fixture 25 + Reference 57).
+  - generated baseline committed as `7f75335f4350738eff683f910f793aa8e49e60db`.
+  - baseline directory: `reference/validation/fixture-exchange/basic-v1/`.
+- FXE-016 Unity 30-Case Matrix Import: **IMPLEMENTED / RUNTIME OPEN**.
+  - dedicated `SansaClothFixtureExchangeMatrixProbe` accepts exactly 30 JSON TextAssets.
+  - verifies 30 unique expected case IDs and 6 cases per scenario.
+  - verifies Body/Cloth/SurfaceReference/Anchor/Contact invariance within each scenario.
+  - verifies case_id-specific Gravity and Conformity values and fixed CollisionTolerance=0.
+  - verifies SR-003 Anchor=7 and baked center position=(+0.03,0,0), normal=(+1,0,0).
+  - runtime PASS is not recorded until Unity execution confirms all 30 files.
 - FXE-017 Unity Nonzero SurfaceResponse: **SPECIFIED / IMPLEMENTATION OPEN**.
 
 Rust exporter:
