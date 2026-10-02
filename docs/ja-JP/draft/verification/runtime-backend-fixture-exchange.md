@@ -300,7 +300,13 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - RMS Position Deviation=3.0006734076066516e-9 m.
   - Unity validation tolerance 1e-6 m以内。
   - this remains Validation-only and is not a Production Runtime Backend implementation.
-- FXE-015 Rust 30-Case Matrix Export: **SPECIFIED / IMPLEMENTATION OPEN**.
+- FXE-015 Rust 30-Case Matrix Export: **IMPLEMENTED / LOCAL QUALITY GATE OPEN**.
+  - `generate_basic_exchange_matrix()` enumerates 5 scenarios x 2 gravity cases x 3 conformity cases = 30.
+  - test verifies exactly 30 unique case_id values and semantic JSON round-trip for every case.
+  - `export_fixture_exchange_matrix` writes one JSON file per case and re-imports the written file for semantic equivalence.
+  - duplicate case_id is rejected before overwrite.
+  - default output directory: `validation/fixture-exchange/basic-v1/`.
+  - PASS requires local fmt/clippy/test plus exporter summary 30/30/30.
 - FXE-016 Unity 30-Case Matrix Import: **SPECIFIED / IMPLEMENTATION OPEN**.
 - FXE-017 Unity Nonzero SurfaceResponse: **SPECIFIED / IMPLEMENTATION OPEN**.
 
@@ -337,3 +343,26 @@ Unity runtime確認対象:
 - FXE-013: format/domain/UV/index/stable ID/strip order/normal/scalarに加え、unknown field、invalid vector length、non-finite相当JSON numberを拒否する。
 
 Unity runtime確認は2026-10-01にFXE-011～013すべてPASSし、Fixture Exchange importer validationをクローズした。
+
+
+### FXE-015 local quality gate
+
+From `reference/`:
+
+```powershell
+cargo fmt --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo run -p sansacloth-fixture --example export_fixture_exchange_matrix
+```
+
+Expected matrix summary:
+
+```text
+SANSA_FXE|MATRIX_CASE_COUNT|30
+SANSA_FXE|MATRIX_WRITTEN_COUNT|30
+SANSA_FXE|MATRIX_ROUND_TRIP_COUNT|30
+SANSA_FXE|MATRIX_OUTPUT_DIR|validation\fixture-exchange\basic-v1
+```
+
+Exporter also emits `SANSA_FXE|MATRIX_CASE|<case_id>|PASS` for each of the 30 cases. Generated files are runtime validation artifacts; FXE-015 PASS is recorded only after the local Cargo quality gate and generated-file status are reviewed.
