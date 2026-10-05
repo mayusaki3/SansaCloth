@@ -320,7 +320,13 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - case_id-specific Gravity / Conformity and CollisionTolerance=0 verified.
   - SR-003 baked Convex-Side verification PASS, including Anchor=7 and baked center geometry.
   - final runtime summary: Case=30 / Scenario=5 / SR003 baked Convex-Side PASS / FXE-016 PASS.
-- FXE-017 Unity Nonzero SurfaceResponse: **SPECIFIED / REFERENCE RESULT EXPORT IMPLEMENTATION OPEN**.
+- FXE-017 Unity Nonzero SurfaceResponse: **IN PROGRESS**.
+  - FXE-017A Reference Result Export: **IMPLEMENTED / LOCAL QUALITY GATE OPEN**.
+  - Reference result format: `sansacloth.validation.surface-response-result/0`.
+  - exporter runs Reference-v1 SurfaceResponse against the same resolved Fixture Exchange mesh/SurfaceReference boundary used by Unity.
+  - each CP records Support plus Bridge/Gravity/Conformity/Collision/final positions, final Surface position/normal, Separation and Contact.
+  - result artifact is comparison output only; it is not Fixture Exchange input and does not change the exchange contract.
+  - FXE-017B/C/D Unity comparison remains OPEN until Reference result artifacts pass the local quality gate.
 
 Rust exporter:
 
@@ -378,3 +384,26 @@ SANSA_FXE|MATRIX_OUTPUT_DIR|validation\fixture-exchange\basic-v1
 ```
 
 Exporter also emits `SANSA_FXE|MATRIX_CASE|<case_id>|PASS` for each of the 30 cases. Generated files are runtime validation artifacts; FXE-015 PASS is recorded only after the local Cargo quality gate and generated-file status are reviewed.
+
+
+### FXE-017A Reference SurfaceResponse Result Matrix
+
+From `reference/`:
+
+```powershell
+cargo fmt --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo run -p sansacloth-reference --example export_surface_response_result_matrix
+```
+
+Expected final summary:
+
+```text
+SANSA_FXE|FXE-017A.CASE_COUNT|30
+SANSA_FXE|FXE-017A.WRITTEN_COUNT|30
+SANSA_FXE|FXE-017A.OUTPUT_DIR|validation\surface-response-result\basic-v1
+SANSA_FXE|FXE-017A.RESULT|PASS
+```
+
+各caseについて `SANSA_FXE|FXE-017A.CASE.<case_id>|PASS` を出力する。生成結果は `reference/validation/surface-response-result/basic-v1/` に置き、quality gate確認後にReference comparison baselineとして確定する。
