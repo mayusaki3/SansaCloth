@@ -228,6 +228,12 @@ Exporter/Importer実装前に以下をテストIDとして固定する。
 - FXE-015 Rust 30-Case Matrix Export: SR-001～005 × Gravity Off/On × Conformity 0/0.5/1の30 case_idがuniqueで、30 JSON filesを生成し、各fileを再importしてsemantic round-tripできる。
 - FXE-016 Unity 30-Case Matrix Import: 30 JSON filesをすべて受理し、各Scenario内6 casesでresolved Body/Cloth geometry・SurfaceReference・Anchor/Contactが不変、Gravity/Conformityだけがcase_idどおり変化することを確認する。SR-003 Anchor=7とbaked Convex-Side geometryもここで再確認する。
 - FXE-017 Unity Nonzero SurfaceResponse: FXE-016完了後にGravity On / Conformity 0.5/1.0をValidation-only SurfaceResponseへ段階的に追加し、Referenceの同一case出力と比較する。Reference固有の未交換settingをFixture Exchangeへ追加して合わせてはならない。
+  - FXE-017A Reference Result Export: 30 casesについてReference-v1 validation profileでSupport/Bridge/Gravity/Conformity/Collision/finalを実行し、比較用Validation Result JSONを生成する。
+  - FXE-017B Unity Gravity Response: まずC0 casesでGravity Off/OnをReference stage/resultと比較し、Gravity差を独立に確認する。
+  - FXE-017C Unity Conformity Response: Gravity境界PASS後にC0.5/C1を追加し、Gravity後→Conformity後のstage差を比較する。
+  - FXE-017D Unity Final SurfaceResponse: Collision後/final queryを含め30 casesを比較する。
+  - Validation Result artifactはFixture Exchange入力形式とは別物とし、Reference stage snapshotやReference-v1 settingをFixture Exchangeへ追加しない。
+  - Reference-v1 validation profileは比較実装側で固定する: characteristic_length=0.10m / quasi_static_gravity_scale=0.1 / conformity_reach=0.02m / collision toleranceはcase input、SR-003のみOneEdge、他はBothEdges。
 
 FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 Unity integration validationとする。30-case拡張ではFXE-015 → FXE-016 → FXE-017の順に進め、入力交換とSurfaceResponse差異を分離する。
 
@@ -307,14 +313,14 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - local quality gate: fmt PASS / clippy PASS / tests 89/89 PASS (Core 7 + Fixture 25 + Reference 57).
   - generated baseline committed as `7f75335f4350738eff683f910f793aa8e49e60db`.
   - baseline directory: `reference/validation/fixture-exchange/basic-v1/`.
-- FXE-016 Unity 30-Case Matrix Import: **IMPLEMENTED / RUNTIME OPEN**.
-  - dedicated `SansaClothFixtureExchangeMatrixProbe` accepts exactly 30 JSON TextAssets.
-  - verifies 30 unique expected case IDs and 6 cases per scenario.
-  - verifies Body/Cloth/SurfaceReference/Anchor/Contact invariance within each scenario.
-  - verifies case_id-specific Gravity and Conformity values and fixed CollisionTolerance=0.
-  - verifies SR-003 Anchor=7 and baked center position=(+0.03,0,0), normal=(+1,0,0).
-  - runtime PASS is not recorded until Unity execution confirms all 30 files.
-- FXE-017 Unity Nonzero SurfaceResponse: **SPECIFIED / IMPLEMENTATION OPEN**.
+- FXE-016 Unity 30-Case Matrix Import: **PASS**.
+  - Unity runtime accepted all 30 expected case IDs.
+  - SR-001～005 each verified 6/6 cases and scenario semantic invariance.
+  - Body/Cloth/SurfaceReference/Anchor/Contact remained invariant within each scenario.
+  - case_id-specific Gravity / Conformity and CollisionTolerance=0 verified.
+  - SR-003 baked Convex-Side verification PASS, including Anchor=7 and baked center geometry.
+  - final runtime summary: Case=30 / Scenario=5 / SR003 baked Convex-Side PASS / FXE-016 PASS.
+- FXE-017 Unity Nonzero SurfaceResponse: **SPECIFIED / REFERENCE RESULT EXPORT IMPLEMENTATION OPEN**.
 
 Rust exporter:
 
