@@ -5,14 +5,16 @@ using UnityEngine;
 namespace SansaCloth.Validation
 {
     /// <summary>
-    /// Validation-only SurfaceResponse path for imported SR-001 C=0/G=0.
+    /// Validation-only SurfaceResponse path for imported Fixture Exchange cases.
     /// Stages mirror the Reference ordering:
     /// Support -> Bridge -> Gravity -> Query -> Conformity -> Query -> Collision -> Query.
-    /// Non-zero gravity/conformity are rejected until their backend behavior is validated.
+    /// FXE-017B enables Reference-v1 Gravity Response for C=0 cases only.
     /// </summary>
     internal static class SansaClothImportedSurfaceResponse
     {
         private const double InputZeroTolerance = 1.0e-15;
+        private const float ReferenceCharacteristicLengthM = 0.10f;
+        private const float ReferenceQuasiStaticGravityScale = 0.1f;
 
         internal static ImportedSurfaceResponseResult SolveSr001C0G0(
             FixtureExchangeDocument document,
@@ -30,10 +32,24 @@ namespace SansaCloth.Validation
                 document.inputs.worldGravityMPerS2,
                 "FXE-014 only validates Gravity=0"
             );
+            return SolveC0(document, surfaceQuery);
+        }
+
+        internal static ImportedSurfaceResponseResult SolveC0(
+            FixtureExchangeDocument document,
+            SansaClothResolvedMeshSurfaceQuery surfaceQuery
+        )
+        {
+            if (document == null || surfaceQuery == null)
+            {
+                throw new FixtureExchangeException(
+                    "Imported SurfaceResponse requires document and SurfaceQuery"
+                );
+            }
             if (Math.Abs(document.inputs.conformity) > InputZeroTolerance)
             {
                 throw new FixtureExchangeException(
-                    "FXE-014 only validates Conformity=0"
+                    "FXE-017B only validates Conformity=0"
                 );
             }
 
@@ -113,7 +129,16 @@ namespace SansaCloth.Validation
                 }
             }
 
-            // Gravity=0: Reference gravity stage is identity.
+            Vector3[] bridgePositions = (Vector3[])positions.Clone();
+
+            ApplyReferenceGravity(
+                document,
+                strips,
+                support,
+                positions
+            );
+            Vector3[] gravityPositions = (Vector3[])positions.Clone();
+
             // Conformity=0: Reference conformity stage is identity.
             // Query before collision, then apply collision tolerance.
             var beforeCollision = new ResolvedSurfaceQueryResult[count];
@@ -151,10 +176,65 @@ namespace SansaCloth.Validation
 
             return new ImportedSurfaceResponseResult(
                 initial,
+                bridgePositions,
+                gravityPositions,
                 positions,
                 support,
                 finalQueries
             );
+        }
+
+        private static void ApplyReferenceGravity(
+            FixtureExchangeDocument document,
+            SortedDictionary<ulong, SortedDictionary<ulong, int>> strips,
+            bool[] support,
+            Vector3[] positions
+        )
+        {
+            Vector3 gravity = SansaClothResolvedMeshSurfaceQuery.ToVector3(
+                document.inputs.worldGravityMPerS2
+            );
+            if (gravity.sqrMagnitude <= 0.0f)
+            {
+                return;
+            }
+
+            Vector3 direction = gravity.normalized;
+            bool oneEdge = document.caseId.StartsWith(
+                "SR-003-",
+                StringComparison.Ordinal
+            );
+
+            foreach (
+                KeyValuePair<ulong, SortedDictionary<ulong, int>> stripEntry in strips
+            )
+            {
+                var orderedIndices = new List<int>(stripEntry.Value.Values);
+                int lastOrder = orderedIndices.Count - 1;
+                if (lastOrder <= 0)
+                {
+                    continue;
+                }
+
+                for (int order = 0; order <= lastOrder; ++order)
+                {
+                    int index = orderedIndices[order];
+                    if (support[index])
+                    {
+                        continue;
+                    }
+
+                    float t = (float)order / lastOrder;
+                    float supportWeight = oneEdge
+                        ? t
+                        : 4.0f * t * (1.0f - t);
+                    float displacementM =
+                        ReferenceCharacteristicLengthM
+                        * ReferenceQuasiStaticGravityScale
+                        * supportWeight;
+                    positions[index] += direction * displacementM;
+                }
+            }
         }
 
         private static void RequireZeroInput(double[] value, string message)
@@ -176,18 +256,24 @@ namespace SansaCloth.Validation
     {
         internal ImportedSurfaceResponseResult(
             Vector3[] initialPositionsM,
+            Vector3[] bridgePositionsM,
+            Vector3[] gravityPositionsM,
             Vector3[] positionsM,
             bool[] support,
             ResolvedSurfaceQueryResult[] finalQueries
         )
         {
             this.initialPositionsM = initialPositionsM;
+            this.bridgePositionsM = bridgePositionsM;
+            this.gravityPositionsM = gravityPositionsM;
             this.positionsM = positionsM;
             this.support = support;
             this.finalQueries = finalQueries;
         }
 
         internal readonly Vector3[] initialPositionsM;
+        internal readonly Vector3[] bridgePositionsM;
+        internal readonly Vector3[] gravityPositionsM;
         internal readonly Vector3[] positionsM;
         internal readonly bool[] support;
         internal readonly ResolvedSurfaceQueryResult[] finalQueries;
