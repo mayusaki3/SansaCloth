@@ -321,12 +321,16 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - SR-003 baked Convex-Side verification PASS, including Anchor=7 and baked center geometry.
   - final runtime summary: Case=30 / Scenario=5 / SR003 baked Convex-Side PASS / FXE-016 PASS.
 - FXE-017 Unity Nonzero SurfaceResponse: **IN PROGRESS**.
-  - FXE-017A Reference Result Export: **IMPLEMENTED / LOCAL QUALITY GATE OPEN**.
+  - FXE-017A Reference Result Export: **PASS** (2026-10-05).
   - Reference result format: `sansacloth.validation.surface-response-result/0`.
   - exporter runs Reference-v1 SurfaceResponse against the same resolved Fixture Exchange mesh/SurfaceReference boundary used by Unity.
   - each CP records Support plus Bridge/Gravity/Conformity/Collision/final positions, final Surface position/normal, Separation and Contact.
   - result artifact is comparison output only; it is not Fixture Exchange input and does not change the exchange contract.
-  - FXE-017B/C/D Unity comparison remains OPEN until Reference result artifacts pass the local quality gate.
+  - FXE-017A local gate: rustfmt PASS, clippy `-D warnings` PASS, workspace tests 89/89 PASS, result export 30/30 PASS.
+  - 30 generated result artifacts are fixed as the Reference comparison baseline in commit `f459850`.
+  - FXE-017B Unity Gravity Response: **OPEN**.
+  - FXE-017C Unity Conformity Response: **OPEN**.
+  - FXE-017D Unity Final SurfaceResponse 30-case comparison: **OPEN**.
 
 Rust exporter:
 
@@ -406,4 +410,6 @@ SANSA_FXE|FXE-017A.OUTPUT_DIR|validation\surface-response-result\basic-v1
 SANSA_FXE|FXE-017A.RESULT|PASS
 ```
 
-各caseについて `SANSA_FXE|FXE-017A.CASE.<case_id>|PASS` を出力する。生成結果は `reference/validation/surface-response-result/basic-v1/` に置き、quality gate確認後にReference comparison baselineとして確定する。
+各caseについて `SANSA_FXE|FXE-017A.CASE.<case_id>|PASS` を出力する。生成結果は `reference/validation/surface-response-result/basic-v1/` に置く。
+
+2026-10-05実測では、rustfmt PASS、clippy `-D warnings` PASS、workspace tests 89/89 PASS、30/30 case export PASS、最終 `FXE-017A.RESULT|PASS` を確認した。生成された30 JSONは commit `f459850` でReference comparison baselineとして確定した。
