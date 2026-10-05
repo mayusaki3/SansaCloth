@@ -100,7 +100,7 @@ namespace SansaCloth.Validation
                             ControlPoint point =
                                 fixture.cloth.controlPoints[i];
                             Require(
-                                point.stableId <= long.MaxValue,
+                                point.stableId <= (ulong)long.MaxValue,
                                 $"{caseId} stable_id is too large"
                             );
                             long stableId = (long)point.stableId;
