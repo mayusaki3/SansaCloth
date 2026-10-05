@@ -62,6 +62,8 @@ dependencies = [
  "glam",
  "sansacloth-core",
  "sansacloth-fixture",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
