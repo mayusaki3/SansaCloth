@@ -7,11 +7,11 @@ use std::{
 use glam::DVec3;
 use sansacloth_core::SurfaceReference;
 use sansacloth_fixture::exchange::{
-    ExchangeBodySurface, FixtureExchange, BASIC_EXCHANGE_CASE_COUNT, generate_basic_exchange_matrix,
+    BASIC_EXCHANGE_CASE_COUNT, ExchangeBodySurface, FixtureExchange, generate_basic_exchange_matrix,
 };
 use sansacloth_reference::{
     GravitySupportLayout, ReferenceSolverSettings, ReferenceSurfaceSolver,
-    ReferenceSurfaceSolverInput, SurfaceQuery, SurfaceQueryResult, SupportKind,
+    ReferenceSurfaceSolverInput, SupportKind, SurfaceQuery, SurfaceQueryResult,
 };
 use serde::Serialize;
 
@@ -83,11 +83,9 @@ impl SurfaceQuery for ResolvedExchangeSurfaceQuery<'_> {
             let p0 = vec3(v0.position_m);
             let p1 = vec3(v1.position_m);
             let p2 = vec3(v2.position_m);
-            let surface_position_m =
-                p0 * weights[0] + p1 * weights[1] + p2 * weights[2];
+            let surface_position_m = p0 * weights[0] + p1 * weights[1] + p2 * weights[2];
             let surface_normal = (p1 - p0).cross(p2 - p0).normalize();
-            let separation_m =
-                (current_position_m - surface_position_m).dot(surface_normal);
+            let separation_m = (current_position_m - surface_position_m).dot(surface_normal);
             return SurfaceQueryResult {
                 surface_position_m,
                 surface_normal,
@@ -129,10 +127,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("SANSA_FXE|FXE-017A.CASE_COUNT|{}", exchanges.len());
     println!("SANSA_FXE|FXE-017A.WRITTEN_COUNT|{written}");
-    println!(
-        "SANSA_FXE|FXE-017A.OUTPUT_DIR|{}",
-        output_dir.display()
-    );
+    println!("SANSA_FXE|FXE-017A.OUTPUT_DIR|{}", output_dir.display());
     println!("SANSA_FXE|FXE-017A.RESULT|PASS");
     Ok(())
 }
@@ -252,12 +247,7 @@ fn write_result(
     Ok(())
 }
 
-fn barycentric(
-    p: [f64; 2],
-    a: [f64; 2],
-    b: [f64; 2],
-    c: [f64; 2],
-) -> Option<[f64; 3]> {
+fn barycentric(p: [f64; 2], a: [f64; 2], b: [f64; 2], c: [f64; 2]) -> Option<[f64; 3]> {
     let v0 = [b[0] - a[0], b[1] - a[1]];
     let v1 = [c[0] - a[0], c[1] - a[1]];
     let v2 = [p[0] - a[0], p[1] - a[1]];
