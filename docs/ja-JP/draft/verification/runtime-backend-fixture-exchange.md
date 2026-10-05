@@ -328,7 +328,11 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - result artifact is comparison output only; it is not Fixture Exchange input and does not change the exchange contract.
   - FXE-017A local gate: rustfmt PASS, clippy `-D warnings` PASS, workspace tests 89/89 PASS, result export 30/30 PASS.
   - 30 generated result artifacts are fixed as the Reference comparison baseline in commit `f459850`.
-  - FXE-017B Unity Gravity Response: **OPEN**.
+  - FXE-017B Unity Gravity Response: **IMPLEMENTED / RUNTIME OPEN**.
+    - scope is the ten C0 cases only: SR-001..005 × G0/G1.
+    - Unity uses the fixed Reference-v1 validation profile values CharacteristicLength=0.10m and QuasiStaticGravityScale=0.1; SR-003 uses OneEdge support weight, the other scenarios use BothEdges.
+    - compares both post-Bridge and post-Gravity positions against the committed Reference result baseline.
+    - comparison tolerance is 1e-6m to account for Unity Vector3 single precision.
   - FXE-017C Unity Conformity Response: **OPEN**.
   - FXE-017D Unity Final SurfaceResponse 30-case comparison: **OPEN**.
 
@@ -413,3 +417,25 @@ SANSA_FXE|FXE-017A.RESULT|PASS
 各caseについて `SANSA_FXE|FXE-017A.CASE.<case_id>|PASS` を出力する。生成結果は `reference/validation/surface-response-result/basic-v1/` に置く。
 
 2026-10-05実測では、rustfmt PASS、clippy `-D warnings` PASS、workspace tests 89/89 PASS、30/30 case export PASS、最終 `FXE-017A.RESULT|PASS` を確認した。生成された30 JSONは commit `f459850` でReference comparison baselineとして確定した。
+
+
+### FXE-017B Unity Gravity Response Comparison
+
+Unity側では `SansaClothGravityResponseComparisonProbe` を空のGameObjectへ追加し、次の10件ずつを割り当てる。
+
+- `Fixture Exchange C0 Json`: `SR-001..005-C0-G0/G1` のFixture Exchange JSON 10件。
+- `Surface Response Result C0 Json`: 同じcase_idのReference SurfaceResponse result JSON 10件。
+
+Inspectorのコンポーネントメニューから `Run SansaCloth FXE-017B Gravity Comparison` を実行する。配列順序には依存せず、case_idとstable_idで対応付ける。
+
+期待する最終ログ:
+
+```text
+SANSA_FXE|FXE-017B.CASE_COUNT|10
+SANSA_FXE|FXE-017B.BRIDGE_MAX_POSITION_DEVIATION_M|<value>
+SANSA_FXE|FXE-017B.GRAVITY_MAX_POSITION_DEVIATION_M|<value>
+SANSA_FXE|FXE-017B.POSITION_TOLERANCE_M|1E-06
+SANSA_FXE|FXE-017B.RESULT|PASS
+```
+
+各caseについてBridge/Gravityの最大位置偏差と `FXE-017B.CASE.<case_id>|PASS` を出力する。FXE-017BはUnity runtime実測ログを確認するまでPASSにはしない。
