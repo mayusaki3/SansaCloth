@@ -8,8 +8,8 @@ using UnityEngine;
 namespace SansaCloth.Validation.Editor
 {
     /// <summary>
-    /// Creates a ready-to-run validation GameObject and wires copied baseline assets.
-    /// Safe to run repeatedly.
+    /// Recreates a ready-to-run validation GameObject and wires copied baseline assets.
+    /// Safe to run repeatedly, including after probe script GUIDs change on redeploy.
     /// </summary>
     internal static class ProbeSetup
     {
@@ -30,12 +30,14 @@ namespace SansaCloth.Validation.Editor
                 Require(fixtures.Length == 30, "Fixture Exchange asset count must be 30");
                 Require(results.Length == 30, "SurfaceResponse result asset count must be 30");
 
-                GameObject target = GameObject.Find(GameObjectName);
-                if (target == null)
+                GameObject previous = GameObject.Find(GameObjectName);
+                if (previous != null)
                 {
-                    target = new GameObject(GameObjectName);
-                    Undo.RegisterCreatedObjectUndo(target, "Create SansaCloth Probe");
+                    Undo.DestroyObjectImmediate(previous);
                 }
+
+                var target = new GameObject(GameObjectName);
+                Undo.RegisterCreatedObjectUndo(target, "Create SansaCloth Probe");
 
                 SansaClothFixtureExchangeProbe single =
                     GetOrAdd<SansaClothFixtureExchangeProbe>(target);
