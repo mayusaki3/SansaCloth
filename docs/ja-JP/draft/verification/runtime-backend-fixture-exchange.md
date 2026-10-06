@@ -328,12 +328,18 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - result artifact is comparison output only; it is not Fixture Exchange input and does not change the exchange contract.
   - FXE-017A local gate: rustfmt PASS, clippy `-D warnings` PASS, workspace tests 89/89 PASS, result export 30/30 PASS.
   - 30 generated result artifacts are fixed as the Reference comparison baseline in commit `f459850`.
-  - FXE-017B Unity Gravity Response: **IMPLEMENTED / RUNTIME OPEN**.
-    - scope is the ten C0 cases only: SR-001..005 × G0/G1.
+  - FXE-017B Unity Gravity Response: **PASS** (2026-10-06).
+    - ten C0 cases: SR-001..005 × G0/G1 all PASS.
     - Unity uses the fixed Reference-v1 validation profile values CharacteristicLength=0.10m and QuasiStaticGravityScale=0.1; SR-003 uses OneEdge support weight, the other scenarios use BothEdges.
     - compares both post-Bridge and post-Gravity positions against the committed Reference result baseline.
-    - comparison tolerance is 1e-6m to account for Unity Vector3 single precision.
-  - FXE-017C Unity Conformity Response: **OPEN**.
+    - runtime max Bridge deviation = 7.9412300580726156e-9 m.
+    - runtime max Gravity deviation = 7.9462224603427879e-9 m.
+    - comparison tolerance = 1e-6 m.
+  - FXE-017C Unity Conformity Response: **IMPLEMENTED / RUNTIME OPEN**.
+    - full 30-case matrix is compared at post-Gravity and post-Conformity stages.
+    - Reference-v1 ConformityReach=0.02m is fixed in the comparison implementation, not added to Fixture Exchange.
+    - anchors remain fixed; unsupported points use conformity × clamp(1 - separation/reach, 0, 1), matching Reference-v1.
+    - comparison tolerance = 1e-6 m.
   - FXE-017D Unity Final SurfaceResponse 30-case comparison: **OPEN**.
 
 Rust exporter:
@@ -439,3 +445,26 @@ SANSA_FXE|FXE-017B.RESULT|PASS
 ```
 
 各caseについてBridge/Gravityの最大位置偏差と `FXE-017B.CASE.<case_id>|PASS` を出力する。FXE-017BはUnity runtime実測ログを確認するまでPASSにはしない。
+
+
+### FXE-017C Unity Conformity Response Comparison
+
+FXE-017B runtime PASS後、Conformity 0 / 0.5 / 1を含む30 cases全体を比較する。Probe setを再deployして `SansaCloth > Probe > Setup` を再実行すると、30 Fixture Exchange + 30 Reference resultがFXE-017Cへ自動設定される。
+
+実行:
+
+```text
+SansaCloth > Probe > Run FXE-017C
+```
+
+期待する最終ログ:
+
+```text
+SANSA_FXE|FXE-017C.CASE_COUNT|30
+SANSA_FXE|FXE-017C.GRAVITY_MAX_POSITION_DEVIATION_M|<value>
+SANSA_FXE|FXE-017C.CONFORMITY_MAX_POSITION_DEVIATION_M|<value>
+SANSA_FXE|FXE-017C.POSITION_TOLERANCE_M|1E-06
+SANSA_FXE|FXE-017C.RESULT|PASS
+```
+
+各caseについてpost-Gravity/post-Conformityの最大位置偏差と `FXE-017C.CASE.<case_id>|PASS` を出力する。FXE-017CはUnity runtime実測ログを確認するまでPASSにはしない。
