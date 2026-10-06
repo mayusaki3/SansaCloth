@@ -8,13 +8,15 @@ namespace SansaCloth.Validation
     /// Validation-only SurfaceResponse path for imported Fixture Exchange cases.
     /// Stages mirror the Reference ordering:
     /// Support -> Bridge -> Gravity -> Query -> Conformity -> Query -> Collision -> Query.
-    /// FXE-017B enables Reference-v1 Gravity Response for C=0 cases only.
+    /// FXE-017B validates Gravity Response for C=0 cases.
+    /// FXE-017C adds Reference-v1 Conformity Response for the full 30-case matrix.
     /// </summary>
     internal static class SansaClothImportedSurfaceResponse
     {
         private const double InputZeroTolerance = 1.0e-15;
         private const float ReferenceCharacteristicLengthM = 0.10f;
         private const float ReferenceQuasiStaticGravityScale = 0.1f;
+        private const float ReferenceConformityReachM = 0.02f;
 
         internal static ImportedSurfaceResponseResult SolveSr001C0G0(
             FixtureExchangeDocument document,
@@ -50,6 +52,21 @@ namespace SansaCloth.Validation
             {
                 throw new FixtureExchangeException(
                     "FXE-017B only validates Conformity=0"
+                );
+            }
+
+            return SolveValidationProfile(document, surfaceQuery);
+        }
+
+        internal static ImportedSurfaceResponseResult SolveValidationProfile(
+            FixtureExchangeDocument document,
+            SansaClothResolvedMeshSurfaceQuery surfaceQuery
+        )
+        {
+            if (document == null || surfaceQuery == null)
+            {
+                throw new FixtureExchangeException(
+                    "Imported SurfaceResponse requires document and SurfaceQuery"
                 );
             }
 
@@ -139,8 +156,23 @@ namespace SansaCloth.Validation
             );
             Vector3[] gravityPositions = (Vector3[])positions.Clone();
 
-            // Conformity=0: Reference conformity stage is identity.
-            // Query before collision, then apply collision tolerance.
+            var afterGravityQueries = new ResolvedSurfaceQueryResult[count];
+            for (int i = 0; i < count; ++i)
+            {
+                afterGravityQueries[i] = surfaceQuery.Query(
+                    positions[i],
+                    points[i].surfaceReference
+                );
+            }
+
+            ApplyReferenceConformity(
+                document,
+                support,
+                positions,
+                afterGravityQueries
+            );
+            Vector3[] conformityPositions = (Vector3[])positions.Clone();
+
             var beforeCollision = new ResolvedSurfaceQueryResult[count];
             for (int i = 0; i < count; ++i)
             {
@@ -178,6 +210,7 @@ namespace SansaCloth.Validation
                 initial,
                 bridgePositions,
                 gravityPositions,
+                conformityPositions,
                 positions,
                 support,
                 finalQueries
@@ -237,6 +270,44 @@ namespace SansaCloth.Validation
             }
         }
 
+        private static void ApplyReferenceConformity(
+            FixtureExchangeDocument document,
+            bool[] support,
+            Vector3[] positions,
+            ResolvedSurfaceQueryResult[] queries
+        )
+        {
+            float conformity = (float)document.inputs.conformity;
+            if (conformity <= 0.0f || ReferenceConformityReachM <= 0.0f)
+            {
+                return;
+            }
+
+            for (int i = 0; i < positions.Length; ++i)
+            {
+                if (support[i])
+                {
+                    continue;
+                }
+
+                float separationM = queries[i].separationM;
+                if (!float.IsFinite(separationM) || separationM < 0.0f)
+                {
+                    continue;
+                }
+
+                float distanceWeight = Mathf.Clamp01(
+                    1.0f - separationM / ReferenceConformityReachM
+                );
+                float effective = conformity * distanceWeight;
+                positions[i] = Vector3.LerpUnclamped(
+                    positions[i],
+                    queries[i].surfacePosition,
+                    effective
+                );
+            }
+        }
+
         private static void RequireZeroInput(double[] value, string message)
         {
             if (
@@ -258,6 +329,7 @@ namespace SansaCloth.Validation
             Vector3[] initialPositionsM,
             Vector3[] bridgePositionsM,
             Vector3[] gravityPositionsM,
+            Vector3[] conformityPositionsM,
             Vector3[] positionsM,
             bool[] support,
             ResolvedSurfaceQueryResult[] finalQueries
@@ -266,6 +338,7 @@ namespace SansaCloth.Validation
             this.initialPositionsM = initialPositionsM;
             this.bridgePositionsM = bridgePositionsM;
             this.gravityPositionsM = gravityPositionsM;
+            this.conformityPositionsM = conformityPositionsM;
             this.positionsM = positionsM;
             this.support = support;
             this.finalQueries = finalQueries;
@@ -274,6 +347,7 @@ namespace SansaCloth.Validation
         internal readonly Vector3[] initialPositionsM;
         internal readonly Vector3[] bridgePositionsM;
         internal readonly Vector3[] gravityPositionsM;
+        internal readonly Vector3[] conformityPositionsM;
         internal readonly Vector3[] positionsM;
         internal readonly bool[] support;
         internal readonly ResolvedSurfaceQueryResult[] finalQueries;
