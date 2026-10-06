@@ -38,6 +38,7 @@ namespace SansaCloth.Validation
                 double overallNormalMax = 0.0;
                 double overallSeparationMaxM = 0.0;
                 int checkedContacts = 0;
+                int contactBoundaryMatches = 0;
                 int checkedCases = 0;
 
                 foreach (
@@ -130,14 +131,23 @@ namespace SansaCloth.Validation
                         double collisionToleranceM =
                             fixture.inputs.collisionToleranceM;
                         bool actualContact =
-                            query.separationM
-                            <= collisionToleranceM + SeparationToleranceM;
-                        Require(
-                            actualContact == expected.contact,
-                            $"{caseId} contact mismatch at stable_id {stableId}: "
-                                + $"Unity={actualContact}, Reference={expected.contact}, "
-                                + $"separation={query.separationM:R}"
-                        );
+                            query.separationM <= collisionToleranceM;
+                        if (actualContact != expected.contact)
+                        {
+                            bool bothAtContactBoundary =
+                                Math.Abs(query.separationM - collisionToleranceM)
+                                    <= SeparationToleranceM
+                                && Math.Abs(expected.separation_m - collisionToleranceM)
+                                    <= SeparationToleranceM;
+                            Require(
+                                bothAtContactBoundary,
+                                $"{caseId} contact mismatch at stable_id {stableId}: "
+                                    + $"Unity={actualContact}, Reference={expected.contact}, "
+                                    + $"Unity separation={query.separationM:R}, "
+                                    + $"Reference separation={expected.separation_m:R}"
+                            );
+                            contactBoundaryMatches++;
+                        }
                         checkedContacts++;
                     }
 
@@ -211,7 +221,7 @@ namespace SansaCloth.Validation
                 );
 
                 LogInt("FXE-017D.CASE_COUNT", checkedCases);
-                LogInt("FXE-017D.CONTACT_COUNT_CHECKED", checkedContacts);
+                LogInt("FXE-017D.CONTACT_COUNT_CHECKED", checkedContacts);\n                LogInt(\n                    "FXE-017D.CONTACT_BOUNDARY_MATCH_COUNT",\n                    contactBoundaryMatches\n                );
                 LogDouble(
                     "FXE-017D.COLLISION_MAX_POSITION_DEVIATION_M",
                     overallCollisionMaxM
