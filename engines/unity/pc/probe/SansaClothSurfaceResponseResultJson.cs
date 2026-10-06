@@ -84,6 +84,27 @@ namespace SansaCloth.Validation
                     point.conformity_position_m,
                     $"conformity_position_m for stable_id {point.stable_id}"
                 );
+                RequireVector3(
+                    point.collision_position_m,
+                    $"collision_position_m for stable_id {point.stable_id}"
+                );
+                RequireVector3(
+                    point.final_position_m,
+                    $"final_position_m for stable_id {point.stable_id}"
+                );
+                RequireVector3(
+                    point.surface_position_m,
+                    $"surface_position_m for stable_id {point.stable_id}"
+                );
+                RequireVector3(
+                    point.surface_normal,
+                    $"surface_normal for stable_id {point.stable_id}"
+                );
+                Require(
+                    !double.IsNaN(point.separation_m)
+                        && !double.IsInfinity(point.separation_m),
+                    $"separation_m for stable_id {point.stable_id}"
+                );
             }
         }
 
@@ -144,5 +165,11 @@ namespace SansaCloth.Validation
         public double[] bridge_position_m;
         public double[] gravity_position_m;
         public double[] conformity_position_m;
+        public double[] collision_position_m;
+        public double[] final_position_m;
+        public double[] surface_position_m;
+        public double[] surface_normal;
+        public double separation_m;
+        public bool contact;
     }
 }
