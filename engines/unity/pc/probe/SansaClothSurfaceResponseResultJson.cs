@@ -80,6 +80,10 @@ namespace SansaCloth.Validation
                     point.gravity_position_m,
                     $"gravity_position_m for stable_id {point.stable_id}"
                 );
+                RequireVector3(
+                    point.conformity_position_m,
+                    $"conformity_position_m for stable_id {point.stable_id}"
+                );
             }
         }
 
@@ -139,5 +143,6 @@ namespace SansaCloth.Validation
         public string support;
         public double[] bridge_position_m;
         public double[] gravity_position_m;
+        public double[] conformity_position_m;
     }
 }
