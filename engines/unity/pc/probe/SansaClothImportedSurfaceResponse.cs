@@ -291,7 +291,11 @@ namespace SansaCloth.Validation
                 }
 
                 float separationM = queries[i].separationM;
-                if (!float.IsFinite(separationM) || separationM < 0.0f)
+                if (
+                    float.IsNaN(separationM)
+                    || float.IsInfinity(separationM)
+                    || separationM < 0.0f
+                )
                 {
                     continue;
                 }
