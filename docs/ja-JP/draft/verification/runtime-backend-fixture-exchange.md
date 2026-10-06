@@ -344,7 +344,7 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - FXE-017D Unity Final SurfaceResponse 30-case comparison: **IMPLEMENTED / RUNTIME OPEN**.
     - compares Collision position, final position, final SurfaceQuery surface position/normal/Separation and Contact for all 30 cases.
     - position/separation tolerance = 1e-6 m; normal vector deviation tolerance = 1e-5.
-    - Contact comparison adds the separation tolerance only at the Validation comparison boundary to account for Unity float precision; it does not change Fixture Exchange or Product semantics.
+    - Contact bool不一致時は、Reference/Unity双方のSeparationがCollisionToleranceから1e-6 m以内の場合だけ数値境界一致として扱う。境界外ではbool一致を必須とし、Fixture Exchange/Product semanticsは変更しない。
 
 Rust exporter:
 
