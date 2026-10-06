@@ -1,5 +1,6 @@
 param(
-    [string]$OutputDirectory = (Join-Path $PSScriptRoot "build")
+    [string]$OutputDirectory = (Join-Path $PSScriptRoot "build"),
+    [string]$UnityProjectDirectory = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -55,4 +56,24 @@ Write-Host "SANSA_PROBE|BUILD.RUNTIME_CS_COUNT|$($runtimeFiles.Count)"
 Write-Host "SANSA_PROBE|BUILD.FIXTURE_EXCHANGE_COUNT|$($fixtureFiles.Count)"
 Write-Host "SANSA_PROBE|BUILD.SURFACE_RESPONSE_RESULT_COUNT|$($resultFiles.Count)"
 Write-Host "SANSA_PROBE|BUILD.OUTPUT|$assetsRoot"
+
+if (-not [string]::IsNullOrWhiteSpace($UnityProjectDirectory)) {
+    $unityAssetsRoot = Join-Path $UnityProjectDirectory "Assets"
+    if (-not (Test-Path $unityAssetsRoot)) {
+        throw "Unity Project Assets directory not found: $unityAssetsRoot"
+    }
+
+    $unitySansaRoot = Join-Path $unityAssetsRoot "SansaCloth"
+    $unityProbeRoot = Join-Path $unitySansaRoot "Probe"
+    if (Test-Path $unityProbeRoot) {
+        Remove-Item $unityProbeRoot -Recurse -Force
+    }
+    New-Item -ItemType Directory -Force -Path $unitySansaRoot | Out-Null
+    Copy-Item $probeRoot -Destination $unitySansaRoot -Recurse
+
+    Write-Host "SANSA_PROBE|DEPLOY.UNITY_PROJECT|$UnityProjectDirectory"
+    Write-Host "SANSA_PROBE|DEPLOY.TARGET|$unityProbeRoot"
+    Write-Host "SANSA_PROBE|DEPLOY.RESULT|PASS"
+}
+
 Write-Host "SANSA_PROBE|BUILD.RESULT|PASS"
