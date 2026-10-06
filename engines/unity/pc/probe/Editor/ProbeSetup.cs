@@ -47,6 +47,8 @@ namespace SansaCloth.Validation.Editor
                     GetOrAdd<SansaClothGravityResponseComparisonProbe>(target);
                 SansaClothConformityResponseComparisonProbe conformity =
                     GetOrAdd<SansaClothConformityResponseComparisonProbe>(target);
+                SansaClothFinalSurfaceResponseComparisonProbe finalResponse =
+                    GetOrAdd<SansaClothFinalSurfaceResponseComparisonProbe>(target);
 
                 TextAsset sr001C0G0 = fixtures.SingleOrDefault(
                     asset => asset.name == "SR-001-C0-G0"
@@ -72,6 +74,8 @@ namespace SansaCloth.Validation.Editor
                 SetArray(gravity, "surfaceResponseResultC0Json", c0Results);
                 SetArray(conformity, "fixtureExchangeJson", fixtures);
                 SetArray(conformity, "surfaceResponseResultJson", results);
+                SetArray(finalResponse, "fixtureExchangeJson", fixtures);
+                SetArray(finalResponse, "surfaceResponseResultJson", results);
 
                 EditorUtility.SetDirty(target);
                 Selection.activeGameObject = target;
@@ -82,6 +86,7 @@ namespace SansaCloth.Validation.Editor
                 Log("SETUP.FXE-016", "READY");
                 Log("SETUP.FXE-017B", "READY");
                 Log("SETUP.FXE-017C", "READY");
+                Log("SETUP.FXE-017D", "READY");
                 Log("SETUP.RESULT", "PASS");
             }
             catch (Exception exception)
@@ -117,6 +122,12 @@ namespace SansaCloth.Validation.Editor
             FindProbe<SansaClothConformityResponseComparisonProbe>().RunProbe();
         }
 
+        [MenuItem("SansaCloth/Probe/Run FXE-017D")]
+        internal static void RunFxe017D()
+        {
+            FindProbe<SansaClothFinalSurfaceResponseComparisonProbe>().RunProbe();
+        }
+
         [MenuItem("SansaCloth/Probe/Run All Ready Probes")]
         internal static void RunAllReady()
         {
@@ -124,6 +135,7 @@ namespace SansaCloth.Validation.Editor
             RunFxe016();
             RunFxe017B();
             RunFxe017C();
+            RunFxe017D();
         }
 
         private static T GetOrAdd<T>(GameObject target)
