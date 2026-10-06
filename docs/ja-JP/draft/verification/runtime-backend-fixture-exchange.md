@@ -335,12 +335,16 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
     - runtime max Bridge deviation = 7.9412300580726156e-9 m.
     - runtime max Gravity deviation = 7.9462224603427879e-9 m.
     - comparison tolerance = 1e-6 m.
-  - FXE-017C Unity Conformity Response: **IMPLEMENTED / RUNTIME OPEN**.
-    - full 30-case matrix is compared at post-Gravity and post-Conformity stages.
+  - FXE-017C Unity Conformity Response: **PASS** (2026-10-06).
+    - full 30-case matrix compared at post-Gravity and post-Conformity stages: 30/30 PASS.
     - Reference-v1 ConformityReach=0.02m is fixed in the comparison implementation, not added to Fixture Exchange.
-    - anchors remain fixed; unsupported points use conformity × clamp(1 - separation/reach, 0, 1), matching Reference-v1.
+    - runtime max Gravity deviation = 7.9462224603427879e-9 m.
+    - runtime max Conformity deviation = 1.1117441945503134e-8 m.
     - comparison tolerance = 1e-6 m.
-  - FXE-017D Unity Final SurfaceResponse 30-case comparison: **OPEN**.
+  - FXE-017D Unity Final SurfaceResponse 30-case comparison: **IMPLEMENTED / RUNTIME OPEN**.
+    - compares Collision position, final position, final SurfaceQuery surface position/normal/Separation and Contact for all 30 cases.
+    - position/separation tolerance = 1e-6 m; normal vector deviation tolerance = 1e-5.
+    - Contact comparison adds the separation tolerance only at the Validation comparison boundary to account for Unity float precision; it does not change Fixture Exchange or Product semantics.
 
 Rust exporter:
 
@@ -467,4 +471,42 @@ SANSA_FXE|FXE-017C.POSITION_TOLERANCE_M|1E-06
 SANSA_FXE|FXE-017C.RESULT|PASS
 ```
 
-各caseについてpost-Gravity/post-Conformityの最大位置偏差と `FXE-017C.CASE.<case_id>|PASS` を出力する。FXE-017CはUnity runtime実測ログを確認するまでPASSにはしない。
+各caseについてpost-Gravity/post-Conformityの最大位置偏差と `FXE-017C.CASE.<case_id>|PASS` を出力する。
+
+2026-10-06実測では30/30 PASS、Gravity最大偏差 7.9462224603427879e-9 m、Conformity最大偏差 1.1117441945503134e-8 m、許容差1e-6 m、最終 `FXE-017C.RESULT|PASS` を確認した。
+
+### FXE-017D Unity Final SurfaceResponse Comparison
+
+FXE-017C runtime PASS後、30 cases全体についてCollision後位置とFinal SurfaceQueryをReference resultと比較する。
+
+実行:
+
+```text
+SansaCloth > Probe > Run FXE-017D
+```
+
+比較対象:
+
+- Collision position
+- final position
+- final Surface position
+- final Surface normal
+- final Separation
+- Contact
+
+期待する最終ログ:
+
+```text
+SANSA_FXE|FXE-017D.CASE_COUNT|30
+SANSA_FXE|FXE-017D.CONTACT_COUNT_CHECKED|4410
+SANSA_FXE|FXE-017D.COLLISION_MAX_POSITION_DEVIATION_M|<value>
+SANSA_FXE|FXE-017D.FINAL_MAX_POSITION_DEVIATION_M|<value>
+SANSA_FXE|FXE-017D.SURFACE_MAX_POSITION_DEVIATION_M|<value>
+SANSA_FXE|FXE-017D.NORMAL_MAX_DEVIATION|<value>
+SANSA_FXE|FXE-017D.SEPARATION_MAX_DEVIATION_M|<value>
+SANSA_FXE|FXE-017D.POSITION_TOLERANCE_M|1E-06
+SANSA_FXE|FXE-017D.NORMAL_TOLERANCE|1E-05
+SANSA_FXE|FXE-017D.RESULT|PASS
+```
+
+FXE-017DはUnity runtime実測ログを確認するまでPASSにはしない。
