@@ -25,7 +25,7 @@ Unityのcompile完了後、メニューから次を実行する。
 SansaCloth > Probe > Setup
 ```
 
-Setupは再実行可能で、`SansaClothBackendProbe` GameObjectを作成/再利用し、現在必要なComponentとTextAssetを自動設定する。
+Setupは再実行可能で、`SansaClothBackendProbe` GameObjectを再生成し、現在必要なComponentとTextAssetを自動設定する。再deployでscript GUIDが変化しても古いComponentを残さない。
 
 現在自動設定する検証:
 
