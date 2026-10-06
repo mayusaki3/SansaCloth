@@ -648,6 +648,10 @@ Checkpoint後のRust quality gate (2026-10-01):
 Fixture exchange設計:
 - `docs/ja-JP/draft/verification/runtime-backend-fixture-exchange.md`
 
+O3DE PC検証:
+- `docs/ja-JP/draft/verification/runtime-backend-o3de-pc.md`
+- Unity 30-case SurfaceResponse比較完了後の第2 Backendとして、BF-001/BF-002のUnit/Coordinate Probeから開始する。
+
 ## 16. 未確定事項
 
 - Unity側の具体的なmesh/deformation API
