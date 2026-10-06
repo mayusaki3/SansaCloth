@@ -221,7 +221,11 @@ namespace SansaCloth.Validation
                 );
 
                 LogInt("FXE-017D.CASE_COUNT", checkedCases);
-                LogInt("FXE-017D.CONTACT_COUNT_CHECKED", checkedContacts);\n                LogInt(\n                    "FXE-017D.CONTACT_BOUNDARY_MATCH_COUNT",\n                    contactBoundaryMatches\n                );
+                LogInt("FXE-017D.CONTACT_COUNT_CHECKED", checkedContacts);
+                LogInt(
+                    "FXE-017D.CONTACT_BOUNDARY_MATCH_COUNT",
+                    contactBoundaryMatches
+                );
                 LogDouble(
                     "FXE-017D.COLLISION_MAX_POSITION_DEVIATION_M",
                     overallCollisionMaxM
