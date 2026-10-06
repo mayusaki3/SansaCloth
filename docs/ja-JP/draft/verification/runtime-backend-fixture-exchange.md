@@ -320,7 +320,7 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
   - case_id-specific Gravity / Conformity and CollisionTolerance=0 verified.
   - SR-003 baked Convex-Side verification PASS, including Anchor=7 and baked center geometry.
   - final runtime summary: Case=30 / Scenario=5 / SR003 baked Convex-Side PASS / FXE-016 PASS.
-- FXE-017 Unity Nonzero SurfaceResponse: **IN PROGRESS**.
+- FXE-017 Unity Nonzero SurfaceResponse: **PASS** (2026-10-06).
   - FXE-017A Reference Result Export: **PASS** (2026-10-05).
   - Reference result format: `sansacloth.validation.surface-response-result/0`.
   - exporter runs Reference-v1 SurfaceResponse against the same resolved Fixture Exchange mesh/SurfaceReference boundary used by Unity.
@@ -341,10 +341,16 @@ FXE-001～010をRust側初期実装の最低テスト、FXE-011～014をSR-001 U
     - runtime max Gravity deviation = 7.9462224603427879e-9 m.
     - runtime max Conformity deviation = 1.1117441945503134e-8 m.
     - comparison tolerance = 1e-6 m.
-  - FXE-017D Unity Final SurfaceResponse 30-case comparison: **IMPLEMENTED / RUNTIME OPEN**.
-    - compares Collision position, final position, final SurfaceQuery surface position/normal/Separation and Contact for all 30 cases.
+  - FXE-017D Unity Final SurfaceResponse 30-case comparison: **PASS** (2026-10-06).
+    - full 30-case matrix completed: 30/30 PASS; Contact checked = 4410.
+    - runtime max Collision position deviation = 1.1117441945503134e-8 m.
+    - runtime max final position deviation = 1.1117441945503134e-8 m.
+    - runtime max final Surface position deviation = 7.4233777195045981e-9 m.
+    - runtime max normal vector deviation = 1.729267881422308e-7.
+    - runtime max Separation deviation = 1.3384658456225274e-8 m.
     - position/separation tolerance = 1e-6 m; normal vector deviation tolerance = 1e-5.
-    - Contact bool不一致時は、Reference/Unity双方のSeparationがCollisionToleranceから1e-6 m以内の場合だけ数値境界一致として扱う。境界外ではbool一致を必須とし、Fixture Exchange/Product semanticsは変更しない。
+    - Contact bool numeric-boundary matches = 392. Reference/Unity双方のSeparationがCollisionToleranceから1e-6 m以内の場合だけ数値境界一致として扱い、境界外ではbool一致を必須とする。Fixture Exchange/Product semanticsは変更しない。
+    - FXE-017A～DがすべてPASSしたため、30-case Unity Nonzero SurfaceResponse comparisonを完了。
 
 Rust exporter:
 
