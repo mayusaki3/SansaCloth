@@ -45,6 +45,8 @@ namespace SansaCloth.Validation.Editor
                     GetOrAdd<SansaClothFixtureExchangeMatrixProbe>(target);
                 SansaClothGravityResponseComparisonProbe gravity =
                     GetOrAdd<SansaClothGravityResponseComparisonProbe>(target);
+                SansaClothConformityResponseComparisonProbe conformity =
+                    GetOrAdd<SansaClothConformityResponseComparisonProbe>(target);
 
                 TextAsset sr001C0G0 = fixtures.SingleOrDefault(
                     asset => asset.name == "SR-001-C0-G0"
@@ -68,6 +70,8 @@ namespace SansaCloth.Validation.Editor
 
                 SetArray(gravity, "fixtureExchangeC0Json", c0Fixtures);
                 SetArray(gravity, "surfaceResponseResultC0Json", c0Results);
+                SetArray(conformity, "fixtureExchangeJson", fixtures);
+                SetArray(conformity, "surfaceResponseResultJson", results);
 
                 EditorUtility.SetDirty(target);
                 Selection.activeGameObject = target;
@@ -77,6 +81,7 @@ namespace SansaCloth.Validation.Editor
                 Log("SETUP.FXE-011-014", "READY");
                 Log("SETUP.FXE-016", "READY");
                 Log("SETUP.FXE-017B", "READY");
+                Log("SETUP.FXE-017C", "READY");
                 Log("SETUP.RESULT", "PASS");
             }
             catch (Exception exception)
@@ -106,12 +111,19 @@ namespace SansaCloth.Validation.Editor
             FindProbe<SansaClothGravityResponseComparisonProbe>().RunProbe();
         }
 
+        [MenuItem("SansaCloth/Probe/Run FXE-017C")]
+        internal static void RunFxe017C()
+        {
+            FindProbe<SansaClothConformityResponseComparisonProbe>().RunProbe();
+        }
+
         [MenuItem("SansaCloth/Probe/Run All Ready Probes")]
         internal static void RunAllReady()
         {
             RunFxe011To014();
             RunFxe016();
             RunFxe017B();
+            RunFxe017C();
         }
 
         private static T GetOrAdd<T>(GameObject target)
