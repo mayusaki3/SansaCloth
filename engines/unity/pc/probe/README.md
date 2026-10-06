@@ -33,6 +33,7 @@ Setupは再実行可能で、`SansaClothBackendProbe` GameObjectを再生成し�
 - FXE-016: Fixture Exchange 30件を自動割当。
 - FXE-017B: C0 Fixture Exchange 10件 + Reference result 10件を自動割当。
 - FXE-017C: Fixture Exchange 30件 + Reference result 30件を自動割当。
+- FXE-017D: Fixture Exchange 30件 + Reference result 30件を自動割当。
 
 Setup成功時:
 
@@ -43,6 +44,7 @@ SANSA_PROBE|SETUP.FXE-011-014|READY
 SANSA_PROBE|SETUP.FXE-016|READY
 SANSA_PROBE|SETUP.FXE-017B|READY
 SANSA_PROBE|SETUP.FXE-017C|READY
+SANSA_PROBE|SETUP.FXE-017D|READY
 SANSA_PROBE|SETUP.RESULT|PASS
 ```
 
@@ -53,6 +55,7 @@ SansaCloth > Probe > Run FXE-011-014
 SansaCloth > Probe > Run FXE-016
 SansaCloth > Probe > Run FXE-017B
 SansaCloth > Probe > Run FXE-017C
+SansaCloth > Probe > Run FXE-017D
 SansaCloth > Probe > Run All Ready Probes
 ```
 
