@@ -306,7 +306,7 @@ namespace SansaCloth.Validation
                 float effective = conformity * distanceWeight;
                 positions[i] = Vector3.LerpUnclamped(
                     positions[i],
-                    queries[i].surfacePosition,
+                    queries[i].surfacePositionM,
                     effective
                 );
             }
