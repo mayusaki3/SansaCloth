@@ -1,5 +1,61 @@
 # Unity PC Coordinate Probe
 
+## Self-contained Probe Set
+
+Unity検証Project自体はGit管理対象にしない。SansaCloth repository側を正本とし、Probe runtime codeとReference validation baselineから自己完結したUnity `Assets/SansaCloth/Probe` を生成する。
+
+通常の更新・配置はrepository rootから次の1コマンドで行う。
+
+```powershell
+.\engines\unity\pc\probe\BuildProbeAssets.ps1 -UnityProjectDirectory "D:\path\to\UnityProbeProject"
+```
+
+この処理は以下を行う。
+
+- `engines/unity/pc/probe/*.cs` を `Runtime/` へ収集する。
+- `reference/validation/fixture-exchange/basic-v1/` の30 JSONを収集する。
+- `reference/validation/surface-response-result/basic-v1/` の30 JSONを収集する。
+- `Editor/ProbeSetup.cs` を含める。
+- `probe/build/Assets/SansaCloth/Probe/` を毎回クリーン生成する。
+- `-UnityProjectDirectory` 指定時は対象Projectの `Assets/SansaCloth/Probe/` だけを置換する。Project内の他のAssetsは変更しない。
+
+Unityのcompile完了後、メニューから次を実行する。
+
+```text
+SansaCloth > Probe > Setup
+```
+
+Setupは再実行可能で、`SansaClothBackendProbe` GameObjectを作成/再利用し、現在必要なComponentとTextAssetを自動設定する。
+
+現在自動設定する検証:
+
+- FXE-011～014: SR-001-C0-G0を自動割当。
+- FXE-016: Fixture Exchange 30件を自動割当。
+- FXE-017B: C0 Fixture Exchange 10件 + Reference result 10件を自動割当。
+
+Setup成功時:
+
+```text
+SANSA_PROBE|SETUP.FIXTURE_EXCHANGE_COUNT|30
+SANSA_PROBE|SETUP.SURFACE_RESPONSE_RESULT_COUNT|30
+SANSA_PROBE|SETUP.FXE-011-014|READY
+SANSA_PROBE|SETUP.FXE-016|READY
+SANSA_PROBE|SETUP.FXE-017B|READY
+SANSA_PROBE|SETUP.RESULT|PASS
+```
+
+実行もUnityメニューから行える。
+
+```text
+SansaCloth > Probe > Run FXE-011-014
+SansaCloth > Probe > Run FXE-016
+SansaCloth > Probe > Run FXE-017B
+SansaCloth > Probe > Run All Ready Probes
+```
+
+Reference JSONはProbe配下へ二重管理しない。build/deploy時にcanonical validation baselineからコピーする。生成先 `build/` はGit管理外である。
+
+
 Runtime Backend Feasibility CheckpointのBF-001 Unit Mapping / BF-002 Coordinate Mapping / BF-003 SurfaceReference Mapping / BF-004 SurfaceQuery Feasibilityを確認する最小Probe。
 
 これはSansaCloth SolverのUnity移植ではない。
