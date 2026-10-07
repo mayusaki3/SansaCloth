@@ -122,6 +122,12 @@ Body rotationとWorld Gravityを独立に設定・観測し、Body rotationがGr
 
 Physics既定Gravity値そのものをReference既定値と一致させることは要求しない。
 
+実装順序:
+1. Python runtimeで `azlmbr.physics` のGravity/Scene/World関連公開symbolを列挙する。
+2. direct Gravity APIが公開されていれば、そのruntime APIでWorld Gravityを観測する。
+3. direct Gravity APIが公開されていなければ `CPP_REQUIRED` とし、`AzPhysics::SceneInterface::GetGravity` を使う最小C++ Probeへ移る。
+4. Python側で独自にGravityを計算・固定してPASS扱いにはしない。
+
 ## 6. Phase判定
 
 O3DE BF-001 Unit Mapping:
@@ -137,7 +143,7 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-003: **PASS** (2026-10-07)
 - OBF-004: **PASS** (2026-10-07)
 - OBF-005: **PASS** (2026-10-08)
-- OBF-006: OPEN
+- OBF-006: PYTHON API DISCOVERY IMPLEMENTED / RUNTIME OPEN
 - BF-001: **PASS** (2026-10-07)
 - BF-002: OPEN
 
