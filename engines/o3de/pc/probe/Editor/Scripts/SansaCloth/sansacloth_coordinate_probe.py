@@ -37,13 +37,12 @@ def rotation_bases(axis, degrees):
 
     try:
         radians = pymath.radians(degrees)
-        rotation = azmath.Vector3(0.0, 0.0, 0.0)
         if axis == "X":
-            rotation.x = radians
+            rotation = azmath.Vector3(radians, 0.0, 0.0)
         elif axis == "Y":
-            rotation.y = radians
+            rotation = azmath.Vector3(0.0, radians, 0.0)
         elif axis == "Z":
-            rotation.z = radians
+            rotation = azmath.Vector3(0.0, 0.0, radians)
         else:
             raise ValueError(f"unknown rotation axis: {axis}")
 
