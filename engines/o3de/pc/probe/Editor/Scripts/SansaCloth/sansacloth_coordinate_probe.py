@@ -1,9 +1,5 @@
 import math as pymath
 
-import azlmbr.bus as bus
-import azlmbr.components as components
-import azlmbr.editor as editor
-import azlmbr.entity as entity
 import azlmbr.math as azmath
 
 
@@ -25,48 +21,21 @@ def canonical_to_o3de(v):
     return azmath.Vector3(v.x, v.z, v.y)
 
 
-def rotation_bases(axis, degrees):
-    probe_entity = editor.ToolsApplicationRequestBus(
-        bus.Broadcast,
-        "CreateNewEntityAtPosition",
-        azmath.Vector3(0.0, 0.0, 0.0),
-        entity.EntityId(),
+def rotation_transform(axis, radians):
+    factory = getattr(azmath, f"Quaternion_CreateRotation{axis}")
+    quat = factory(radians)
+    return azmath.Transform_CreateFromQuaternionAndTranslation(
+        quat, azmath.Vector3(0.0, 0.0, 0.0)
     )
-    if probe_entity is None or not probe_entity.IsValid():
-        raise RuntimeError("failed to create temporary rotation probe entity")
 
-    try:
-        radians = pymath.radians(degrees)
-        if axis == "X":
-            rotation = azmath.Vector3(radians, 0.0, 0.0)
-        elif axis == "Y":
-            rotation = azmath.Vector3(0.0, radians, 0.0)
-        elif axis == "Z":
-            rotation = azmath.Vector3(0.0, 0.0, radians)
-        else:
-            raise ValueError(f"unknown rotation axis: {axis}")
 
-        components.TransformBus(
-            bus.Event,
-            "SetWorldRotation",
-            probe_entity,
-            rotation,
-        )
-        transform = components.TransformBus(
-            bus.Event,
-            "GetWorldTM",
-            probe_entity,
-        )
-        if transform is None:
-            raise RuntimeError("GetWorldTM returned None")
-
-        return transform.basisX, transform.basisY, transform.basisZ
-    finally:
-        editor.ToolsApplicationRequestBus(
-            bus.Broadcast,
-            "DeleteEntityById",
-            probe_entity,
-        )
+def rotation_bases(axis, degrees):
+    transform = rotation_transform(axis, pymath.radians(degrees))
+    return (
+        transform.GetBasisX(),
+        transform.GetBasisY(),
+        transform.GetBasisZ(),
+    )
 
 
 def try_cross(lhs, rhs):
