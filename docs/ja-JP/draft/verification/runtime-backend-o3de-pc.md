@@ -128,6 +128,12 @@ Physics既定Gravity値そのものをReference既定値と一致させること
 3. direct Gravity APIが公開されていなければ `CPP_REQUIRED` とし、`AzPhysics::SceneInterface::GetGravity` を使う最小C++ Probeへ移る。
 4. Python側で独自にGravityを計算・固定してPASS扱いにはしない。
 
+2026-10-08 Python runtime discovery:
+- `azlmbr.physics` の関連公開symbolは `PhysicsScene`, `PhysicsScene_GetOnGravityChangeEvent`, Scene Query系のみ。
+- O3DEの `PhysicsScene.cpp` BehaviorContext reflectionでも `PhysicsScene` に公開されるのは `GetOnGravityChangeEvent` と `QueryScene` で、`GetGravity` / `SetGravity` は公開されない。
+- よって `PYTHON_GRAVITY_API_CANDIDATE` は変更イベントAPIを拾ったfalse positiveであり、Gravity値の直接観測経路ではない。
+- OBF-006は `AzPhysics::SceneInterface::GetGravity` を直接使う最小C++ Probeへ進む。
+
 ## 6. Phase判定
 
 O3DE BF-001 Unit Mapping:
@@ -143,7 +149,7 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-003: **PASS** (2026-10-07)
 - OBF-004: **PASS** (2026-10-07)
 - OBF-005: **PASS** (2026-10-08)
-- OBF-006: PYTHON API DISCOVERY IMPLEMENTED / RUNTIME OPEN
+- OBF-006: PYTHON API DISCOVERY PASS / C++ PROBE REQUIRED
 - BF-001: **PASS** (2026-10-07)
 - BF-002: OPEN
 
