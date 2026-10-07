@@ -11,14 +11,14 @@ def log(key, value):
 
 
 def vec(v):
-    return f"{v.GetX():.9g},{v.GetY():.9g},{v.GetZ():.9g}"
+    return f"{v.x:.9g},{v.y:.9g},{v.z:.9g}"
 
 
 def canonical_to_o3de(v):
     # Candidate mapping under validation:
     # canonical +X=right,+Y=up,+Z=forward
     # O3DE      +X=right,+Y=forward,+Z=up
-    return azmath.Vector3(v.GetX(), v.GetZ(), v.GetY())
+    return azmath.Vector3(v.x, v.z, v.y)
 
 
 def rotation_transform(axis, radians):
