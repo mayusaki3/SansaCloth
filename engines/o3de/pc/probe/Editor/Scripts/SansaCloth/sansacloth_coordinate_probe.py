@@ -1,5 +1,9 @@
 import math as pymath
 
+import azlmbr.bus as bus
+import azlmbr.components as components
+import azlmbr.editor as editor
+import azlmbr.entity as entity
 import azlmbr.math as azmath
 
 
@@ -21,17 +25,49 @@ def canonical_to_o3de(v):
     return azmath.Vector3(v.x, v.z, v.y)
 
 
-def rotation_transform(axis, radians):
-    factory = getattr(azmath, f"Quaternion_CreateRotation{axis}")
-    quat = factory(radians)
-    return azmath.Transform_CreateFromQuaternionAndTranslation(
-        quat, azmath.Vector3(0.0, 0.0, 0.0)
-    )
-
-
 def rotation_bases(axis, degrees):
-    transform = rotation_transform(axis, pymath.radians(degrees))
-    return transform.basisX, transform.basisY, transform.basisZ
+    probe_entity = editor.ToolsApplicationRequestBus(
+        bus.Broadcast,
+        "CreateNewEntityAtPosition",
+        azmath.Vector3(0.0, 0.0, 0.0),
+        entity.EntityId(),
+    )
+    if probe_entity is None or not probe_entity.IsValid():
+        raise RuntimeError("failed to create temporary rotation probe entity")
+
+    try:
+        radians = pymath.radians(degrees)
+        rotation = azmath.Vector3(0.0, 0.0, 0.0)
+        if axis == "X":
+            rotation.x = radians
+        elif axis == "Y":
+            rotation.y = radians
+        elif axis == "Z":
+            rotation.z = radians
+        else:
+            raise ValueError(f"unknown rotation axis: {axis}")
+
+        components.TransformBus(
+            bus.Event,
+            "SetWorldRotation",
+            probe_entity,
+            rotation,
+        )
+        transform = components.TransformBus(
+            bus.Event,
+            "GetWorldTM",
+            probe_entity,
+        )
+        if transform is None:
+            raise RuntimeError("GetWorldTM returned None")
+
+        return transform.basisX, transform.basisY, transform.basisZ
+    finally:
+        editor.ToolsApplicationRequestBus(
+            bus.Broadcast,
+            "DeleteEntityById",
+            probe_entity,
+        )
 
 
 def try_cross(lhs, rhs):
