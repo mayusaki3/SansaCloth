@@ -168,13 +168,30 @@ def run():
         ",".join(physics_symbols) if physics_symbols else "NONE",
     )
     direct_gravity_symbols = [
-        name for name in physics_symbols if "gravity" in name.lower()
+        name for name in physics_symbols
+        if "gravity" in name.lower()
+        and "event" not in name.lower()
     ]
     if direct_gravity_symbols:
-        log("OBF-006.DISCOVERY", "PYTHON_GRAVITY_API_CANDIDATE")
+        log(
+            "OBF-006.DIRECT_PYTHON_GRAVITY_SYMBOLS",
+            ",".join(direct_gravity_symbols),
+        )
     else:
+        log("OBF-006.DIRECT_PYTHON_GRAVITY_SYMBOLS", "NONE")
+
+    try:
+        import azlmbr.sansacloth_probe as sansacloth_probe
+    except ImportError:
         log("OBF-006.DISCOVERY", "CPP_REQUIRED")
-    log("OBF-006.RESULT", "OPEN")
+        log("OBF-006.RESULT", "OPEN")
+    else:
+        log("OBF-006.DISCOVERY", "CPP_PROBE_AVAILABLE")
+        cpp_result = sansacloth_probe.RunObf006()
+        if not cpp_result:
+            log("OBF-006.PYTHON_BRIDGE_RESULT", "FAIL")
+            raise RuntimeError("OBF-006 C++ gravity probe failed")
+        log("OBF-006.PYTHON_BRIDGE_RESULT", "PASS")
 
     log("OBF-01.PYTHON_PROBE_RESULT", "PASS")
 
