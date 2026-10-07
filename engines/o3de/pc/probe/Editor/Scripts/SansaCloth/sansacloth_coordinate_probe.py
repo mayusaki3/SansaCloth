@@ -1,6 +1,7 @@
 import math as pymath
 
 import azlmbr.math as azmath
+import azlmbr.physics as physics
 
 
 PREFIX = "SANSA_O3DE|"
@@ -153,6 +154,27 @@ def run():
         log("OBF-005.RESULT", "FAIL")
         raise RuntimeError("triangle winding conversion did not match expected normal")
     log("OBF-005.RESULT", "PASS")
+
+    # OBF-006 discovery: do not guess Python names for SceneInterface gravity.
+    # Record the actually exposed physics symbols and decide whether a direct
+    # Python runtime path exists before implementing the gravity probe.
+    physics_symbols = sorted(
+        name
+        for name in dir(physics)
+        if any(token in name.lower() for token in ("gravity", "scene", "world"))
+    )
+    log(
+        "OBF-006.PYTHON_PHYSICS_SYMBOLS",
+        ",".join(physics_symbols) if physics_symbols else "NONE",
+    )
+    direct_gravity_symbols = [
+        name for name in physics_symbols if "gravity" in name.lower()
+    ]
+    if direct_gravity_symbols:
+        log("OBF-006.DISCOVERY", "PYTHON_GRAVITY_API_CANDIDATE")
+    else:
+        log("OBF-006.DISCOVERY", "CPP_REQUIRED")
+    log("OBF-006.RESULT", "OPEN")
 
     log("OBF-01.PYTHON_PROBE_RESULT", "PASS")
 
