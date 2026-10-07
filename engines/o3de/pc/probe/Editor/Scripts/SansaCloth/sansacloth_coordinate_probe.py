@@ -106,6 +106,54 @@ def run():
         log("OBF-004.Z_CROSS_X", vec(zx))
         log("OBF-004.RESULT", "OBSERVED")
 
+    # OBF-005: a canonical triangle with +Y normal.
+    # p0=(0,0,0), p1=(1,0,0), p2=(0,0,-1):
+    # (p1-p0) cross (p2-p0) = +Y in canonical space.
+    canonical_p0 = azmath.Vector3(0.0, 0.0, 0.0)
+    canonical_p1 = azmath.Vector3(1.0, 0.0, 0.0)
+    canonical_p2 = azmath.Vector3(0.0, 0.0, -1.0)
+    canonical_normal = azmath.Vector3(0.0, 1.0, 0.0)
+
+    o3de_p0 = canonical_to_o3de(canonical_p0)
+    o3de_p1 = canonical_to_o3de(canonical_p1)
+    o3de_p2 = canonical_to_o3de(canonical_p2)
+    expected_o3de_normal = canonical_to_o3de(canonical_normal)
+
+    same_edge_1 = azmath.Vector3(
+        o3de_p1.x - o3de_p0.x,
+        o3de_p1.y - o3de_p0.y,
+        o3de_p1.z - o3de_p0.z,
+    )
+    same_edge_2 = azmath.Vector3(
+        o3de_p2.x - o3de_p0.x,
+        o3de_p2.y - o3de_p0.y,
+        o3de_p2.z - o3de_p0.z,
+    )
+    same_winding_normal = same_edge_1.Cross(same_edge_2)
+    reversed_winding_normal = same_edge_2.Cross(same_edge_1)
+
+    log("OBF-005.EXPECTED_MAPPED_NORMAL", vec(expected_o3de_normal))
+    log("OBF-005.SAME_WINDING_NORMAL", vec(same_winding_normal))
+    log("OBF-005.REVERSED_WINDING_NORMAL", vec(reversed_winding_normal))
+
+    tolerance = 1.0e-6
+    reversed_matches = (
+        abs(reversed_winding_normal.x - expected_o3de_normal.x) <= tolerance
+        and abs(reversed_winding_normal.y - expected_o3de_normal.y) <= tolerance
+        and abs(reversed_winding_normal.z - expected_o3de_normal.z) <= tolerance
+    )
+    same_matches = (
+        abs(same_winding_normal.x - expected_o3de_normal.x) <= tolerance
+        and abs(same_winding_normal.y - expected_o3de_normal.y) <= tolerance
+        and abs(same_winding_normal.z - expected_o3de_normal.z) <= tolerance
+    )
+    log("OBF-005.SAME_WINDING_MATCH", str(same_matches).upper())
+    log("OBF-005.REVERSED_WINDING_MATCH", str(reversed_matches).upper())
+    if same_matches or not reversed_matches:
+        log("OBF-005.RESULT", "FAIL")
+        raise RuntimeError("triangle winding conversion did not match expected normal")
+    log("OBF-005.RESULT", "PASS")
+
     log("OBF-01.PYTHON_PROBE_RESULT", "PASS")
 
 
