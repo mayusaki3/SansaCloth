@@ -136,7 +136,7 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-002: **PASS** (2026-10-07)
 - OBF-003: **PASS** (2026-10-07)
 - OBF-004: **PASS** (2026-10-07)
-- OBF-005: IMPLEMENTED / RUNTIME OPEN
+- OBF-005: **PASS** (2026-10-08)
 - OBF-006: OPEN
 - BF-001: **PASS** (2026-10-07)
 - BF-002: OPEN
@@ -151,7 +151,10 @@ O3DE BF-002 Coordinate Mapping:
 - よってO3DE math runtimeは右手系orientationを示す。
 - canonical->O3DE component写像はY/Z交換でorientation reversingであるため、rotation axial vectorはpolar vectorと同じ写像にせず、符号を含めて扱う。
 - rotation-vector候補写像は canonical (rx,ry,rz) -> O3DE (-rx,-rz,-ry)。
-- OBF-005でtriangle winding/normalを確認するまで、mesh index conversion ruleは確定しない。
+- OBF-005 runtime evidence: canonical +Y normal triangleをcomponent変換すると、同一windingではO3DE normal=(0,0,-1)、winding反転では(0,0,+1)となった。
+- expected mapped canonical normal=(0,0,+1)に一致するのはreversed windingのみ。
+- よってFixture Exchange triangleをO3DEへ渡す際は、component変換に加えてtriangle windingを反転する。
+- OBF-005: PASS。
 
 ## 7. Probe配布方針
 
