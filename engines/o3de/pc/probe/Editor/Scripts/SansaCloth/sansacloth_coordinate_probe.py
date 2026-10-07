@@ -29,9 +29,9 @@ def rotation_transform(axis, radians):
     )
 
 
-def rotate(axis, degrees, v):
+def rotation_bases(axis, degrees):
     transform = rotation_transform(axis, pymath.radians(degrees))
-    return transform.TransformPoint(v)
+    return transform.basisX, transform.basisY, transform.basisZ
 
 
 def try_cross(lhs, rhs):
@@ -63,26 +63,30 @@ def run():
     log("OBF-002.CANONICAL_Z_TO_O3DE", vec(canonical_to_o3de(z)))
     log("OBF-002.RESULT", "OBSERVED")
 
+    observed_rotations = {}
     for axis in ("X", "Y", "Z"):
         for degrees in (90, -90):
-            log(
-                f"OBF-003.ROT_{axis}_{degrees:+d}_X",
-                vec(rotate(axis, degrees, x)),
+            basis_x, basis_y, basis_z = rotation_bases(axis, degrees)
+            observed_rotations[(axis, degrees)] = (
+                basis_x,
+                basis_y,
+                basis_z,
             )
-            log(
-                f"OBF-003.ROT_{axis}_{degrees:+d}_Y",
-                vec(rotate(axis, degrees, y)),
-            )
-            log(
-                f"OBF-003.ROT_{axis}_{degrees:+d}_Z",
-                vec(rotate(axis, degrees, z)),
-            )
+            log(f"OBF-003.ROT_{axis}_{degrees:+d}_BASIS_X", vec(basis_x))
+            log(f"OBF-003.ROT_{axis}_{degrees:+d}_BASIS_Y", vec(basis_y))
+            log(f"OBF-003.ROT_{axis}_{degrees:+d}_BASIS_Z", vec(basis_z))
 
     # Canonical +90deg around +Z maps +X to +Y.
     # Under the candidate axis permutation this should map O3DE +X to +Z.
     log("OBF-003.CANONICAL_Z_PLUS90_EXPECTED_O3DE", vec(z))
-    log("OBF-003.O3DE_Y_PLUS90_APPLIED_X", vec(rotate("Y", 90, x)))
-    log("OBF-003.O3DE_Y_MINUS90_APPLIED_X", vec(rotate("Y", -90, x)))
+    log(
+        "OBF-003.O3DE_Y_PLUS90_BASIS_X",
+        vec(observed_rotations[("Y", 90)][0]),
+    )
+    log(
+        "OBF-003.O3DE_Y_MINUS90_BASIS_X",
+        vec(observed_rotations[("Y", -90)][0]),
+    )
     log("OBF-003.RESULT", "OBSERVED")
 
     cross_api, xy = try_cross(x, y)
