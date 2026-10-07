@@ -131,15 +131,27 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-002～006をすべてruntime確認してからPASSとする。
 - Python Binding不足による未観測項目はC++ Probeへ移し、推測でPASSにしない。
 
-初期状態:
-- OBF-001: IMPLEMENTED / RUNTIME OPEN
-- OBF-002: IMPLEMENTED / RUNTIME OPEN
-- OBF-003: IMPLEMENTED / RUNTIME OPEN
-- OBF-004: IMPLEMENTED / RUNTIME OPEN
+現在状態:
+- OBF-001: **PASS** (2026-10-07)
+- OBF-002: **PASS** (2026-10-07)
+- OBF-003: **PASS** (2026-10-07)
+- OBF-004: **PASS** (2026-10-07)
 - OBF-005: OPEN
 - OBF-006: OPEN
-- BF-001: OPEN
+- BF-001: **PASS** (2026-10-07)
 - BF-002: OPEN
+
+2026-10-07 runtime evidence:
+- OBF-01 Python Probe: PASS。
+- O3DE basis X/Y/Z = (1,0,0)/(0,1,0)/(0,0,1)。
+- Position/Direction/Normalのcomponent候補写像は canonical (x,y,z) -> O3DE (x,z,y)。
+- O3DE +90deg Zは+Xを+Yへ回転。
+- canonical +90deg Zは、候補写像後のO3DE空間ではO3DE -90deg Yに対応し、+Xを+Zへ回転することをruntime確認。
+- O3DE Vector3.Crossは X cross Y=+Z、Y cross Z=+X、Z cross X=+Y。
+- よってO3DE math runtimeは右手系orientationを示す。
+- canonical->O3DE component写像はY/Z交換でorientation reversingであるため、rotation axial vectorはpolar vectorと同じ写像にせず、符号を含めて扱う。
+- rotation-vector候補写像は canonical (rx,ry,rz) -> O3DE (-rx,-rz,-ry)。
+- OBF-005でtriangle winding/normalを確認するまで、mesh index conversion ruleは確定しない。
 
 ## 7. Probe配布方針
 
