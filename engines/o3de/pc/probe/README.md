@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|5
+SANSA_O3DE_BUILD|SCRIPT_COUNT|6
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -323,3 +323,57 @@ O3DE Editor on 2026-10-08 for all five validation-only analytic fixtures
 The earlier CPP_GEM_NOT_LOADED state is no longer present; its precise
 cause was not established. This does not validate actual O3DE
 Mesh API or production mesh deformation.
+
+## Run BF-008 Validation Capture
+
+After closing O3DE Editor, deploy the 6 Python scripts and C++ Gem with
+`BuildProbeAssets.ps1`, rebuild the project, and run this Editor script:
+
+~~~text
+SansaCloth/sansacloth_validation_capture_probe.py
+~~~
+
+The C++ `RunBf008Capture()` method uses the BF-005/006 `MapSr001Output`
+path to generate 147 Final CP records and 1 Aggregate record.
+The Python script creates a UUID EventId and UTC Timestamp, adds a header,
+writes **149 JSONL records** to a unique file in the operating system's
+temporary directory, and validates the artifact by reading it back.
+
+The capture's positions and normals are converted back from O3DE Z-up
+to the canonical coordinate system before serialization. The expected
+normal is `(0,1,0)`. This matches the Unity BF-008 measurement semantics.
+
+Expected key log values:
+
+~~~text
+SANSA_O3DE|BF-008.DISCOVERY|CPP_CAPTURE_AVAILABLE
+SANSA_O3DE|BF-008.CPP_CP_COUNT|147
+SANSA_O3DE|BF-008.CPP_CONTACT_COUNT|147
+SANSA_O3DE|BF-008.CPP_SUPPORT_COUNT|14
+SANSA_O3DE|BF-008.CPP_MEASUREMENTS_RESULT|PASS
+SANSA_O3DE|BF-008.PYTHON_BRIDGE_RESULT|PASS
+SANSA_O3DE|BF-008.VCF-001.RESULT|PASS
+SANSA_O3DE|BF-008.VCF-002.RESULT|PASS
+SANSA_O3DE|BF-008.VCF-003.RESULT|PASS
+SANSA_O3DE|BF-008.VCF-004.RESULT|PASS
+SANSA_O3DE|BF-008.VCF-005.RESULT|PASS
+SANSA_O3DE|BF-008.VCF-006.RESULT|PASS
+SANSA_O3DE|BF-008.VCF-007.RESULT|PASS
+SANSA_O3DE|BF-008.TEST_ID|O3DE-SR-001-C0-G0
+SANSA_O3DE|BF-008.RECORD_COUNT|149
+SANSA_O3DE|BF-008.CP_COUNT|147
+SANSA_O3DE|BF-008.CONTACT_COUNT|147
+SANSA_O3DE|BF-008.SUPPORT_COUNT|14
+SANSA_O3DE|BF-008.RESULT|PASS
+SANSA_O3DE|BF-008.PYTHON_PROBE_RESULT|PASS
+~~~
+
+The log also prints `EVENT_ID`, `TIMESTAMP_UTC`, `BACKEND`,
+`CAPTURE_PATH` and the aggregate metrics. Confirm the file exists and
+contains 149 JSONL lines. If possible, attach the JSONL artifact as
+evidence together with the Editor log.
+
+BF-008 remains **OPEN** until O3DE Editor runtime and artifact evidence
+are reviewed. If the Gem or the new capture method is not exposed, the
+script reports OPEN; any capture or read-back error reports FAIL.
+This is validation-only, not a production serialization contract.
