@@ -397,7 +397,22 @@ Validation Case:
 
 **範囲:** 解析式から生成したvalidation-only mesh-like gridの数値写像。O3DE Mesh APIによる実メッシュ読み込み、Reference JSON importer、skinned/deformed mesh、production solverの動作を証明しない。
 
-状態: **BF-007 IMPLEMENTED / BUILD OPEN / RUNTIME OPEN**（2026-10-08）。実際のO3DE Editor実行ログを得るまでPASSとしない。
+状態: **BF-007 PASS**（2026-10-08 20:30 JST、O3DE 26.05 Editor runtime、validation-only analytic fixture）。
+
+実測証拠（ユーザー提供のEditorログ、`CPP_PROBE_AVAILABLE`）:
+- 5 Fixtureとも `VERTEX_COUNT|147`、`TRIANGLE_COUNT|240`、`CP_COUNT|147`。
+- `SR-001.FLAT`: Anchor 14、Local Height 0/0m、Center (0,0,0)、Center/First Triangle Normal (0,0,1)。
+- `SR-002.CONVEX_UP`: Anchor 14、Local Height 0/0.0299999993m、Center (0,0,0.0299999993)、Normal (0,0,1)。
+- `SR-003.CONVEX_SIDE`: Anchor 7、Local Height 0/0.0299999993m、Center (0.0299999993,0,2.6822089e-09)、Center Normal (1,0,8.94069672e-08)、First Triangle Normal (1,-0,8.94069458e-08)。
+- `SR-004.CONCAVE_SHALLOW`: Anchor 14、Local Height -0.0199999996/0m、Center (0,0,-0.0199999996)、Normal (0,0,1)。
+- `SR-005.CONCAVE_DEEP`: Anchor 14、Local Height -0.0500000007/0m、Center (0,0,-0.0500000007)、Normal (0,0,1)。
+- 5 Fixture × 7 Case（`COUNTS`、`ANCHORS`、`HEIGHT_RANGE`、`CENTER_POSITION`、`CENTER_NORMAL`、`FIRST_TRIANGLE_NORMAL`、`ALL_TRIANGLE_GEOMETRY`）はすべて `RESULT|PASS`。
+- `BF-007.SR-001.FLAT.RESULT|PASS`、`BF-007.SR-002.CONVEX_UP.RESULT|PASS`、`BF-007.SR-003.CONVEX_SIDE.RESULT|PASS`、`BF-007.SR-004.CONCAVE_SHALLOW.RESULT|PASS`、`BF-007.SR-005.CONCAVE_DEEP.RESULT|PASS`。
+- `BF-007.RESULT|PASS`、`BF-007.PYTHON_BRIDGE_RESULT|PASS`、`BF-007.PYTHON_PROBE_RESULT|PASS`。
+
+前回の `BF-007.DISCOVERY|CPP_GEM_NOT_LOADED` は今回 `CPP_PROBE_AVAILABLE` に変化し解消を確認。原因（Gem有効化・ビルド・別PC等）はログだけでは断定しない。
+
+このPASSは上記validation-only解析Fixtureに限定する。実O3DE Mesh API、Reference JSON importer、skinned/deformed mesh、production solverの動作保証ではない。
 
 ## 11. Probe配布方針
 
