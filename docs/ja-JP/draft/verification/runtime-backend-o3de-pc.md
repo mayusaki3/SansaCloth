@@ -539,7 +539,21 @@ Rust Referenceが生成・commit済みの`reference/validation/fixture-exchange/
 | OXF-009 | Resolved geometry | 全CPのimported PositionとBody同一UVのPosition一致（1e-6m）、中央位置と法線一致 |
 | OXF-010 | Deploy/read source | Git管理されたReference baselineを検証Projectに配布し、Editor上で実ファイルを読み込む |
 
-実行時のGate `OXF-001`～`OXF-010`は**実Editorログを受け取るまでOPEN**。各CaseがPASS、`OXF-010.RESULT|PASS`、`OXF.RESULT|PASS`、`OXF.PYTHON_PROBE_RESULT|PASS`で初期import検証をPASSとする。
+実行時のGate `OXF-001`～`OXF-010`は**RUNTIME PASS（2026-10-09、O3DE Editor、validation-only Python importer）**。各CaseがPASS、`OXF-010.RESULT|PASS`、`OXF.RESULT|PASS`、`OXF.PYTHON_PROBE_RESULT|PASS`を提示された実行ログで確認した。
+
+2026-10-09 OXF runtime evidence（提示されたO3DE Editorログ）:
+- Project: `SansaClothBackendProbe`（Windows 11 Pro）。ログ上のEditor起動時刻は2026-10-09 00:48:09 JST。OXF各行の個別時刻は記録されていない。
+- `OXF-001.RESULT|PASS` ～ `OXF-010.RESULT|PASS`（OXF-008を含む全10 Gate）。
+- `OXF.BODY_VERTEX_COUNT|147`、`OXF.BODY_TRIANGLE_COUNT|240`、`OXF.CP_COUNT|147`。
+- `OXF.ANCHOR_COUNT|14`、`OXF.CONTACT_INPUT_COUNT|147`、`OXF.CONTACT_ONLY_UNSUPPORTED_COUNT|133`。
+- `OXF-008.REJECTED_CASE_COUNT|14`、`OXF-008.RESULT|PASS`。FORMAT、DOMAIN、UV、TRIANGLE_INDEX、DUPLICATE_STABLE_ID、DUPLICATE_STRIP_ORDER、ZERO_NORMAL、CONFORMITY、NEGATIVE_TOLERANCE、VECTOR_LENGTH、UNKNOWN_FIELD、NONFINITE、DUPLICATE_JSON_KEY、NONFINITE_CONSTANTがすべて`REJECTED`。
+- `OXF-010.SOURCE_PATH` はProject内の `Editor/Scripts/SansaCloth/Fixtures/SR-001-C0-G0.json` を示す。
+- `OXF-010.SHA256|d63de3a9851bf72bf05c41e61f86955178669e198b7c569dc2b54bf70c2d1833`。
+- `OXF.CASE_ID|SR-001-C0-G0`、`OXF.RESULT|PASS`、`OXF.PYTHON_PROBE_RESULT|PASS`。
+- 起動ログには `DiffuseProbeGridUpdatePassTemplate` 不在のPassFactoryエラーがあるが、OXFのGateは全件PASS。描画機能への影響は未評価。
+- 根拠は提示されたEditorログ。JSONファイル自体の独立した再ハッシュ検証および実行環境での再実行は本記録では行っていない。
+
+判定はRust Referenceの単一resolved JSONをPython importerで読み込むvalidation-only範囲に限る。30-case matrix、C++ Backendへのgeometry投入、実O3DE Mesh API、production solver、およびReference SurfaceResponse数値一致は未検証。
 
 このPhaseはPython Editor Validation-only importerであり、C++ Gem側へimported geometryを渡すことやproduction mesh生成を意味しない。後続Gateで実データのC++境界投入を別途要求する。
 
