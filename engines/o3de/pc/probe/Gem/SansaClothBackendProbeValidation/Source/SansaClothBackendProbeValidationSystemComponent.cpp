@@ -84,7 +84,7 @@ namespace SansaClothBackendProbeValidation
         bodyConfiguration.m_startSimulationEnabled = false;
         bodyConfiguration.m_orientation = AZ::Quaternion::CreateIdentity();
 
-        const AzPhysics::SimulatedBodyHandle bodyHandle =
+        AzPhysics::SimulatedBodyHandle bodyHandle =
             sceneInterface->AddSimulatedBody(sceneHandle, &bodyConfiguration);
 
         bool result = bodyHandle != AzPhysics::InvalidSimulatedBodyHandle;
