@@ -341,7 +341,26 @@ Validation-only実装:
 - Final PositionはC0/G0のidentity stage。非ゼロGravity/Conformityでは計算せず拒否する。**Reference Solverやproduction Runtime Backendの移植・数値一致の証明ではない。**
 - 判定は `BF-005.RESULT`、`BF-006.RESULT`、`SR-001.RESULT` がすべてPASSかつ各ISF/OSF結果PASSの場合のみ行う。
 
-状態: **BF-005 OPEN / BF-006 OPEN**（2026-10-08、probe実装済み、build/runtime未検証）。
+状態: **BF-005 PASS / BF-006 PASS**（2026-10-08、O3DE 26.05 Editor実行ログで確認、validation-only SR-001 Flat / C=0 / G=0）。
+
+実測証拠（2026-10-08 18:03 JST、O3DE Editor / SansaClothBackendProbeValidation Gem）:
+- `SR-001.DISCOVERY|CPP_PROBE_AVAILABLE`
+- `SR-001.CP_COUNT|147`、`SR-001.ANCHOR_COUNT|14`
+- `SR-001.CONTACT_INPUT_COUNT|147`、`SR-001.DIRECT_SUPPORT_COUNT|14`
+- `SR-001.CONTACT_ONLY_UNSUPPORTED_COUNT|133`
+- `SR-001.OUTPUT_CP_COUNT|147`、`SR-001.DERIVED_CONTACT_COUNT|147`
+- `SR-001.WORLD_GRAVITY_INPUT|0,0,0`、`SR-001.CONFORMITY_INPUT|0`、`SR-001.COLLISION_TOLERANCE_M|0`
+- `SR-001.FINAL_POSITION_DEVIATION_MAX_M|0`、`SR-001.NORMAL_DEVIATION_MAX|0`、`SR-001.SEPARATION_ABS_MAX_M|0`
+- `SR-001.NONZERO_GRAVITY_REJECTED|TRUE`、`SR-001.NONZERO_CONFORMITY_REJECTED|TRUE`
+- `SR-001.CP_FIRST|id=0;domain=1;uv=0,0;position=-0.100000001,-0.0500000007,0;normal=0,0,1;separation_m=0;support=Anchor`
+- `SR-001.CP_CENTER|id=73;domain=1;uv=0.5,0.5;position=0,0,0;normal=0,0,1;separation_m=0;support=Unsupported`
+- `SR-001.CP_LAST|id=146;domain=1;uv=1,1;position=0.100000001,0.0500000007,0;normal=0,0,1;separation_m=0;support=Anchor`
+- `BF-005.ISF-001.RESULT|PASS` ～ `BF-005.ISF-007.RESULT|PASS`
+- `BF-006.OSF-001.RESULT|PASS` ～ `BF-006.OSF-010.RESULT|PASS`
+- `BF-005.RESULT|PASS`、`BF-006.RESULT|PASS`、`SR-001.RESULT|PASS`
+- `SR-001.PYTHON_BRIDGE_RESULT|PASS`、`SR-001.PYTHON_PROBE_RESULT|PASS`
+
+判定範囲は解析平面・単一Domain・C0/G0の入力/出力意味論に限定する。非ゼロ入力は明示的拒否が確認されたのみであり、非ゼロGravity/ConformityのSimulation結果、実O3DE Mesh API、Reference JSON importer、production Solverを検証したものではない。
 
 ## 10. Probe配布方針
 
