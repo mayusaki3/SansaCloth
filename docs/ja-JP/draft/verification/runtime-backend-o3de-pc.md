@@ -509,7 +509,41 @@ JSONLファイルは会話に添付されており、GitHubリポジトリへコ
 
 この判定は既存validation-only fixtureによるBackend境界の実現可能性に限定する。Production Backend完成、Reference Solverとの数値一致、実Mesh API、skinned/deformed mesh stable mapping、性能保証を意味しない。後続はFixture Exchange importerおよびSurfaceResponse比較の検証へ進む。
 
-## 12. Probe配布方針
+## 12. Phase OBF-07: Fixture Exchange SR-001 JSON Import
+
+### 12.1 目的と入力
+
+Rust Referenceが生成・commit済みの`reference/validation/fixture-exchange/basic-v1/SR-001-C0-G0.json`をO3DE Editorで読み込む。BF-007の解析式を再利用してFixtureを作り直さず、**JSON resolved dataのみ**からO3DE用のBody頂点/法線/triangle、CP/strip/SurfaceReference/Anchor/Contact、case inputsを構成する。
+
+初期検証は`SR-001-C0-G0` 1ケースだけを対象とする。30-case importer、Reference Resultとの比較、O3DE実Mesh API、Solverへの接続は後続Gateで別途検証する。
+
+- Format: `sansacloth.validation.fixture-exchange/0`、canonical length m、gravity m/s²、X=right/Y=up/Z=forward。
+- Body: DomainId=1、147 vertices、240 triangles。頂点position/normal/UVはJSON値を読み込む。
+- Cloth: 147 CP、StableId 0..146、7 strips×21、Anchor 14、Contact input 147。ContactはSupportに昇格させない。
+- Inputs: World Gravity=(0,0,0)、Conformity=0、CollisionTolerance=0。
+- O3DE座標: canonical `(x,y,z)` → O3DE `(x,z,y)`、Triangle `[a,b,c]` → `[a,c,b]`。DomainId/UV/StableIdは変えない。
+- Importerは未知field/format、nonfinite、vector長、UV範囲、重複ID/strip-order、無効triangle index/normal、未知domain、範囲外Conformity、負CollisionToleranceを拒否する。
+
+### 12.2 実装前に固定する検証ケース
+
+| ID | Gate | PASS条件 |
+|---|---|---|
+| OXF-001 | JSON format/coordinate | Rust baselineのformatとcanonical unit/axesが正しい |
+| OXF-002 | Body mesh import | 147 vertices/240 triangles、Width 0.20m、Depth 0.10m、normal +Zに写像 |
+| OXF-003 | Winding conversion | 全240 triangleが非退化、O3DE outward +Z |
+| OXF-004 | SurfaceReference | DomainId=1、全CPのUVを保持、runtime triangle IDへ置換しない |
+| OXF-005 | CP identity/strip | 0..146 stable ID、7×21 strip/order、147 CP |
+| OXF-006 | Anchor/Contact | Anchor=14、Contact input=147、Contact-only unsupported=133 |
+| OXF-007 | Case inputs | G=(0,0,0)、C=0、Tolerance=0を保持 |
+| OXF-008 | Negative import | 不正format/domain/UV/index/id/strip-order/normal/scalar/vector/unknown field/nonfiniteをすべて拒否 |
+| OXF-009 | Resolved geometry | 全CPのimported PositionとBody同一UVのPosition一致（1e-6m）、中央位置と法線一致 |
+| OXF-010 | Deploy/read source | Git管理されたReference baselineを検証Projectに配布し、Editor上で実ファイルを読み込む |
+
+実行時のGate `OXF-001`～`OXF-010`は**実Editorログを受け取るまでOPEN**。各CaseがPASS、`OXF-010.RESULT|PASS`、`OXF.RESULT|PASS`、`OXF.PYTHON_PROBE_RESULT|PASS`で初期import検証をPASSとする。
+
+このPhaseはPython Editor Validation-only importerであり、C++ Gem側へimported geometryを渡すことやproduction mesh生成を意味しない。後続Gateで実データのC++境界投入を別途要求する。
+
+## 13. Probe配布方針
 
 Unity検証と同様、O3DE検証Project自体をSansaCloth repositoryへ含めることは要求しない。
 
@@ -523,7 +557,7 @@ Deploy target:
 
 Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、検証Project側は再生成可能な作業環境として扱う。
 
-## 13. 後続順序
+## 14. 後続順序
 
 1. OBF-001～004 Python Probe runtime確認。
 2. 必要ならC++ Probeを追加しOBF-004/005を確認。
@@ -537,7 +571,7 @@ Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、�
 10. Fixture Exchange 30-case import/SurfaceResponse比較へ進む。
 11. Unity/O3DE双方で成立した境界だけをBackend-neutral contract候補として整理する。
 
-## 14. 未確定事項
+## 15. 未確定事項
 
 - Canonical handednessの全体仕様確定（O3DE math runtimeのCross orientationおよび変換時winding反転は確認済み）。
 - O3DE実メッシュAPIへtriangle winding/geometric normalを適用する統合経路（math probeでのwinding反転は確認済み）。
