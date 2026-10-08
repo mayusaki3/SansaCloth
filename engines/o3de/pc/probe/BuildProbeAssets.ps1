@@ -39,7 +39,7 @@ if ($scripts.Count -ne $requiredScripts.Count) {
 $fixtureSourceDir = [System.IO.Path]::GetFullPath((Join-Path $probeRoot "..\..\..\..\reference\validation\fixture-exchange\basic-v1"))
 $expectedCaseIds = @(
     foreach ($scenario in 1..5) {
-        foreach ($conformity in @("0", "0.5", "1")) {
+        foreach ($conformity in @("0", "05", "1")) {
             foreach ($gravity in @("0", "1")) {
                 "SR-{0:D3}-C{1}-G{2}" -f $scenario, $conformity, $gravity
             }
