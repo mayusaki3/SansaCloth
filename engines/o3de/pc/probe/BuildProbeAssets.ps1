@@ -24,7 +24,8 @@ $requiredScripts = @(
     "sansacloth_sr001_boundary_probe.py",
     "sansacloth_basic_fixture_probe.py",
     "sansacloth_validation_capture_probe.py",
-    "sansacloth_fixture_exchange_import_probe.py"
+    "sansacloth_fixture_exchange_import_probe.py",
+    "sansacloth_fixture_exchange_matrix_probe.py"
 )
 foreach ($requiredScript in $requiredScripts) {
     if (-not (Test-Path -LiteralPath (Join-Path $source $requiredScript) -PathType Leaf)) {
@@ -35,11 +36,19 @@ if ($scripts.Count -ne $requiredScripts.Count) {
     throw "Expected $($requiredScripts.Count) O3DE probe Python scripts, found $($scripts.Count): $source"
 }
 
-$fixtureSource = [System.IO.Path]::GetFullPath(
-    (Join-Path $probeRoot "..\..\..\..\reference\validation\fixture-exchange\basic-v1\SR-001-C0-G0.json")
+$fixtureSourceDir = [System.IO.Path]::GetFullPath((Join-Path $probeRoot "..\..\..\..\reference\validation\fixture-exchange\basic-v1"))
+$expectedCaseIds = @(
+    foreach ($scenario in 1..5) {
+        foreach ($conformity in @("0", "0.5", "1")) {
+            foreach ($gravity in @("0", "1")) {
+                "SR-{0:D3}-C{1}-G{2}" -f $scenario, $conformity, $gravity
+            }
+        }
+    }
 )
-if (-not (Test-Path -LiteralPath $fixtureSource -PathType Leaf)) {
-    throw "Reference Fixture Exchange baseline not found: $fixtureSource"
+if ($expectedCaseIds.Count -ne 30 -or -not (Test-Path -LiteralPath $fixtureSourceDir -PathType Container)) { throw "Reference 30-case Fixture Exchange directory missing: $fixtureSourceDir" }
+foreach ($caseId in $expectedCaseIds) {
+    if (-not (Test-Path -LiteralPath (Join-Path $fixtureSourceDir "$caseId.json") -PathType Leaf)) { throw "Reference Fixture Exchange baseline missing: $caseId" }
 }
 
 $gemManifest = Join-Path $gemSource "gem.json"
@@ -63,20 +72,24 @@ Copy-Item -Path (Join-Path $gemSource "*") -Destination $gemTarget -Recurse -For
 
 $fixtureTargetDir = Join-Path $target "Fixtures"
 New-Item -ItemType Directory -Path $fixtureTargetDir -Force | Out-Null
-$fixtureTarget = Join-Path $fixtureTargetDir "SR-001-C0-G0.json"
-Copy-Item -LiteralPath $fixtureSource -Destination $fixtureTarget -Force
-$sourceHash = (Get-FileHash -LiteralPath $fixtureSource -Algorithm SHA256).Hash
-$targetHash = (Get-FileHash -LiteralPath $fixtureTarget -Algorithm SHA256).Hash
-if ($sourceHash -ne $targetHash) {
-    throw "Reference Fixture Exchange SHA256 mismatch after deploy"
+foreach ($caseId in $expectedCaseIds) {
+    $fixtureSource = Join-Path $fixtureSourceDir "$caseId.json"
+    $fixtureTarget = Join-Path $fixtureTargetDir "$caseId.json"
+    Copy-Item -LiteralPath $fixtureSource -Destination $fixtureTarget -Force
+    $sourceHash = (Get-FileHash -LiteralPath $fixtureSource -Algorithm SHA256).Hash
+    $targetHash = (Get-FileHash -LiteralPath $fixtureTarget -Algorithm SHA256).Hash
+    if ($sourceHash -ne $targetHash) { throw "Reference Fixture Exchange SHA256 mismatch after deploy: $caseId" }
+    if ($caseId -eq "SR-001-C0-G0") { $singleFixtureHash = $targetHash; $singleFixtureTarget = $fixtureTarget }
+    Write-Host "SANSA_O3DE_BUILD|MATRIX_CASE|$caseId|$targetHash|PASS"
 }
 
 $gemFiles = @(Get-ChildItem -LiteralPath $gemTarget -File -Recurse)
 
 Write-Host "SANSA_O3DE_BUILD|SCRIPT_COUNT|$($scripts.Count)"
+Write-Host "SANSA_O3DE_BUILD|MATRIX_CASE_COUNT|$($expectedCaseIds.Count)"
 Write-Host "SANSA_O3DE_BUILD|FIXTURE_CASE_ID|SR-001-C0-G0"
-Write-Host "SANSA_O3DE_BUILD|FIXTURE_SHA256|$targetHash"
-Write-Host "SANSA_O3DE_BUILD|FIXTURE_DEPLOY_TARGET|$fixtureTarget"
+Write-Host "SANSA_O3DE_BUILD|FIXTURE_SHA256|$singleFixtureHash"
+Write-Host "SANSA_O3DE_BUILD|FIXTURE_DEPLOY_TARGET|$singleFixtureTarget"
 Write-Host "SANSA_O3DE_BUILD|DEPLOY_TARGET|$target"
 Write-Host "SANSA_O3DE_BUILD|GEM_FILE_COUNT|$($gemFiles.Count)"
 Write-Host "SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|$gemTarget"
