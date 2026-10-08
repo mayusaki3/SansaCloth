@@ -19,7 +19,8 @@ if (-not (Test-Path -LiteralPath $projectRoot -PathType Container)) {
 $scripts = @(Get-ChildItem -LiteralPath $source -Filter "*.py" -File)
 $requiredScripts = @(
     "sansacloth_coordinate_probe.py",
-    "sansacloth_surface_reference_probe.py"
+    "sansacloth_surface_reference_probe.py",
+    "sansacloth_surface_query_probe.py"
 )
 foreach ($requiredScript in $requiredScripts) {
     if (-not (Test-Path -LiteralPath (Join-Path $source $requiredScript) -PathType Leaf)) {
