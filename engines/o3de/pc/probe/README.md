@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|8
+SANSA_O3DE_BUILD|SCRIPT_COUNT|9
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -208,7 +208,7 @@ scale, or a full cloth solver.
 
 ## Run BF-005 / BF-006 SR-001 Input/Output Semantics
 
-Deploy the current 8 Python scripts and C++ Validation Gem, rebuild the project,
+Deploy the current 9 Python scripts and C++ Validation Gem, rebuild the project,
 and run in O3DE Editor (Tools > Other > Python Scripts):
 
 ~~~text
@@ -472,5 +472,34 @@ SANSA_O3DE|OXF.MATRIX_RESULT|PASS
 ~~~
 
 Re-run the original single-case importer as a regression check.
-**OXF-011..019 remain OPEN** until the real O3DE Editor log is reviewed.
+**OXF-011..019 were confirmed RUNTIME PASS** in the 2026-10-09 Editor log.
 This does not validate C++ geometry handoff, production Mesh API, or solver results.
+
+## Run OXC-001 BehaviorContext string handoff spike
+
+This is a validation-only API type probe, not a JSON importer or C++ solver.
+It checks a Python string passed to `AZStd::string` and the return value.
+
+Close Editor, deploy the latest assets (expected `SCRIPT_COUNT|9`), rebuild
+the C++ Validation Gem, and reopen O3DE Editor. Run:
+
+~~~text
+SansaCloth/sansacloth_handoff_string_probe.py
+~~~
+
+Expected log:
+
+~~~text
+SANSA_O3DE|OXC-001.DISCOVERY|CPP_STRING_HANDOFF_AVAILABLE
+SANSA_O3DE|OXC-001.CPP_RECEIVED_LENGTH|22
+SANSA_O3DE|OXC-001.CPP_RESULT|PASS
+SANSA_O3DE|OXC-001.CPP_RESULT|FAIL
+SANSA_O3DE|OXC-001.ROUNDTRIP|PASS
+SANSA_O3DE|OXC-001.INVALID_REJECTED|PASS
+SANSA_O3DE|OXC-001.RESULT|PASS
+~~~
+
+The intentional `CPP_RESULT|FAIL` is from the negative input; the Python
+probe must report `INVALID_REJECTED|PASS`. If the Gem is unavailable,
+`OXC-001.RESULT|OPEN`; a failed conversion or unexpected response is FAIL.
+OXC-001 remains OPEN until the actual Editor log is reviewed.
