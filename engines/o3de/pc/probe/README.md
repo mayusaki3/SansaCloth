@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|4
+SANSA_O3DE_BUILD|SCRIPT_COUNT|5
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -272,3 +272,51 @@ SANSA_O3DE|SR-001.PYTHON_PROBE_RESULT|PASS
 Tolerance for positions, normals and separation is 1e-5. Stop on the
 first build or runtime error. BF-005/006 remain OPEN until the real
 Editor runtime log is collected.
+
+## Run BF-007 Basic Fixture Mapping
+
+After closing O3DE Editor, deploy the 5 Python scripts and validation Gem
+using `BuildProbeAssets.ps1`. Rebuild the O3DE project in Project Manager.
+In Editor > Tools > Other > Python Scripts, run:
+
+~~~text
+SansaCloth/sansacloth_basic_fixture_probe.py
+~~~
+
+The script calls `azlmbr.sansacloth_probe.RunBf007()`.
+Five validation-only analytic grids are generated using the same raised
+cosine equations as Unity's BF-007 probe. Each has 147 vertices, 147 CP,
+240 triangles. The O3DE Y/Z axis swap requires reversed triangle winding;
+SR-003 Convex-Side rotates +90 degrees around O3DE Y.
+
+Expected fixture summaries:
+
+| Fixture | Center position (O3DE m) | Normal | Anchor | Local height min/max (m) |
+|---|---|---|---|---|
+| SR-001.FLAT | 0,0,0 | 0,0,1 | 14 | 0/0 |
+| SR-002.CONVEX_UP | 0,0,0.03 | 0,0,1 | 14 | 0/0.03 |
+| SR-003.CONVEX_SIDE | 0.03,0,0 | 1,0,0 | 7 | 0/0.03 |
+| SR-004.CONCAVE_SHALLOW | 0,0,-0.02 | 0,0,1 | 14 | -0.02/0 |
+| SR-005.CONCAVE_DEEP | 0,0,-0.05 | 0,0,1 | 14 | -0.05/0 |
+
+For every fixture, the following checks must all be PASS:
+`COUNTS`, `ANCHORS`, `HEIGHT_RANGE`, `CENTER_POSITION`,
+`CENTER_NORMAL`, `FIRST_TRIANGLE_NORMAL`, and
+`ALL_TRIANGLE_GEOMETRY` (all 240 triangles nondegenerate and outward).
+Final expected log:
+
+~~~text
+SANSA_O3DE|BF-007.DISCOVERY|CPP_PROBE_AVAILABLE
+SANSA_O3DE|BF-007.SR-001.FLAT.RESULT|PASS
+SANSA_O3DE|BF-007.SR-002.CONVEX_UP.RESULT|PASS
+SANSA_O3DE|BF-007.SR-003.CONVEX_SIDE.RESULT|PASS
+SANSA_O3DE|BF-007.SR-004.CONCAVE_SHALLOW.RESULT|PASS
+SANSA_O3DE|BF-007.SR-005.CONCAVE_DEEP.RESULT|PASS
+SANSA_O3DE|BF-007.RESULT|PASS
+SANSA_O3DE|BF-007.PYTHON_BRIDGE_RESULT|PASS
+SANSA_O3DE|BF-007.PYTHON_PROBE_RESULT|PASS
+~~~
+
+Stop on the first build or runtime error. BF-007 is OPEN until real O3DE
+Editor runtime evidence is recorded. This does not validate actual O3DE
+Mesh API or production mesh deformation.
