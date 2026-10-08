@@ -373,7 +373,16 @@ The log also prints `EVENT_ID`, `TIMESTAMP_UTC`, `BACKEND`,
 contains 149 JSONL lines. If possible, attach the JSONL artifact as
 evidence together with the Editor log.
 
-BF-008 remains **OPEN** until O3DE Editor runtime and artifact evidence
-are reviewed. If the Gem or the new capture method is not exposed, the
-script reports OPEN; any capture or read-back error reports FAIL.
-This is validation-only, not a production serialization contract.
+BF-008 was confirmed **RUNTIME PASS** in O3DE Editor on 2026-10-09 JST
+(2026-10-08 15:00:21 UTC). C++ measurements and Python bridge passed;
+VCF-001 through VCF-007 all passed after JSONL file read-back.
+149 records, 147 CP, 147 contacts, 14 supports, all separation and
+deviation aggregates zero. The generated file itself was not attached
+for independent review; the read-back result is established by the log.
+
+O3DE PC BF-001 through BF-008 are now PASS at the validation-only
+Runtime Backend Feasibility Checkpoint. This does not validate a
+production solver, actual O3DE Mesh API or production serialization.
+
+If the Gem or capture method is not exposed in a subsequent run,
+the script reports OPEN; any capture or read-back error reports FAIL.
