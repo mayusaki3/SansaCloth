@@ -414,7 +414,55 @@ Validation Case:
 
 このPASSは上記validation-only解析Fixtureに限定する。実O3DE Mesh API、Reference JSON importer、skinned/deformed mesh、production solverの動作保証ではない。
 
-## 11. Probe配布方針
+## 11. Phase OBF-06: BF-008 Validation Capture
+
+### 11.1 検証範囲
+
+Unity PC BF-008のJSON Lines validation artifactと同じ測定意味を、O3DE PC Validation GemのSR-001 Flat / C=0 / G=0から外部取得する。**Production serializationではない。**
+
+C++ `RunBf008Capture()` がBF-005/006と同じ `MapSr001Output` で147 CPを評価し、`final_cp` 147レコードと`aggregate` 1レコードを生成する。Python Editor scriptがUUID EventIdとUTC Timestampを付け、JSONLをOSの一時フォルダに保存し、**ファイルを再読込して検証する**。PythonはCP測定結果を再計算して生成しない。
+
+- TestId: `O3DE-SR-001-C0-G0`
+- Backend: `O3DE PC`
+- CP: 21 U × 7 V = 147、DomainId=1、StableControlPointId=0..146
+- Coordinate: O3DE `(x,z,y)` からcanonical `(x,y,z)` へ戻して出力する。Flat Normalはcanonical `(0,1,0)`。
+- Contact: `SeparationDistance <= CollisionTolerance(0m)`。ContactCount=147。
+- Support: Anchor=14、Unsupported=133。SupportCount=14。
+- Final Position/SurfaceReference/Normal/Separation/Support/derived ContactをCPごとに記録する。
+- Aggregate: ContactCount、SupportCount、MeanSeparation、MaxSeparation、MaxPenetration、MaxPositionDeviation、RMSPositionDeviation。
+- Stage Measurementは対象外。
+
+### 11.2 JSONLレコード構成
+
+| Record Type | Count | 内容 |
+|---|---:|---|
+| `header` | 1 | event_id、timestamp_utc、test_id、backend、cp_count |
+| `final_cp` | 147 | stable_id、position_m、surface_reference、surface_normal、separation_m、support、derived_contact |
+| `aggregate` | 1 | contact_count、support_count、mean_separation_m、max_separation_m、max_penetration_m、max_position_deviation_m、rms_position_deviation_m |
+| 合計 | **149** | JSON Lines UTF-8 |
+
+### 11.3 Validation Cases
+
+- VCF-001: Header EventId/TimestampUtc/TestId/Backend/CPCount。
+- VCF-002: Final CP 147 records。
+- VCF-003: Stable CP IDが0..146で一意・連続。
+- VCF-004: 全CPのDomainId/U/V、Final Position、Normal、Separationがcanonical期待値と一致（許容差1e-5）。
+- VCF-005: 全CPのSupport/derived Contactが期待値と一致。
+- VCF-006: AggregateのContactCount=147、SupportCount=14、Separation/Deviation統計が全CP測定値から再集計した値と一致（許容差1e-5）。
+- VCF-007: 実際に書き出したJSONLを再読込して上記検証にPASS。
+
+PASSにはC++ `BF-008.CPP_MEASUREMENTS_RESULT|PASS`、Python Bridge PASS、VCF-001～007 PASS、`BF-008.RESULT|PASS`、`BF-008.PYTHON_PROBE_RESULT|PASS`、出力ファイル149行を要求する。Gem未ロード/Method未公開はOPEN、測定・書き出し・検証失敗はFAILとする。
+
+実装:
+- `engines/o3de/pc/probe/Gem/SansaClothBackendProbeValidation/Source/SansaClothBackendProbeValidationSystemComponent.cpp`
+- `engines/o3de/pc/probe/Editor/Scripts/SansaCloth/sansacloth_validation_capture_probe.py`
+- `BuildProbeAssets.ps1` は6本のPython ProbeとC++ Validation Gemを配置する。
+
+**範囲:** BF-005/006と同じ解析平面・C0/G0 identity stage。実Mesh API、Solver非ゼロ入力、Reference JSON importer、Production serializationは未検証。
+
+状態: **BF-008 IMPLEMENTED / BUILD OPEN / RUNTIME OPEN**（2026-10-08）。実Editorログおよび出力JSONLを確認するまでPASSとしない。
+
+## 12. Probe配布方針
 
 Unity検証と同様、O3DE検証Project自体をSansaCloth repositoryへ含めることは要求しない。
 
@@ -428,7 +476,7 @@ Deploy target:
 
 Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、検証Project側は再生成可能な作業環境として扱う。
 
-## 12. 後続順序
+## 13. 後続順序
 
 1. OBF-001～004 Python Probe runtime確認。
 2. 必要ならC++ Probeを追加しOBF-004/005を確認。
@@ -442,13 +490,13 @@ Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、�
 10. Fixture Exchange 30-case import/SurfaceResponse比較へ進む。
 11. Unity/O3DE双方で成立した境界だけをBackend-neutral contract候補として整理する。
 
-## 13. 未確定事項
+## 14. 未確定事項
 
 - Canonical handednessの全体仕様確定（O3DE math runtimeのCross orientationおよび変換時winding反転は確認済み）。
 - O3DE実メッシュAPIへtriangle winding/geometric normalを適用する統合経路（math probeでのwinding反転は確認済み）。
 - 外部World GravityのBackend入力経路（実Runtime Backend統合時に確認）。
 - stable SurfaceReference mapping。
 - runtime/deformed mesh access。
-- Validation Captureの最終出力経路。
+- Validation Captureのproduction出力経路（BF-008では一時JSONL出力を検証対象とする）。
 
 > SansaCloth > docs > ja-JP > draft > verification > O3DEPC.RuntimeBackend
