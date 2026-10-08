@@ -1,7 +1,6 @@
 import math as pymath
 
 import azlmbr.math as azmath
-import azlmbr.physics as physics
 
 
 PREFIX = "SANSA_O3DE|"
@@ -155,35 +154,12 @@ def run():
         raise RuntimeError("triangle winding conversion did not match expected normal")
     log("OBF-005.RESULT", "PASS")
 
-    # OBF-006 discovery: do not guess Python names for SceneInterface gravity.
-    # Record the actually exposed physics symbols and decide whether a direct
-    # Python runtime path exists before implementing the gravity probe.
-    physics_symbols = sorted(
-        name
-        for name in dir(physics)
-        if any(token in name.lower() for token in ("gravity", "scene", "world"))
-    )
-    log(
-        "OBF-006.PYTHON_PHYSICS_SYMBOLS",
-        ",".join(physics_symbols) if physics_symbols else "NONE",
-    )
-    direct_gravity_symbols = [
-        name for name in physics_symbols
-        if "gravity" in name.lower()
-        and "event" not in name.lower()
-    ]
-    if direct_gravity_symbols:
-        log(
-            "OBF-006.DIRECT_PYTHON_GRAVITY_SYMBOLS",
-            ",".join(direct_gravity_symbols),
-        )
-    else:
-        log("OBF-006.DIRECT_PYTHON_GRAVITY_SYMBOLS", "NONE")
-
+    # OBF-006 uses explicitly supplied world gravity and O3DE Transform.
+    # It does not require a physics engine or physics scene.
     try:
         import azlmbr.sansacloth_probe as sansacloth_probe
     except ImportError:
-        log("OBF-006.DISCOVERY", "CPP_REQUIRED")
+        log("OBF-006.DISCOVERY", "CPP_GEM_NOT_LOADED")
         log("OBF-006.RESULT", "OPEN")
     else:
         log("OBF-006.DISCOVERY", "CPP_PROBE_AVAILABLE")
