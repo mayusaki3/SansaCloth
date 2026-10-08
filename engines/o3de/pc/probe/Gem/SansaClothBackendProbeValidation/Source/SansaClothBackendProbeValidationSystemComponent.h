@@ -1,6 +1,7 @@
 #pragma once
 
 #include <AzCore/Component/Component.h>
+#include <AzCore/std/string/string.h>
 
 namespace SansaClothBackendProbeValidation
 {
@@ -22,5 +23,6 @@ namespace SansaClothBackendProbeValidation
         static bool RunBf004();
         static bool RunBf005006();
         static bool RunBf007();
+        static AZStd::string RunBf008Capture();
     };
 } // namespace SansaClothBackendProbeValidation
