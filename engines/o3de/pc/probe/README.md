@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|9
+SANSA_O3DE_BUILD|SCRIPT_COUNT|10
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -480,7 +480,7 @@ This does not validate C++ geometry handoff, production Mesh API, or solver resu
 This is a validation-only API type probe, not a JSON importer or C++ solver.
 It checks a Python string passed to `AZStd::string` and the return value.
 
-Close Editor, deploy the latest assets (expected `SCRIPT_COUNT|9`), rebuild
+Close Editor, deploy the latest assets (expected `SCRIPT_COUNT|10`), rebuild
 the C++ Validation Gem, and reopen O3DE Editor. Run:
 
 ~~~text
@@ -503,3 +503,38 @@ The intentional `CPP_RESULT|FAIL` is from the negative input; the Python
 probe must report `INVALID_REJECTED|PASS`. If the Gem is unavailable,
 `OXC-001.RESULT|OPEN`; a failed conversion or unexpected response is FAIL.
 OXC-001 remains OPEN until the actual Editor log is reviewed.
+
+## Run OXC-002 real Fixture Exchange JSON → C++ handoff
+
+After updating the repository, close Editor, run `BuildProbeAssets.ps1`
+(expected `SCRIPT_COUNT|10`), rebuild the Validation Gem, and reopen Editor.
+In Tools > Other > Python Scripts, run:
+
+~~~text
+SansaCloth/sansacloth_fixture_cpp_handoff_probe.py
+~~~
+
+The script first runs the existing OXF single-case importer regression,
+then passes the **original SR-001-C0-G0.json bytes as text** to
+`azlmbr.sansacloth_probe.ProbeFixtureJson`. The C++ side independently
+parses JSON and checks format, case ID, body/CP counts, and anchor/contact
+counts; it does not regenerate the fixture. It also rejects a deliberately
+invalid JSON object.
+
+Expected final output:
+
+~~~text
+SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|147
+SANSA_O3DE|OXC-002.CPP_BODY_TRIANGLE_COUNT|240
+SANSA_O3DE|OXC-002.CPP_CP_COUNT|147
+SANSA_O3DE|OXC-002.CPP_ANCHOR_COUNT|14
+SANSA_O3DE|OXC-002.CPP_CONTACT_COUNT|147
+SANSA_O3DE|OXC-002.REAL_JSON_ROUNDTRIP|PASS
+SANSA_O3DE|OXC-002.INVALID_REJECTED|PASS
+SANSA_O3DE|OXC-002.RESULT|PASS
+~~~
+
+The negative-input C++ `OXC-002.CPP_RESULT|FAIL` is intentional.
+OXC-002 remains **Runtime OPEN** until actual Editor evidence is reviewed.
+OXC-003+ require full geometry/identity/input validation; this probe only
+establishes a real-data handoff and checks initial counts.
