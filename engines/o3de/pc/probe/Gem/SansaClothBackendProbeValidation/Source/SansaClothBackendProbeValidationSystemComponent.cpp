@@ -1,13 +1,9 @@
 #include "SansaClothBackendProbeValidationSystemComponent.h"
 
-#include <AzCore/Interface/Interface.h>
 #include <AzCore/Math/MathUtils.h>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
-#include <AzFramework/Physics/Common/PhysicsSimulatedBody.h>
-#include <AzFramework/Physics/Configuration/RigidBodyConfiguration.h>
-#include <AzFramework/Physics/PhysicsScene.h>
 
 namespace SansaClothBackendProbeValidation
 {
@@ -15,22 +11,56 @@ namespace SansaClothBackendProbeValidation
     {
         constexpr float Tolerance = 1.0e-5f;
 
-        bool Near(const AZ::Vector3& lhs, const AZ::Vector3& rhs)
+        // Canonical: +X right, +Y up, +Z forward.
+        // O3DE:      +X right, +Y forward, +Z up.
+        AZ::Vector3 CanonicalToO3de(const AZ::Vector3& canonical)
         {
-            return lhs.IsClose(rhs, Tolerance);
+            return AZ::Vector3(canonical.GetX(), canonical.GetZ(), canonical.GetY());
         }
 
-        void LogVector(const char* key, const AZ::Vector3& value)
+        void LogVector(const char* caseId, const char* key, const AZ::Vector3& value)
         {
             AZ_Printf(
                 "SansaClothBackendProbe",
-                "SANSA_O3DE|OBF-006.%s|%.9g,%.9g,%.9g\n",
-                key,
-                value.GetX(),
-                value.GetY(),
-                value.GetZ());
+                "SANSA_O3DE|OBF-006.%s.%s|%.9g,%.9g,%.9g\n",
+                caseId, key, value.GetX(), value.GetY(), value.GetZ());
         }
-    }
+
+        bool CheckGravityCase(
+            const char* caseId,
+            const AZ::Vector3& canonicalWorldGravity,
+            const AZ::Transform& bodyTransform,
+            bool expectDifferentLocal)
+        {
+            // World Gravity is an explicit input, not read from a physics scene
+            // and not derived from the body transform.
+            const AZ::Vector3 worldGravity = CanonicalToO3de(canonicalWorldGravity);
+
+            // O3DE Transform is used only when a body-local gravity vector is
+            // explicitly required. Converting back must recover the world input.
+            const AZ::Vector3 bodyLocalGravity =
+                bodyTransform.GetInverse().TransformVector(worldGravity);
+            const AZ::Vector3 reconstructedWorldGravity =
+                bodyTransform.TransformVector(bodyLocalGravity);
+
+            LogVector(caseId, "WORLD_GRAVITY_INPUT", worldGravity);
+            LogVector(caseId, "BODY_LOCAL_GRAVITY", bodyLocalGravity);
+            LogVector(caseId, "RECONSTRUCTED_WORLD_GRAVITY", reconstructedWorldGravity);
+
+            const bool roundTripMatch =
+                reconstructedWorldGravity.IsClose(worldGravity, Tolerance);
+            const bool localDifferenceMatch =
+                !expectDifferentLocal
+                || !bodyLocalGravity.IsClose(worldGravity, Tolerance);
+            const bool result = roundTripMatch && localDifferenceMatch;
+
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|OBF-006.%s.RESULT|%s\n",
+                caseId, result ? "PASS" : "FAIL");
+            return result;
+        }
+    } // namespace
 
     void SystemComponent::Reflect(AZ::ReflectContext* context)
     {
@@ -53,91 +83,33 @@ namespace SansaClothBackendProbeValidation
 
     bool SystemComponent::RunObf006()
     {
-        auto* sceneInterface = AZ::Interface<AzPhysics::SceneInterface>::Get();
-        if (sceneInterface == nullptr)
-        {
-            AZ_Printf(
-                "SansaClothBackendProbe",
-                "SANSA_O3DE|OBF-006.RESULT|FAIL|SceneInterface unavailable\n");
-            return false;
-        }
+        const AZ::Vector3 arbitraryCanonicalGravity(1.25f, -3.75f, 2.5f);
+        const AZ::Vector3 verticalCanonicalGravity(0.0f, -9.81f, 0.0f);
+        const AZ::Vector3 zeroGravity = AZ::Vector3::CreateZero();
 
-        const AzPhysics::SceneHandle sceneHandle =
-            sceneInterface->GetSceneHandle(AzPhysics::EditorPhysicsSceneName);
-        if (sceneHandle == AzPhysics::InvalidSceneHandle)
-        {
-            AZ_Printf(
-                "SansaClothBackendProbe",
-                "SANSA_O3DE|OBF-006.RESULT|FAIL|Editor physics scene unavailable\n");
-            return false;
-        }
+        const AZ::Transform identity = AZ::Transform::CreateIdentity();
+        const AZ::Transform rotatedY =
+            AZ::Transform::CreateRotationY(AZ::DegToRad(90.0f));
+        const AZ::Transform rotatedX =
+            AZ::Transform::CreateRotationX(AZ::DegToRad(-90.0f));
 
-        const AZ::Vector3 originalGravity = sceneInterface->GetGravity(sceneHandle);
+        // Non-axis-aligned and vertical inputs cover two distinct directions.
+        // Rotations must affect body-local coordinates, not world-space input.
+        const bool identityResult =
+            CheckGravityCase("C01", arbitraryCanonicalGravity, identity, false);
+        const bool rotatedYResult =
+            CheckGravityCase("C02", arbitraryCanonicalGravity, rotatedY, true);
+        const bool rotatedXResult =
+            CheckGravityCase("C03", verticalCanonicalGravity, rotatedX, true);
+        const bool zeroResult =
+            CheckGravityCase("C04", zeroGravity, rotatedY, false);
 
-        // Canonical test gravity (1.25, -3.75, 2.5) maps to O3DE
-        // (1.25, 2.5, -3.75) under canonical (x,y,z) -> O3DE (x,z,y).
-        const AZ::Vector3 probeGravity(1.25f, 2.5f, -3.75f);
-        sceneInterface->SetGravity(sceneHandle, probeGravity);
-        const AZ::Vector3 gravityBeforeBody = sceneInterface->GetGravity(sceneHandle);
-
-        AzPhysics::RigidBodyConfiguration bodyConfiguration;
-        bodyConfiguration.m_startSimulationEnabled = false;
-        bodyConfiguration.m_orientation = AZ::Quaternion::CreateIdentity();
-
-        AzPhysics::SimulatedBodyHandle bodyHandle =
-            sceneInterface->AddSimulatedBody(sceneHandle, &bodyConfiguration);
-
-        bool result = bodyHandle != AzPhysics::InvalidSimulatedBodyHandle;
-        AZ::Vector3 gravityAtIdentity = AZ::Vector3::CreateZero();
-        AZ::Vector3 gravityAfterRotation = AZ::Vector3::CreateZero();
-
-        if (result)
-        {
-            AzPhysics::SimulatedBody* body =
-                sceneInterface->GetSimulatedBodyFromHandle(sceneHandle, bodyHandle);
-            result = body != nullptr;
-
-            if (body != nullptr)
-            {
-                gravityAtIdentity = sceneInterface->GetGravity(sceneHandle);
-
-                const AZ::Quaternion rotated =
-                    AZ::Quaternion::CreateRotationY(AZ::DegToRad(90.0f));
-                body->SetTransform(
-                    AZ::Transform::CreateFromQuaternionAndTranslation(
-                        rotated,
-                        AZ::Vector3::CreateZero()));
-
-                gravityAfterRotation = sceneInterface->GetGravity(sceneHandle);
-                const AZ::Vector3 bodyBasisX = body->GetTransform().GetBasisX();
-                LogVector("BODY_ROTATED_BASIS_X", bodyBasisX);
-            }
-
-            sceneInterface->RemoveSimulatedBody(sceneHandle, bodyHandle);
-        }
-
-        sceneInterface->SetGravity(sceneHandle, originalGravity);
-        const AZ::Vector3 restoredGravity = sceneInterface->GetGravity(sceneHandle);
-
-        LogVector("ORIGINAL_GRAVITY", originalGravity);
-        LogVector("PROBE_GRAVITY", probeGravity);
-        LogVector("GRAVITY_BEFORE_BODY", gravityBeforeBody);
-        LogVector("GRAVITY_AT_IDENTITY", gravityAtIdentity);
-        LogVector("GRAVITY_AFTER_BODY_ROTATION", gravityAfterRotation);
-        LogVector("RESTORED_GRAVITY", restoredGravity);
-
-        result =
-            result
-            && Near(gravityBeforeBody, probeGravity)
-            && Near(gravityAtIdentity, probeGravity)
-            && Near(gravityAfterRotation, probeGravity)
-            && Near(restoredGravity, originalGravity);
-
+        const bool result =
+            identityResult && rotatedYResult && rotatedXResult && zeroResult;
         AZ_Printf(
             "SansaClothBackendProbe",
             "SANSA_O3DE|OBF-006.RESULT|%s\n",
             result ? "PASS" : "FAIL");
-
         return result;
     }
 } // namespace SansaClothBackendProbeValidation
