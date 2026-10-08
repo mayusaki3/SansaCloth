@@ -205,6 +205,115 @@ namespace SansaClothBackendProbeValidation
                 "SANSA_O3DE|BF-004.%s|%s\n", key, result ? "PASS" : "FAIL");
         }
 
+        // BF-005/BF-006: validation-only SR-001-C0-G0 semantic boundary.
+        // Contact and anchor are independent input facts; only anchors provide
+        // direct support. A nonzero gravity/conformity case is not simulated.
+        constexpr int Sr001USamples = 21;
+        constexpr int Sr001VSamples = 7;
+        constexpr int Sr001ControlPointCount = Sr001USamples * Sr001VSamples;
+        constexpr float Sr001WidthM = 0.20f;
+        constexpr float Sr001DepthM = 0.10f;
+        constexpr float Sr001CollisionToleranceM = 0.0f;
+
+        struct Sr001Input
+        {
+            int m_stableId = -1;
+            SurfaceReference m_reference{ 0, AZ::Vector2::CreateZero() };
+            AZ::Vector3 m_initialPosition = AZ::Vector3::CreateZero();
+            bool m_anchor = false;
+            bool m_contact = false;
+        };
+
+        struct Sr001Output
+        {
+            int m_stableId = -1;
+            SurfaceReference m_reference{ 0, AZ::Vector2::CreateZero() };
+            AZ::Vector3 m_finalPosition = AZ::Vector3::CreateZero();
+            AZ::Vector3 m_surfaceNormal = AZ::Vector3::CreateZero();
+            float m_separationM = 0.0f;
+            bool m_directSupport = false;
+        };
+
+        bool MapSr001Output(
+            const Sr001Input& input,
+            const AZ::Vector3& worldGravity,
+            float conformity,
+            const std::array<AZ::Vector3, 4>& surfaceVertices,
+            const std::array<AZ::Vector2, 4>& surfaceUvs,
+            const std::array<int, 6>& surfaceTriangles,
+            Sr001Output& output)
+        {
+            // C=0/G=0 is the only supported no-deformation validation case.
+            // Reject other inputs rather than falsely claiming a solver result.
+            if (!worldGravity.IsZero(Tolerance) || AZ::GetAbs(conformity) > Tolerance)
+            {
+                return false;
+            }
+
+            output.m_stableId = input.m_stableId;
+            output.m_reference = input.m_reference;
+            output.m_finalPosition = input.m_initialPosition;
+            output.m_directSupport = input.m_anchor;
+
+            SurfaceQueryResult query;
+            if (!QuerySurface(
+                input.m_reference, surfaceVertices, surfaceUvs, surfaceTriangles,
+                AZ::Transform::CreateIdentity(), output.m_finalPosition, query))
+            {
+                return false;
+            }
+            output.m_surfaceNormal = query.m_worldNormal;
+            output.m_separationM = query.m_signedSeparation;
+            return true;
+        }
+
+        void LogSr001Scalar(const char* key, int value)
+        {
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|SR-001.%s|%d\n", key, value);
+        }
+
+        void LogSr001Float(const char* key, float value)
+        {
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|SR-001.%s|%.9g\n", key, value);
+        }
+
+        void LogSr001Vector(const char* key, const AZ::Vector3& value)
+        {
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|SR-001.%s|%.9g,%.9g,%.9g\n",
+                key, value.GetX(), value.GetY(), value.GetZ());
+        }
+
+        void LogSr001Sample(const char* label, const Sr001Output& output)
+        {
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|SR-001.%s|id=%d;domain=%llu;uv=%.9g,%.9g;"
+                "position=%.9g,%.9g,%.9g;normal=%.9g,%.9g,%.9g;"
+                "separation_m=%.9g;support=%s\n",
+                label, output.m_stableId,
+                static_cast<unsigned long long>(output.m_reference.m_domainId),
+                output.m_reference.m_uv.GetX(), output.m_reference.m_uv.GetY(),
+                output.m_finalPosition.GetX(), output.m_finalPosition.GetY(),
+                output.m_finalPosition.GetZ(),
+                output.m_surfaceNormal.GetX(), output.m_surfaceNormal.GetY(),
+                output.m_surfaceNormal.GetZ(), output.m_separationM,
+                output.m_directSupport ? "Anchor" : "Unsupported");
+        }
+
+        void LogBoundaryCheck(const char* gate, const char* key, bool passed)
+        {
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|%s.%s.RESULT|%s\n",
+                gate, key, passed ? "PASS" : "FAIL");
+        }
+
         void LogBf003Vector(const char* key, const AZ::Vector3& value)
         {
             AZ_Printf(
@@ -224,6 +333,11 @@ namespace SansaClothBackendProbeValidation
 
         if (auto* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
+            behaviorContext->Method("RunBf005006", &SystemComponent::RunBf005006)
+                ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
+                ->Attribute(
+                    AZ::Script::Attributes::Scope,
+                    AZ::Script::Attributes::ScopeFlags::Common);
             behaviorContext->Method("RunBf004", &SystemComponent::RunBf004)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(
@@ -461,6 +575,211 @@ namespace SansaClothBackendProbeValidation
             && sqf005 && sqf006 && sqf007;
         LogBf004Check("RESULT", result);
         return result;
+    }
+
+    bool SystemComponent::RunBf005006()
+    {
+        // Analytic 0.20m x 0.10m body patch in O3DE XY plane, outward +Z.
+        // The fixture is not imported from an O3DE mesh or JSON file.
+        const std::array<AZ::Vector3, 4> surfaceVertices = {
+            AZ::Vector3(-0.10f, -0.05f, 0.0f),
+            AZ::Vector3(-0.10f,  0.05f, 0.0f),
+            AZ::Vector3( 0.10f, -0.05f, 0.0f),
+            AZ::Vector3( 0.10f,  0.05f, 0.0f)
+        };
+        const std::array<AZ::Vector2, 4> surfaceUvs = {
+            AZ::Vector2(0.0f, 0.0f),
+            AZ::Vector2(0.0f, 1.0f),
+            AZ::Vector2(1.0f, 0.0f),
+            AZ::Vector2(1.0f, 1.0f)
+        };
+        const std::array<int, 6> surfaceTriangles = { 0, 3, 1, 0, 2, 3 };
+
+        const AZ::Vector3 canonicalWorldGravity = AZ::Vector3::CreateZero();
+        const AZ::Vector3 worldGravity = CanonicalToO3de(canonicalWorldGravity);
+        constexpr float conformity = 0.0f;
+        const AZ::Vector3 expectedNormal(0.0f, 0.0f, 1.0f);
+
+        std::array<Sr001Input, Sr001ControlPointCount> inputs{};
+        std::array<Sr001Output, Sr001ControlPointCount> outputs{};
+
+        int inputCount = 0;
+        int anchorCount = 0;
+        int contactInputCount = 0;
+        int directSupportCount = 0;
+        int contactOnlyUnsupportedCount = 0;
+        int derivedContactCount = 0;
+        int outputCount = 0;
+        int referenceOutputCount = 0;
+        int normalOutputCount = 0;
+        int separationOutputCount = 0;
+        int supportOutputCount = 0;
+        float maxPositionDeviationM = 0.0f;
+        float maxNormalDeviation = 0.0f;
+        float maxAbsSeparationM = 0.0f;
+        bool stableIdsAndUvValid = true;
+        bool allNonAnchorUnsupported = true;
+        bool allExpectedPositionsValid = true;
+        bool allExpectedNormalsValid = true;
+        bool allExpectedSeparationsValid = true;
+
+        for (int vIndex = 0; vIndex < Sr001VSamples; ++vIndex)
+        {
+            const float v = static_cast<float>(vIndex) / (Sr001VSamples - 1);
+            for (int uIndex = 0; uIndex < Sr001USamples; ++uIndex)
+            {
+                const float u = static_cast<float>(uIndex) / (Sr001USamples - 1);
+                const int stableId = vIndex * Sr001USamples + uIndex;
+                Sr001Input& input = inputs[stableId];
+                input.m_stableId = stableId;
+                input.m_reference = SurfaceReference{ FixtureDomainId, AZ::Vector2(u, v) };
+                input.m_initialPosition = AZ::Vector3(
+                    (u - 0.5f) * Sr001WidthM, (v - 0.5f) * Sr001DepthM, 0.0f);
+                input.m_anchor = (uIndex == 0 || uIndex == Sr001USamples - 1);
+                input.m_contact = true;
+                ++inputCount;
+                anchorCount += input.m_anchor ? 1 : 0;
+                contactInputCount += input.m_contact ? 1 : 0;
+            }
+        }
+
+        bool allMapped = true;
+        for (const Sr001Input& input : inputs)
+        {
+            Sr001Output& output = outputs[input.m_stableId];
+            if (!MapSr001Output(
+                input, worldGravity, conformity, surfaceVertices,
+                surfaceUvs, surfaceTriangles, output))
+            {
+                allMapped = false;
+                break;
+            }
+            ++outputCount;
+            ++referenceOutputCount;
+            ++normalOutputCount;
+            ++separationOutputCount;
+            ++supportOutputCount;
+
+            directSupportCount += output.m_directSupport ? 1 : 0;
+            contactOnlyUnsupportedCount +=
+                (input.m_contact && !output.m_directSupport) ? 1 : 0;
+            derivedContactCount +=
+                (output.m_separationM <= Sr001CollisionToleranceM) ? 1 : 0;
+
+            const AZ::Vector3 independentExpectedPosition(
+                (input.m_reference.m_uv.GetX() - 0.5f) * Sr001WidthM,
+                (input.m_reference.m_uv.GetY() - 0.5f) * Sr001DepthM, 0.0f);
+            allExpectedPositionsValid &= output.m_finalPosition.IsClose(
+                independentExpectedPosition, Tolerance);
+            allExpectedNormalsValid &= output.m_surfaceNormal.IsClose(
+                expectedNormal, Tolerance);
+            allExpectedSeparationsValid &=
+                AZ::GetAbs(output.m_separationM) <= Tolerance;
+            stableIdsAndUvValid &=
+                output.m_stableId == input.m_stableId
+                && output.m_reference.m_domainId == FixtureDomainId
+                && output.m_reference.m_uv.IsClose(input.m_reference.m_uv, Tolerance);
+            allNonAnchorUnsupported &=
+                output.m_directSupport == input.m_anchor;
+            maxPositionDeviationM = AZStd::GetMax(
+                maxPositionDeviationM,
+                (output.m_finalPosition - input.m_initialPosition).GetLength());
+            maxNormalDeviation = AZStd::GetMax(
+                maxNormalDeviation,
+                (output.m_surfaceNormal - expectedNormal).GetLength());
+            maxAbsSeparationM = AZStd::GetMax(
+                maxAbsSeparationM, AZ::GetAbs(output.m_separationM));
+        }
+
+        // Reject unimplemented simulation modes rather than silently treating
+        // them as the identity C=0/G=0 result.
+        Sr001Output rejectedOutput;
+        const bool nonzeroGravityRejected = !MapSr001Output(
+            inputs[73], AZ::Vector3(0.0f, 0.0f, -9.81f), conformity,
+            surfaceVertices, surfaceUvs, surfaceTriangles, rejectedOutput);
+        const bool nonzeroConformityRejected = !MapSr001Output(
+            inputs[73], worldGravity, 0.5f,
+            surfaceVertices, surfaceUvs, surfaceTriangles, rejectedOutput);
+
+        const bool isf001 = inputCount == 147;
+        const bool isf002 = anchorCount == 14
+            && inputs[0].m_anchor && !inputs[73].m_anchor && inputs[146].m_anchor;
+        const bool isf003 = contactInputCount == 147;
+        const bool isf004 = directSupportCount == 14
+            && contactOnlyUnsupportedCount == 133 && allNonAnchorUnsupported;
+        const bool isf005 = worldGravity.IsZero(Tolerance);
+        const bool isf006 = AZ::GetAbs(conformity) <= Tolerance
+            && nonzeroGravityRejected && nonzeroConformityRejected;
+        const bool isf007 = stableIdsAndUvValid
+            && inputs[0].m_reference.m_uv.IsClose(AZ::Vector2(0.0f, 0.0f), Tolerance)
+            && inputs[73].m_reference.m_uv.IsClose(AZ::Vector2(0.5f, 0.5f), Tolerance)
+            && inputs[146].m_reference.m_uv.IsClose(AZ::Vector2(1.0f, 1.0f), Tolerance);
+
+        const bool osf001 = outputCount == 147 && allExpectedPositionsValid;
+        const bool osf002 = referenceOutputCount == 147 && stableIdsAndUvValid;
+        const bool osf003 = normalOutputCount == 147 && allExpectedNormalsValid;
+        const bool osf004 = separationOutputCount == 147 && allExpectedSeparationsValid;
+        const bool osf005 = supportOutputCount == 147 && allNonAnchorUnsupported;
+        const bool osf006 = maxPositionDeviationM <= Tolerance;
+        const bool osf007 = maxNormalDeviation <= Tolerance;
+        const bool osf008 = maxAbsSeparationM <= Tolerance;
+        const bool osf009 = directSupportCount == 14;
+        const bool osf010 = derivedContactCount == 147;
+
+        LogSr001Scalar("CP_COUNT", inputCount);
+        LogSr001Scalar("ANCHOR_COUNT", anchorCount);
+        LogSr001Scalar("CONTACT_INPUT_COUNT", contactInputCount);
+        LogSr001Scalar("DIRECT_SUPPORT_COUNT", directSupportCount);
+        LogSr001Scalar("CONTACT_ONLY_UNSUPPORTED_COUNT", contactOnlyUnsupportedCount);
+        LogSr001Scalar("OUTPUT_CP_COUNT", outputCount);
+        LogSr001Scalar("DERIVED_CONTACT_COUNT", derivedContactCount);
+        LogSr001Vector("WORLD_GRAVITY_INPUT", worldGravity);
+        LogSr001Float("CONFORMITY_INPUT", conformity);
+        LogSr001Float("COLLISION_TOLERANCE_M", Sr001CollisionToleranceM);
+        LogSr001Float("FINAL_POSITION_DEVIATION_MAX_M", maxPositionDeviationM);
+        LogSr001Float("NORMAL_DEVIATION_MAX", maxNormalDeviation);
+        LogSr001Float("SEPARATION_ABS_MAX_M", maxAbsSeparationM);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|SR-001.NONZERO_GRAVITY_REJECTED|%s\n",
+            nonzeroGravityRejected ? "TRUE" : "FALSE");
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|SR-001.NONZERO_CONFORMITY_REJECTED|%s\n",
+            nonzeroConformityRejected ? "TRUE" : "FALSE");
+
+        if (allMapped)
+        {
+            LogSr001Sample("CP_FIRST", outputs[0]);
+            LogSr001Sample("CP_CENTER", outputs[73]);
+            LogSr001Sample("CP_LAST", outputs[146]);
+        }
+
+        LogBoundaryCheck("BF-005", "ISF-001", isf001);
+        LogBoundaryCheck("BF-005", "ISF-002", isf002);
+        LogBoundaryCheck("BF-005", "ISF-003", isf003);
+        LogBoundaryCheck("BF-005", "ISF-004", isf004);
+        LogBoundaryCheck("BF-005", "ISF-005", isf005);
+        LogBoundaryCheck("BF-005", "ISF-006", isf006);
+        LogBoundaryCheck("BF-005", "ISF-007", isf007);
+        LogBoundaryCheck("BF-006", "OSF-001", osf001);
+        LogBoundaryCheck("BF-006", "OSF-002", osf002);
+        LogBoundaryCheck("BF-006", "OSF-003", osf003);
+        LogBoundaryCheck("BF-006", "OSF-004", osf004);
+        LogBoundaryCheck("BF-006", "OSF-005", osf005);
+        LogBoundaryCheck("BF-006", "OSF-006", osf006);
+        LogBoundaryCheck("BF-006", "OSF-007", osf007);
+        LogBoundaryCheck("BF-006", "OSF-008", osf008);
+        LogBoundaryCheck("BF-006", "OSF-009", osf009);
+        LogBoundaryCheck("BF-006", "OSF-010", osf010);
+
+        const bool bf005 = allMapped && isf001 && isf002 && isf003
+            && isf004 && isf005 && isf006 && isf007;
+        const bool bf006 = allMapped && osf001 && osf002 && osf003
+            && osf004 && osf005 && osf006 && osf007 && osf008
+            && osf009 && osf010;
+        LogBoundaryCheck("BF-005", "OVERALL", bf005);
+        LogBoundaryCheck("BF-006", "OVERALL", bf006);
+        LogBoundaryCheck("SR-001", "RESULT", bf005 && bf006);
+        return bf005 && bf006;
     }
 
 } // namespace SansaClothBackendProbeValidation
