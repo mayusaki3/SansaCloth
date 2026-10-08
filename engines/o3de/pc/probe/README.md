@@ -270,8 +270,8 @@ SANSA_O3DE|SR-001.PYTHON_PROBE_RESULT|PASS
 ~~~
 
 Tolerance for positions, normals and separation is 1e-5. Stop on the
-first build or runtime error. BF-005/006 remain OPEN until the real
-Editor runtime log is collected.
+first build or runtime error. BF-005/006 were confirmed PASS in O3DE Editor on 2026-10-08 for the
+validation-only SR-001 Flat C=0/G=0 fixture.
 
 ## Run BF-007 Basic Fixture Mapping
 
@@ -317,6 +317,9 @@ SANSA_O3DE|BF-007.PYTHON_BRIDGE_RESULT|PASS
 SANSA_O3DE|BF-007.PYTHON_PROBE_RESULT|PASS
 ~~~
 
-Stop on the first build or runtime error. BF-007 is OPEN until real O3DE
-Editor runtime evidence is recorded. This does not validate actual O3DE
+Stop on the first build or runtime error. BF-007 was confirmed PASS in
+O3DE Editor on 2026-10-08 for all five validation-only analytic fixtures
+(35 fixture checks, five per-fixture results, C++ bridge and Python probe).
+The earlier CPP_GEM_NOT_LOADED state is no longer present; its precise
+cause was not established. This does not validate actual O3DE
 Mesh API or production mesh deformation.
