@@ -615,6 +615,46 @@ Rust Referenceが生成・commit済みの`reference/validation/fixture-exchange/
 - Reference Result 30ケースとのGravity/Conformity/Collision/Final SurfaceResponse比較。
 - 実O3DE Mesh API・deformed mesh lifecycleの検証。これらは本PhaseのPASS条件に含めない。
 
+## 12B. Phase OBF-09: Python → C++ Fixture Exchange Data Handoff（実装前テスト仕様）
+
+### 12B.1 既存境界と目的
+
+2026-10-09時点のValidation Gem `SansaClothBackendProbeValidationSystemComponent` は `BehaviorContext` で `azlmbr.sansacloth_probe` に `RunObf006`、`RunBf003`、`RunBf004`、`RunBf005006`、`RunBf007`、`RunBf008Capture` を公開する。既存のBF-003/004/005/006/007/008は主にC++内で作成したvalidation fixtureを使用しており、Python importerのresolved JSONデータをC++に渡す経路は未実装。
+
+本Phaseは**Python importerで厳密検証した実データをC++ Validation Gemへ渡し、受け渡し前後の意味論を照合する**。C++側で解析式を使って同等形状を再生成することは禁止。既存BF/OXF probeは維持する。
+
+### 12B.2 Handoff契約（案）
+
+- 公開境界はO3DE `BehaviorContext` のValidation-only APIとする。実際の引数表現はO3DE Python Bindingsで動作検証してから確定する。候補は、version付きの単一JSON文字列（Pythonで検証済みのresolved dataを渡し、C++でも独立parse/validate）またはO3DE BehaviorContextが確実に変換できる明示的な配列・scalar群。Pythonオブジェクトの生ポインタや所有権不明な参照を渡さない。
+- 値の基準はcanonical (X右/Y上/Z前)、m、m/s²。変換は**一箇所のみ**で行い、O3DE (X右/Y前/Z上)へのY/Z交換に伴うtriangle winding反転を二重適用しない。
+- 必須意味論：case_id、body domain_id、position/normal/UV/triangles、cloth stable_id/strip_id/strip_order/position/SurfaceReference/anchor/contact、World Gravity/Conformity/CollisionTolerance。
+- StableId、StripId/Order、DomainId/UVは数値を変更しない。Contact入力はSupport結果ではない。SR-003はReferenceでbaked済みのConvex-Side geometryを二重変換しない。
+- C++側は受信データを検証処理中に自己所有の値として保持し、Python呼び出し終了後に借用参照を残さない。返却する比較結果は構造化された検証情報とし、C++がPASSを返すだけで検証内容を隠さない。
+- バージョン違い、欠落、余剰、不正数値、index範囲外、重複StableId/Strip、未知DomainIdを拒否する。境界を通した後のC++結果はPython側の入力と照合する。
+
+### 12B.3 実装前テストケース
+
+| ID | Gate | PASS条件 |
+|---|---|---|
+| OXC-001 | API discovery | Editor PythonからValidation Gemの新規Handoff APIを発見し呼び出せる。未ロード時はOPENでありPASSとしない |
+| OXC-002 | Real payload | Git管理の`SR-001-C0-G0.json`からimportした実データを渡し、C++内部の解析Fixture再生成を使わない |
+| OXC-003 | Body mapping | bodyの全頂点・法線・UV・triangleを受信し、147頂点/240 triangleとwinding/座標変換を検証 |
+| OXC-004 | CP identity | 147 CPのStableId、7×21 strip/order、SurfaceReference DomainId/UVを完全照合 |
+| OXC-005 | Anchor/Contact | Anchor 14、Contact input 147、Contact-only unsupported 133を保持し、ContactをSupportへ昇格させない |
+| OXC-006 | Inputs | G=(0,0,0)、C=0、CollisionTolerance=0を受信し、単位・座標変換を照合 |
+| OXC-007 | Ownership/lifetime | 受信データをC++所有値へコピーし、Python側の元データ破棄・変更後も参照不正がないことを確認 |
+| OXC-008 | Negative boundary | 欠落/余剰field、version不一致、非有限値、重複ID、無効triangle/UV/domain等をC++境界で拒否し、Python importerだけの検証に依存しない |
+| OXC-009 | 30-case extension | SR-001～005×6の全30ケースをC++へ渡し、case ID・geometry/CP/inputs・Scenario内不変性を照合。SR-003 baked geometry/Anchor=7を含む |
+| OXC-010 | Aggregate/evidence | 各Gateと30ケースのPASS/FAIL、件数、source SHA-256、API/format versionをEditorログに記録。失敗があれば総合FAIL |
+
+### 12B.4 実装順序と判定
+
+1. O3DE側で確実に呼び出せるBehaviorContext引数型を最小のspikeで確認する（validation-only試作）。
+2. 受け渡し表現と座標変換責任を固定する。C++側の独立validationと所有権を実装する。
+3. SR-001-C0-G0単一ケース（OXC-001～008）をEditor runtimeで確認する。
+4. 30ケース（OXC-009～010）へ拡張し、既存BF-001～008、OXF-001～019の退行を確認する。
+5. 実Editorログの確認までは**OXC-001～010 OPEN**。本Phase PASSでもproduction Mesh API、deformed mesh lifecycle、SurfaceResponse solver/Reference数値一致は未検証とする。
+
 ## 13. Probe配布方針
 
 Unity検証と同様、O3DE検証Project自体をSansaCloth repositoryへ含めることは要求しない。
