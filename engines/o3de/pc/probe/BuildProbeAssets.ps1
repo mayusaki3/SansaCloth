@@ -22,7 +22,8 @@ $requiredScripts = @(
     "sansacloth_surface_reference_probe.py",
     "sansacloth_surface_query_probe.py",
     "sansacloth_sr001_boundary_probe.py",
-    "sansacloth_basic_fixture_probe.py"
+    "sansacloth_basic_fixture_probe.py",
+    "sansacloth_validation_capture_probe.py"
 )
 foreach ($requiredScript in $requiredScripts) {
     if (-not (Test-Path -LiteralPath (Join-Path $source $requiredScript) -PathType Leaf)) {
