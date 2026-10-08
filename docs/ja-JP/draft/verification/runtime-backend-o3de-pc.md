@@ -392,7 +392,7 @@ Validation Case:
 実装:
 - C++ `RunBf007()` をBehaviorContextの`azlmbr.sansacloth_probe`に公開。
 - Python `sansacloth_basic_fixture_probe.py` から呼び出す。
-- `BuildProbeAssets.ps1` は5本のPython ProbeとC++ Validation Gemを配置する。
+- `BuildProbeAssets.ps1` は現行6本のPython ProbeとC++ Validation Gemを配置する。
 - `BF-007.<Fixture>.RESULT|PASS` 5件と `BF-007.RESULT|PASS`、`BF-007.PYTHON_BRIDGE_RESULT|PASS`、`BF-007.PYTHON_PROBE_RESULT|PASS`を確認する。
 
 **範囲:** 解析式から生成したvalidation-only mesh-like gridの数値写像。O3DE Mesh APIによる実メッシュ読み込み、Reference JSON importer、skinned/deformed mesh、production solverの動作を証明しない。
