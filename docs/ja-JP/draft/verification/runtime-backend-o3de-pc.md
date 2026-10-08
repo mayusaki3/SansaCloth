@@ -460,7 +460,41 @@ PASSにはC++ `BF-008.CPP_MEASUREMENTS_RESULT|PASS`、Python Bridge PASS、VCF-0
 
 **範囲:** BF-005/006と同じ解析平面・C0/G0 identity stage。実Mesh API、Solver非ゼロ入力、Reference JSON importer、Production serializationは未検証。
 
-状態: **BF-008 IMPLEMENTED / BUILD OPEN / RUNTIME OPEN**（2026-10-08）。実Editorログおよび出力JSONLを確認するまでPASSとしない。
+状態: **BF-008 RUNTIME PASS**（2026-10-09 JST / 2026-10-08 15:00:21 UTC、O3DE 26.05 Editor、validation-only）。
+
+ユーザー提供のEditor実測ログ:
+- `BF-008.DISCOVERY|CPP_CAPTURE_AVAILABLE`。
+- `BF-008.CPP_CP_COUNT|147`、`BF-008.CPP_CONTACT_COUNT|147`、`BF-008.CPP_SUPPORT_COUNT|14`。
+- `BF-008.CPP_MEASUREMENTS_RESULT|PASS`、`BF-008.PYTHON_BRIDGE_RESULT|PASS`。
+- `BF-008.VCF-001.RESULT|PASS` ～ `BF-008.VCF-007.RESULT|PASS`（7/7）。
+- EventId: `0646dfd1-5a68-4cda-8119-d83607a92689`。
+- TimestampUtc: `2026-10-08T15:00:21.264564Z`。
+- TestId: `O3DE-SR-001-C0-G0`、Backend: `O3DE PC`。
+- CapturePath（実行端末の一時ディレクトリ）: `C:\Users\masay\AppData\Local\Temp\SansaClothO3DEValidationCapture-0646dfd1-5a68-4cda-8119-d83607a92689.jsonl`。
+- `BF-008.RECORD_COUNT|149`、`BF-008.CP_COUNT|147`、`BF-008.CONTACT_COUNT|147`、`BF-008.SUPPORT_COUNT|14`。
+- `MEAN_SEPARATION_M`、`MAX_SEPARATION_M`、`MAX_PENETRATION_M`、`MAX_POSITION_DEVIATION_M`、`RMS_POSITION_DEVIATION_M` はすべて0。
+- `BF-008.RESULT|PASS`、`BF-008.PYTHON_PROBE_RESULT|PASS`。
+
+**証拠範囲:** Pythonスクリプトが実際のJSONLファイルを再読込し、149レコードおよびVCF-001～007を検証したことはEditorログから確認した。一方、JSONLファイル本体は本検証記録への添付・独立検査が未実施である。実Mesh API、Solver、Production serializationは対象外。
+
+## O3DE PC Runtime Backend Feasibility Checkpoint
+
+2026-10-09 JST時点のO3DE 26.05 Editor実測結果:
+
+| Gate | 状態 | 実測範囲 |
+|---|---|---|
+| BF-001 Unit Mapping | PASS | canonical m ↔ O3DE unit |
+| BF-002 Coordinate Mapping | PASS | axes/rotation/winding |
+| BF-003 SurfaceReference Mapping | PASS | validation-only single-domain flat |
+| BF-004 SurfaceQuery Feasibility | PASS | static rigid flat |
+| BF-005 Input Semantics | PASS | SR-001 C0/G0 |
+| BF-006 Output Semantics | PASS | SR-001 final CP |
+| BF-007 Basic Fixture Mapping | PASS | SR-001～005 analytic grids |
+| BF-008 Validation Capture | PASS | JSONL 149 records, read-back VCF-001～007 |
+
+判定: **O3DE PC Runtime Backend Feasibility Checkpoint PASS**（BF-001～008にBLOCKED/OPENなし）。
+
+この判定は既存validation-only fixtureによるBackend境界の実現可能性に限定する。Production Backend完成、Reference Solverとの数値一致、実Mesh API、skinned/deformed mesh stable mapping、性能保証を意味しない。後続はFixture Exchange importerおよびSurfaceResponse比較の検証へ進む。
 
 ## 12. Probe配布方針
 
