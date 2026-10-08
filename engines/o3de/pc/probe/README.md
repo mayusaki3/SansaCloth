@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|7
+SANSA_O3DE_BUILD|SCRIPT_COUNT|8
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -208,7 +208,7 @@ scale, or a full cloth solver.
 
 ## Run BF-005 / BF-006 SR-001 Input/Output Semantics
 
-Deploy the current 7 Python scripts and C++ Validation Gem, rebuild the project,
+Deploy the current 8 Python scripts and C++ Validation Gem, rebuild the project,
 and run in O3DE Editor (Tools > Other > Python Scripts):
 
 ~~~text
@@ -439,6 +439,38 @@ SANSA_O3DE|OXF.PYTHON_PROBE_RESULT|PASS
 
 The importer also reports the deployed source path and SHA-256.
 A missing baseline reports OPEN; malformed or inconsistent data reports
-FAIL. OXF-001..010 remain OPEN until real Editor runtime logs are
-reviewed. Subsequent gates will validate the 30-case matrix and C++
+FAIL. OXF-001..010 were confirmed RUNTIME PASS in the 2026-10-09 Editor log. Subsequent gates will validate the 30-case matrix and C++
 backend integration separately.
+
+## Run OXF-011..019 30-case matrix import
+
+Close Editor and run `BuildProbeAssets.ps1` from the repository root with the
+O3DE project path. The deploy verifies all 30 committed Reference JSON files
+and prints `MATRIX_CASE_COUNT|30` and `SCRIPT_COUNT|8`.
+
+In O3DE Editor > Tools > Other > Python Scripts, run:
+
+~~~text
+SansaCloth/sansacloth_fixture_exchange_matrix_probe.py
+~~~
+
+Expected final output after 30 case lines:
+
+~~~text
+SANSA_O3DE|OXF-011.RESULT|PASS
+SANSA_O3DE|OXF-012.RESULT|PASS
+SANSA_O3DE|OXF-013.RESULT|PASS
+SANSA_O3DE|OXF-014.RESULT|PASS
+SANSA_O3DE|OXF-015.RESULT|PASS
+SANSA_O3DE|OXF-016.RESULT|PASS
+SANSA_O3DE|OXF-017.RESULT|PASS
+SANSA_O3DE|OXF-018.RESULT|PASS
+SANSA_O3DE|OXF-019.CASE_COUNT|30
+SANSA_O3DE|OXF-019.SCENARIO_COUNT|5
+SANSA_O3DE|OXF-019.RESULT|PASS
+SANSA_O3DE|OXF.MATRIX_RESULT|PASS
+~~~
+
+Re-run the original single-case importer as a regression check.
+**OXF-011..019 remain OPEN** until the real O3DE Editor log is reviewed.
+This does not validate C++ geometry handoff, production Mesh API, or solver results.
