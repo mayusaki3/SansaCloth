@@ -1,6 +1,7 @@
 #include "SansaClothBackendProbeValidationSystemComponent.h"
 
 #include <AzCore/Math/MathUtils.h>
+#include <AzCore/std/string/string.h>
 #include <AzCore/Math/Vector2.h>
 
 #include <algorithm>
@@ -581,6 +582,11 @@ namespace SansaClothBackendProbeValidation
 
         if (auto* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
+            behaviorContext->Method("RunBf008Capture", &SystemComponent::RunBf008Capture)
+                ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
+                ->Attribute(
+                    AZ::Script::Attributes::Scope,
+                    AZ::Script::Attributes::ScopeFlags::Common);
             behaviorContext->Method("RunBf007", &SystemComponent::RunBf007)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(
@@ -1068,6 +1074,142 @@ namespace SansaClothBackendProbeValidation
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|BF-007.RESULT|%s\n", passed ? "PASS" : "FAIL");
         return passed;
+    }
+
+    AZStd::string SystemComponent::RunBf008Capture()
+    {
+        // BF-008: generate measurement records from the same C++ semantic
+        // mapper used by BF-005/006. Python owns UTC metadata, disk transport,
+        // JSONL read-back validation, and final PASS/FAIL classification.
+        // A blank string means the C++ measurement stage failed.
+        const std::array<AZ::Vector3, 4> surfaceVertices = {
+            AZ::Vector3(-0.10f, -0.05f, 0.0f),
+            AZ::Vector3(-0.10f,  0.05f, 0.0f),
+            AZ::Vector3( 0.10f, -0.05f, 0.0f),
+            AZ::Vector3( 0.10f,  0.05f, 0.0f)
+        };
+        const std::array<AZ::Vector2, 4> surfaceUvs = {
+            AZ::Vector2(0.0f, 0.0f),
+            AZ::Vector2(0.0f, 1.0f),
+            AZ::Vector2(1.0f, 0.0f),
+            AZ::Vector2(1.0f, 1.0f)
+        };
+        const std::array<int, 6> surfaceTriangles = { 0, 3, 1, 0, 2, 3 };
+        const AZ::Vector3 worldGravity = CanonicalToO3de(AZ::Vector3::CreateZero());
+
+        AZStd::string measurements;
+        int cpCount = 0;
+        int contactCount = 0;
+        int supportCount = 0;
+        double separationSumM = 0.0;
+        float maxSeparationM = 0.0f;
+        float maxPenetrationM = 0.0f;
+        float maxPositionDeviationM = 0.0f;
+        double squaredPositionDeviationSum = 0.0;
+
+        for (int vIndex = 0; vIndex < Sr001VSamples; ++vIndex)
+        {
+            const float v = static_cast<float>(vIndex) / (Sr001VSamples - 1);
+            for (int uIndex = 0; uIndex < Sr001USamples; ++uIndex)
+            {
+                const float u = static_cast<float>(uIndex) / (Sr001USamples - 1);
+                Sr001Input input;
+                input.m_stableId = vIndex * Sr001USamples + uIndex;
+                input.m_reference = SurfaceReference{ FixtureDomainId, AZ::Vector2(u, v) };
+                input.m_initialPosition = AZ::Vector3(
+                    (u - 0.5f) * Sr001WidthM, (v - 0.5f) * Sr001DepthM, 0.0f);
+                input.m_anchor = uIndex == 0 || uIndex == Sr001USamples - 1;
+                input.m_contact = true;
+
+                Sr001Output output;
+                if (!MapSr001Output(
+                    input, worldGravity, 0.0f,
+                    surfaceVertices, surfaceUvs, surfaceTriangles, output))
+                {
+                    AZ_Printf("SansaClothBackendProbe",
+                        "SANSA_O3DE|BF-008.CPP_MEASUREMENTS_RESULT|FAIL|MapSr001Output\n");
+                    return {};
+                }
+
+                const bool derivedContact =
+                    output.m_separationM <= Sr001CollisionToleranceM;
+                const float positionDeviationM =
+                    (output.m_finalPosition - input.m_initialPosition).GetLength();
+                ++cpCount;
+                contactCount += derivedContact ? 1 : 0;
+                supportCount += output.m_directSupport ? 1 : 0;
+                separationSumM += static_cast<double>(output.m_separationM);
+                maxSeparationM = std::max(maxSeparationM, output.m_separationM);
+                maxPenetrationM = std::max(
+                    maxPenetrationM, std::max(0.0f, -output.m_separationM));
+                maxPositionDeviationM = std::max(
+                    maxPositionDeviationM, positionDeviationM);
+                squaredPositionDeviationSum +=
+                    static_cast<double>(positionDeviationM) * positionDeviationM;
+
+                // Canonical measurement values are serialized after reversing
+                // the O3DE Y/Z component mapping. This matches Unity BF-008
+                // and the canonical Reference measurement coordinate system.
+                const AZ::Vector3 canonicalPosition(
+                    output.m_finalPosition.GetX(), output.m_finalPosition.GetZ(),
+                    output.m_finalPosition.GetY());
+                const AZ::Vector3 canonicalNormal(
+                    output.m_surfaceNormal.GetX(), output.m_surfaceNormal.GetZ(),
+                    output.m_surfaceNormal.GetY());
+
+                measurements += AZStd::string::format(
+                    "{\"record_type\":\"final_cp\",\"stable_id\":%d,"
+                    "\"position_m\":[%.9g,%.9g,%.9g],"
+                    "\"surface_reference\":{\"domain_id\":%llu,\"u\":%.9g,\"v\":%.9g},"
+                    "\"surface_normal\":[%.9g,%.9g,%.9g],"
+                    "\"separation_m\":%.9g,\"support\":\"%s\","
+                    "\"derived_contact\":%s}\n",
+                    output.m_stableId,
+                    canonicalPosition.GetX(), canonicalPosition.GetY(),
+                    canonicalPosition.GetZ(),
+                    static_cast<unsigned long long>(output.m_reference.m_domainId),
+                    output.m_reference.m_uv.GetX(), output.m_reference.m_uv.GetY(),
+                    canonicalNormal.GetX(), canonicalNormal.GetY(),
+                    canonicalNormal.GetZ(),
+                    output.m_separationM,
+                    output.m_directSupport ? "Anchor" : "Unsupported",
+                    derivedContact ? "true" : "false");
+            }
+        }
+
+        const double meanSeparationM =
+            cpCount > 0 ? separationSumM / cpCount : 0.0;
+        const double rmsPositionDeviationM =
+            cpCount > 0 ? std::sqrt(squaredPositionDeviationSum / cpCount) : 0.0;
+
+        measurements += AZStd::string::format(
+            "{\"record_type\":\"aggregate\","
+            "\"contact_count\":%d,\"support_count\":%d,"
+            "\"mean_separation_m\":%.17g,\"max_separation_m\":%.9g,"
+            "\"max_penetration_m\":%.9g,"
+            "\"max_position_deviation_m\":%.9g,"
+            "\"rms_position_deviation_m\":%.17g}\n",
+            contactCount, supportCount, meanSeparationM, maxSeparationM,
+            maxPenetrationM, maxPositionDeviationM, rmsPositionDeviationM);
+
+        const bool valid = cpCount == Sr001ControlPointCount
+            && contactCount == Sr001ControlPointCount
+            && supportCount == 14
+            && AZ::GetAbs(static_cast<float>(meanSeparationM)) <= Tolerance
+            && AZ::GetAbs(maxSeparationM) <= Tolerance
+            && AZ::GetAbs(maxPenetrationM) <= Tolerance
+            && AZ::GetAbs(maxPositionDeviationM) <= Tolerance
+            && rmsPositionDeviationM <= Tolerance;
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|BF-008.CPP_CP_COUNT|%d\n", cpCount);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|BF-008.CPP_CONTACT_COUNT|%d\n", contactCount);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|BF-008.CPP_SUPPORT_COUNT|%d\n", supportCount);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|BF-008.CPP_MEASUREMENTS_RESULT|%s\n",
+            valid ? "PASS" : "FAIL");
+        return valid ? measurements : AZStd::string{};
     }
 
 } // namespace SansaClothBackendProbeValidation
