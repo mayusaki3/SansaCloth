@@ -136,7 +136,7 @@ Physics既定Gravity値そのものをReference既定値と一致させること
 - C++ Probeはvalidation-only Gem `SansaClothBackendProbeValidation` として実装。
 - Editor Physics Sceneへtest Gravityを一時設定し、probe rigid bodyのorientation変更前後でScene Gravityが同一world vectorを保持することを確認する。
 - probe body削除後に元のScene Gravityを復元する。
-- 実O3DE build/runtime未確認のため、OBF-006はまだPASSにしない。
+- O3DE SDK 26.05 (Windows / MSVC) でのC++ Gem buildは2026-10-08にユーザー報告によりPASS確認。runtimeは未検証のため、OBF-006はまだPASSにしない。
 
 ## 6. Phase判定
 
@@ -153,7 +153,7 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-003: **PASS** (2026-10-07)
 - OBF-004: **PASS** (2026-10-07)
 - OBF-005: **PASS** (2026-10-08)
-- OBF-006: C++ PROBE IMPLEMENTED / RUNTIME OPEN
+- OBF-006: C++ GEM BUILD PASS (2026-10-08) / RUNTIME OPEN
 - BF-001: **PASS** (2026-10-07)
 - BF-002: OPEN
 
