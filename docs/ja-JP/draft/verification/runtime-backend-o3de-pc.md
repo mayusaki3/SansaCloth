@@ -475,7 +475,20 @@ PASSにはC++ `BF-008.CPP_MEASUREMENTS_RESULT|PASS`、Python Bridge PASS、VCF-0
 - `MEAN_SEPARATION_M`、`MAX_SEPARATION_M`、`MAX_PENETRATION_M`、`MAX_POSITION_DEVIATION_M`、`RMS_POSITION_DEVIATION_M` はすべて0。
 - `BF-008.RESULT|PASS`、`BF-008.PYTHON_PROBE_RESULT|PASS`。
 
-**証拠範囲:** Pythonスクリプトが実際のJSONLファイルを再読込し、149レコードおよびVCF-001～007を検証したことはEditorログから確認した。一方、JSONLファイル本体は本検証記録への添付・独立検査が未実施である。実Mesh API、Solver、Production serializationは対象外。
+**証拠範囲:** Pythonスクリプトが実際のJSONLファイルを再読込し、149レコードおよびVCF-001～007を検証したことはEditorログから確認した。加えて、2026-10-09 JSTにユーザーが会話へJSONLファイル本体を提出し、独立したJSONパース・全147 CPの数値比較・Aggregate再集計を実施してPASSした。
+
+添付ファイルの独立検査:
+- Filename: `SansaClothO3DEValidationCapture-0646dfd1-5a68-4cda-8119-d83607a92689.jsonl`
+- Size: **34853 bytes**
+- SHA-256: `70ecf22f4967dbf5ddc889de63194525c69fd09832fd36a8e0e28b4e42a2cf92`
+- JSONL: Header 1 / Final CP 147 / Aggregate 1 = **149 records**。全行JSONとしてパース成功。
+- Header EventId、TimestampUtc、TestId、Backend、CPCountがEditorログと一致。
+- Stable ID 0..146、DomainId=1、全CPのUV、canonical Position、Normal、Support、Contact、Separationを独立検査。
+- 最大Position期待値差: `7.700000012600405e-09 m`、最大UV差: `2.399999998736746e-08`、最大Normal差: `0`。許容差 `1e-5` 内。
+- Anchor=14、Contact=147、Aggregate統計は再集計値と一致。
+- **独立検査結果: PASS（検査エラー0件）**。
+
+JSONLファイルは会話に添付されており、GitHubリポジトリへコピーしていない。Production Backendの実Mesh API、Solver、Production serializationは対象外。
 
 ## O3DE PC Runtime Backend Feasibility Checkpoint
 
