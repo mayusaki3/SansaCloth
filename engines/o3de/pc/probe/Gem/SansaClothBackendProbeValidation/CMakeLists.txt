@@ -11,7 +11,6 @@ ly_add_target(
     BUILD_DEPENDENCIES
         PRIVATE
             AZ::AzCore
-            AZ::AzFramework
 )
 
 ly_add_source_properties(
