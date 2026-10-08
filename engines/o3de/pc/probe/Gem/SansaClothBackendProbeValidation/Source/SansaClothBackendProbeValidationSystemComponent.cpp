@@ -587,6 +587,9 @@ namespace SansaClothBackendProbeValidation
                 ->Attribute(
                     AZ::Script::Attributes::Scope,
                     AZ::Script::Attributes::ScopeFlags::Common);
+            behaviorContext->Method("ProbeHandoffString", &SystemComponent::ProbeHandoffString)
+                ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
+                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common);
             behaviorContext->Method("RunBf008Capture", &SystemComponent::RunBf008Capture)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(
@@ -1089,6 +1092,17 @@ namespace SansaClothBackendProbeValidation
         constexpr const char* prefix = "SANSA-HANDOFF-V0|";
         const AZStd::string expected = AZStd::string(prefix) + "probe";
         const bool passed = payload == expected;
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-001.CPP_RECEIVED_LENGTH|%zu\\n", payload.size());
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-001.CPP_RESULT|%s\\n", passed ? "PASS" : "FAIL");
+        return passed ? AZStd::string("SANSA-HANDOFF-V0|ACK") : AZStd::string{};
+    }
+
+    AZStd::string SystemComponent::ProbeHandoffString(const AZStd::string& payload)
+    {
+        // OXC-001 spike: string roundtrip only, not a fixture importer.
+        const bool passed = payload == "SANSA-HANDOFF-V0|probe";
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-001.CPP_RECEIVED_LENGTH|%zu\\n", payload.size());
         AZ_Printf("SansaClothBackendProbe",
