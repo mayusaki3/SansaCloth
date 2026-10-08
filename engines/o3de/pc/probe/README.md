@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|1
+SANSA_O3DE_BUILD|SCRIPT_COUNT|2
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -116,3 +116,47 @@ SANSA_O3DE|OBF-01.PYTHON_PROBE_RESULT|PASS
 ~~~
 
 This validates the coordinate/semantic boundary, not a complete SansaCloth production Runtime Backend.
+
+## Run BF-003 SurfaceReference Mapping
+
+After deploying and rebuilding the validation Gem, in O3DE Editor open:
+
+~~~text
+Tools > Other > Python Scripts
+~~~
+
+Run:
+
+~~~text
+SansaCloth/sansacloth_surface_reference_probe.py
+~~~
+
+The separate script calls `azlmbr.sansacloth_probe.RunBf003()`.
+This probe uses a validation-only flat mesh represented by O3DE math arrays;
+it does **not** access the O3DE Mesh API or claim production skinned/deformed
+mesh mapping.
+
+Expected values (O3DE coordinate space):
+
+~~~text
+SANSA_O3DE|BF-003.DISCOVERY|CPP_PROBE_AVAILABLE
+SANSA_O3DE|BF-003.DOMAIN_ID|1
+SANSA_O3DE|BF-003.SURFACE_REFERENCE_UV|0.25,0.75
+SANSA_O3DE|BF-003.RESOLVED_TRIANGLE|0
+SANSA_O3DE|BF-003.REORDERED_RESOLVED_TRIANGLE|1
+SANSA_O3DE|BF-003.IDENTITY_SURFACE_POSITION|-0.05,0.025,0
+SANSA_O3DE|BF-003.TRANSFORMED_SURFACE_POSITION|0.3,-0.075,0.25
+SANSA_O3DE|BF-003.REORDERED_SURFACE_POSITION|-0.05,0.025,0
+SANSA_O3DE|BF-003.IDENTITY_RESULT|PASS
+SANSA_O3DE|BF-003.TRANSFORM_RESULT|PASS
+SANSA_O3DE|BF-003.TRIANGLE_REORDER_RESULT|PASS
+SANSA_O3DE|BF-003.INVALID_DOMAIN_REJECTED|TRUE
+SANSA_O3DE|BF-003.INVALID_UV_REJECTED|TRUE
+SANSA_O3DE|BF-003.RESULT|PASS
+SANSA_O3DE|BF-003.PYTHON_BRIDGE_RESULT|PASS
+SANSA_O3DE|BF-003.PYTHON_PROBE_RESULT|PASS
+~~~
+
+Float rounding differences in vector values are acceptable within 1e-5m.
+On the first compile or runtime error, stop and capture the first error.
+BF-003 remains OPEN until actual runtime evidence is recorded.
