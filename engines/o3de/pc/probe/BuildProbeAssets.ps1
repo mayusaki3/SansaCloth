@@ -17,8 +17,17 @@ if (-not (Test-Path -LiteralPath $projectRoot -PathType Container)) {
 }
 
 $scripts = @(Get-ChildItem -LiteralPath $source -Filter "*.py" -File)
-if ($scripts.Count -ne 1) {
-    throw "Expected exactly 1 O3DE probe Python script, found $($scripts.Count): $source"
+$requiredScripts = @(
+    "sansacloth_coordinate_probe.py",
+    "sansacloth_surface_reference_probe.py"
+)
+foreach ($requiredScript in $requiredScripts) {
+    if (-not (Test-Path -LiteralPath (Join-Path $source $requiredScript) -PathType Leaf)) {
+        throw "Required O3DE probe Python script missing: $requiredScript"
+    }
+}
+if ($scripts.Count -ne $requiredScripts.Count) {
+    throw "Expected $($requiredScripts.Count) O3DE probe Python scripts, found $($scripts.Count): $source"
 }
 
 $gemManifest = Join-Path $gemSource "gem.json"
@@ -35,7 +44,9 @@ if (Test-Path -LiteralPath $gemTarget) {
 
 New-Item -ItemType Directory -Path $target -Force | Out-Null
 New-Item -ItemType Directory -Path $gemTarget -Force | Out-Null
-Copy-Item -LiteralPath $scripts[0].FullName -Destination $target -Force
+foreach ($script in $scripts) {
+    Copy-Item -LiteralPath $script.FullName -Destination $target -Force
+}
 Copy-Item -Path (Join-Path $gemSource "*") -Destination $gemTarget -Recurse -Force
 
 $gemFiles = @(Get-ChildItem -LiteralPath $gemTarget -File -Recurse)
