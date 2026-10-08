@@ -35,7 +35,7 @@ The deploy replaces only:
 
 ## Enable the OBF-006 validation Gem
 
-OBF-001 through OBF-005 run from Python only. OBF-006 requires the validation-only C++ Gem because O3DE does not expose `SceneInterface::GetGravity` / `SetGravity` through the Python `PhysicsScene` reflection.
+OBF-001 through OBF-005 run from Python only. OBF-006 uses a validation-only C++ Gem to exercise O3DE Transform math with explicitly supplied world-space gravity. It does not require PhysX5, a Physics Scene, or a rigid body.
 
 After deploy, enable:
 
@@ -87,20 +87,32 @@ OBF-004 remains OPEN when the Python binding does not expose AZ::Vector3 Cross d
 When the validation Gem is not loaded, the Python probe reports:
 
 ~~~text
-SANSA_O3DE|OBF-006.DISCOVERY|CPP_REQUIRED
+SANSA_O3DE|OBF-006.DISCOVERY|CPP_GEM_NOT_LOADED
 SANSA_O3DE|OBF-006.RESULT|OPEN
 ~~~
 
-When the Gem is loaded, the Python probe calls the C++ OBF-006 probe. The C++ probe temporarily changes the Editor Physics Scene gravity, creates a probe rigid body, changes the body's rotation, verifies the scene gravity remains unchanged, removes the body, and restores the original gravity.
+When the Gem is loaded, the Python probe calls the C++ OBF-006 probe. It accepts explicit canonical world-space gravity, maps it to O3DE world-space, transforms it into body-local space with O3DE Transform math, and reconstructs the original world-space vector. Rotating the body must change the local representation but must not rotate the external world-space input.
+
+Cases:
+- C01: arbitrary gravity, identity transform
+- C02: arbitrary gravity, O3DE Y +90 degrees
+- C03: vertical gravity, O3DE X -90 degrees
+- C04: zero gravity, O3DE Y +90 degrees
 
 A successful run includes:
 
 ~~~text
 SANSA_O3DE|OBF-006.DISCOVERY|CPP_PROBE_AVAILABLE
-SANSA_O3DE|OBF-006.GRAVITY_BEFORE_BODY|...
-SANSA_O3DE|OBF-006.GRAVITY_AT_IDENTITY|...
-SANSA_O3DE|OBF-006.GRAVITY_AFTER_BODY_ROTATION|...
-SANSA_O3DE|OBF-006.RESTORED_GRAVITY|...
+SANSA_O3DE|OBF-006.C01.WORLD_GRAVITY_INPUT|...
+SANSA_O3DE|OBF-006.C01.BODY_LOCAL_GRAVITY|...
+SANSA_O3DE|OBF-006.C01.RECONSTRUCTED_WORLD_GRAVITY|...
+SANSA_O3DE|OBF-006.C01.RESULT|PASS
+SANSA_O3DE|OBF-006.C02.RESULT|PASS
+SANSA_O3DE|OBF-006.C03.RESULT|PASS
+SANSA_O3DE|OBF-006.C04.RESULT|PASS
 SANSA_O3DE|OBF-006.RESULT|PASS
 SANSA_O3DE|OBF-006.PYTHON_BRIDGE_RESULT|PASS
+SANSA_O3DE|OBF-01.PYTHON_PROBE_RESULT|PASS
 ~~~
+
+This validates the coordinate/semantic boundary, not a complete SansaCloth production Runtime Backend.
