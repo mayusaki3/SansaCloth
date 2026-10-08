@@ -25,5 +25,6 @@ namespace SansaClothBackendProbeValidation
         static bool RunBf007();
         static AZStd::string RunBf008Capture();
         static AZStd::string ProbeHandoffString(const AZStd::string& payload);
+        static AZStd::string ProbeFixtureJson(const AZStd::string& payload);
     };
 } // namespace SansaClothBackendProbeValidation
