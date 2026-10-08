@@ -647,6 +647,17 @@ Rust Referenceが生成・commit済みの`reference/validation/fixture-exchange/
 | OXC-009 | 30-case extension | SR-001～005×6の全30ケースをC++へ渡し、case ID・geometry/CP/inputs・Scenario内不変性を照合。SR-003 baked geometry/Anchor=7を含む |
 | OXC-010 | Aggregate/evidence | 各Gateと30ケースのPASS/FAIL、件数、source SHA-256、API/format versionをEditorログに記録。失敗があれば総合FAIL |
 
+### 12B.3a OXC-001 Editor Runtime実績（2026-10-09）
+
+O3DE 26.05 / Windows 11 / `SansaClothBackendProbe` のEditorログ（起動時刻 07:04:26 JST）で、C++ Gemの`ProbeHandoffString(const AZStd::string&)` をPythonから呼び出し、以下を確認した。
+
+- `OXC-001.DISCOVERY|CPP_STRING_HANDOFF_AVAILABLE`
+- 正常入力22文字：`OXC-001.CPP_RECEIVED_LENGTH|22`、`OXC-001.CPP_RESULT|PASS`、応答ACK一致
+- 異常入力24文字：`OXC-001.CPP_RECEIVED_LENGTH|24`、`OXC-001.CPP_RESULT|FAIL`（意図した拒否）、Python側`OXC-001.INVALID_REJECTED|PASS`
+- `OXC-001.ROUNDTRIP|PASS`、`OXC-001.RESULT|PASS`
+
+**OXC-001 Runtime PASS。OXC-002～010 OPEN。** これは文字列引数/返値の境界spikeであり、Fixture JSONのC++ parse・検証・所有権や数値一致は未検証。Editor起動時の`DiffuseProbeGridUpdatePassTemplate`エラーは別途継続観測する。
+
 ### 12B.4 実装順序と判定
 
 1. O3DE側で確実に呼び出せるBehaviorContext引数型を最小のspikeで確認する（validation-only試作）。
