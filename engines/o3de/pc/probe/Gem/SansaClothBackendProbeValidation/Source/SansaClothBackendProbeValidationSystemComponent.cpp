@@ -1086,27 +1086,12 @@ namespace SansaClothBackendProbeValidation
 
     AZStd::string SystemComponent::ProbeHandoffString(const AZStd::string& payload)
     {
-        // OXC-001 spike only: verify Python -> BehaviorContext -> C++ string
-        // conversion and C++ -> Python return. No fixture JSON is parsed yet.
-        // AZStd::string owns a copy; no Python object is retained.
-        constexpr const char* prefix = "SANSA-HANDOFF-V0|";
-        const AZStd::string expected = AZStd::string(prefix) + "probe";
-        const bool passed = payload == expected;
-        AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-001.CPP_RECEIVED_LENGTH|%zu\\n", payload.size());
-        AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-001.CPP_RESULT|%s\\n", passed ? "PASS" : "FAIL");
-        return passed ? AZStd::string("SANSA-HANDOFF-V0|ACK") : AZStd::string{};
-    }
-
-    AZStd::string SystemComponent::ProbeHandoffString(const AZStd::string& payload)
-    {
         // OXC-001 spike: string roundtrip only, not a fixture importer.
         const bool passed = payload == "SANSA-HANDOFF-V0|probe";
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-001.CPP_RECEIVED_LENGTH|%zu\\n", payload.size());
+            "SANSA_O3DE|OXC-001.CPP_RECEIVED_LENGTH|%zu\n", payload.size());
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-001.CPP_RESULT|%s\\n", passed ? "PASS" : "FAIL");
+            "SANSA_O3DE|OXC-001.CPP_RESULT|%s\n", passed ? "PASS" : "FAIL");
         return passed ? AZStd::string("SANSA-HANDOFF-V0|ACK") : AZStd::string{};
     }
 
