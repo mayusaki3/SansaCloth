@@ -273,7 +273,23 @@ SurfaceQuery output:
 検証範囲:
 - **O3DE math runtime上のrigid flat validation fixture**。O3DE Mesh API、Skinned Mesh、deformed mesh、non-uniform scale、curved surface、production solverは未検証。
 - 完全なSurfaceFrame tangent U/Vは本Checkpointで要求しない。
-- BF-004は **IMPLEMENTED / BUILD OPEN / RUNTIME OPEN** (2026-10-08)。実際のEditor runtime logを確認するまでPASSにしない。
+- BF-004は **PASS** (2026-10-08、O3DE 26.05 Editor runtime、validation-only rigid flat fixture)。C++ Gemがロードされ、7件の数値検証とPython bridgeがすべてPASS。
+
+2026-10-08 BF-004 runtime evidence:
+- `BF-004.DISCOVERY|CPP_PROBE_AVAILABLE`
+- Identity Surface Position = (-0.0500000007, 0.0250000004, 0)
+- Identity Surface Normal = (0, 0, 1)
+- Identity outward Separation = +0.00999999978 m
+- Identity inward Separation = -0.00999999978 m
+- Body Transform後のSurface Position = (0.300000012, -0.075000003, 0.25)
+- Body Transform後のSurface Normal = (1, 0, 8.94069672e-08)
+- Body Transform後のoutward Separation = +0.00999999046 m
+- Body Transform後のinward Separation = -0.00999999046 m
+- Identity tangent Separation = 0 m
+- `BF-004.SQF-001.RESULT|PASS` ～ `BF-004.SQF-007.RESULT|PASS`
+- `BF-004.RESULT|PASS`、`BF-004.PYTHON_BRIDGE_RESULT|PASS`、`BF-004.PYTHON_PROBE_RESULT|PASS`
+
+判定は上記validation fixture範囲に限定する。実O3DE Mesh API、Skinned/deformed mesh、non-uniform scale、curved surface、production solverの動作保証ではない。
 
 ## 9. Probe配布方針
 
