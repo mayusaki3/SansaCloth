@@ -263,6 +263,10 @@ namespace SansaClothBackendProbeValidation
             {
                 return false;
             }
+            if (!query.m_worldPosition.IsClose(output.m_finalPosition, Tolerance))
+            {
+                return false;
+            }
             output.m_surfaceNormal = query.m_worldNormal;
             output.m_separationM = query.m_signedSeparation;
             return true;
