@@ -159,13 +159,12 @@ namespace SansaClothBackendProbeValidation
 
         if (auto* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
-            behaviorContext
-                ->Method("RunBf003", &SystemComponent::RunBf003)
+            behaviorContext->Method("RunBf003", &SystemComponent::RunBf003)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(
                     AZ::Script::Attributes::Scope,
-                    AZ::Script::Attributes::ScopeFlags::Common)
-                ->Method("RunObf006", &SystemComponent::RunObf006)
+                    AZ::Script::Attributes::ScopeFlags::Common);
+            behaviorContext->Method("RunObf006", &SystemComponent::RunObf006)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(
                     AZ::Script::Attributes::Scope,
