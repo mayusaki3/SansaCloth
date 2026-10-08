@@ -18,5 +18,6 @@ namespace SansaClothBackendProbeValidation
         void Deactivate() override {}
 
         static bool RunObf006();
+        static bool RunBf003();
     };
 } // namespace SansaClothBackendProbeValidation
