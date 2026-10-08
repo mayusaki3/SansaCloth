@@ -557,6 +557,51 @@ Rust Referenceが生成・commit済みの`reference/validation/fixture-exchange/
 
 このPhaseはPython Editor Validation-only importerであり、C++ Gem側へimported geometryを渡すことやproduction mesh生成を意味しない。後続Gateで実データのC++境界投入を別途要求する。
 
+## 12A. Phase OBF-08: Fixture Exchange 30-Case Matrix Import（実装前テスト仕様）
+
+### 12A.1 対象・境界
+
+- Gate: OXF-011～OXF-019。**仕様定義済み・Runtime OPEN**。実装とEditor実行結果の確認までPASSにしない。
+- 入力: `reference/validation/fixture-exchange/basic-v1/` にcommit済みのRust Reference JSON 30件（SR-001～005 × G0/G1 × C0/C0.5/C1）。解析式によるO3DE側Fixture再生成は禁止。
+- O3DE Editor Python Bindingsを使用し、Git管理されたJSONを検証Projectへ配布する。既存のOXF-001～010のSR-001-C0-G0単体検証は維持する。
+- JSON形式は `sansacloth.validation.fixture-exchange/0`。canonical (x,y,z) → O3DE (x,z,y)、triangle [a,b,c] → [a,c,b]、長さm。StableId、Strip、DomainId、UV、Anchor、Contactの意味論を保持する。
+- 本Gateはvalidation-only importer検証であり、C++ Gem境界への実データ投入、実Mesh API、production solver、SurfaceResponse数値一致は対象外。これらは後続Gateとする。
+
+### 12A.2 実装前テストケース
+
+| ID | Gate | PASS条件 |
+|---|---|---|
+| OXF-011 | Matrix deploy/read | 30件のGit管理baselineをEditorから実ファイルとして読み込み、30件すべてparse/import成功。欠落・重複ファイルはFAIL |
+| OXF-012 | Case identity | 30件のcase_idがファイル名と一致し一意。SR-001～005それぞれG0/G1×C0/C0.5/C1の6件が過不足なく存在 |
+| OXF-013 | Geometry integrity | 各caseでbody頂点・triangle・normal・UV・cloth CP・stripを妥当性検証。index範囲、非退化triangle、winding変換、StableId重複禁止を確認。SR-001専用の147/240を全Scenarioに強制しない |
+| OXF-014 | Scenario invariance | 同一SRの6ケース間でbody/cloth resolved geometry、SurfaceReference、Anchor/Contact、StableId/Stripを比較し不変。Gravity/Conformityのみcase差分として許容（CollisionToleranceはbaselineに従い検証） |
+| OXF-015 | SurfaceReference/identity | 全CPのDomainId・normalized UV・StableId・StripId/Orderを保持し、runtime triangle IDに置換しない。canonical→O3DE変換後も参照identityが不変 |
+| OXF-016 | Anchor/Contact | 全caseのAnchor/ContactをJSON入力どおり保持。Contact入力を自動的にSupportへ昇格しない。SR-001はAnchor=14/Contact=147、SR-003はAnchor=7を追加確認 |
+| OXF-017 | Input matrix | 各case_idのG0/G1とC0/C0.5/C1に対応するWorld Gravity・Conformityを検証し、O3DE変換後のGravityとCollisionToleranceを保持。期待する具体値はReference baselineの仕様・実値に基づき固定し、case名から数値を推測しない |
+| OXF-018 | SR-003 baked geometry | SR-003の6件でReference JSONに焼き込まれたConvex-Side形状・法線・座標変換・winding・Anchor=7を検証。O3DE側でrigid transformを二重適用しない |
+| OXF-019 | Aggregate verdict | OXF-011～018が全PASS、case 30/30・scenario 5/5・case別結果30件を出力。いずれか失敗で総合FAIL、未配布等の未実行状態をPASS扱いしない |
+
+### 12A.3 実装設計・確認事項
+
+1. 既存単一ケースimporterのschema validation、厳密JSON parser、座標/winding変換を共通利用できる形へ分離する。既存OXF-001～010の挙動と14件のnegative testを退行させない。
+2. `SR-001-C0-G0` 固定のcase_id、147/240、平面形状、zero Gravity/Conformityのassertionを汎用import処理から切り離す。Scenario固有assertionは別レイヤーとする。
+3. Rust baseline 30ファイルをデプロイする際は元ファイルのSHA-256を検証し、Editor側で読んだファイルのdigestを記録する。コピー先の同名旧ファイル残存による誤検証を防ぐ。
+4. 30件の一覧・case別検証結果・aggregate結果を機械判読可能な `SANSA_O3DE|` プレフィックスで出力する。FAIL時はcase_idと失敗したGateを記録する。
+5. 検証条件を先に固定し、実装後は静的テストと実O3DE Editor実行ログの両方を確認する。ログ未提示のGateはOPENのままとする。
+
+### 12A.4 Runtime evidenceの受け入れ条件
+
+- `OXF-011.RESULT|PASS` ～ `OXF-019.RESULT|PASS` の全9件を実Editorログで確認。
+- Case count 30、Scenario count 5、各caseのPASS 30件、およびaggregate PASSを確認。
+- OXF-001～010を再実行し退行がないことを確認。
+- 失敗時は検証ID・case_id・理由を記録し、PASS判定を保留する。
+
+### 12A.5 後続Gate
+
+- C++ Validation Gemへのimported geometry実データ受け渡し。
+- Reference Result 30ケースとのGravity/Conformity/Collision/Final SurfaceResponse比較。
+- 実O3DE Mesh API・deformed mesh lifecycleの検証。これらは本PhaseのPASS条件に含めない。
+
 ## 13. Probe配布方針
 
 Unity検証と同様、O3DE検証Project自体をSansaCloth repositoryへ含めることは要求しない。
