@@ -291,7 +291,59 @@ SurfaceQuery output:
 
 判定は上記validation fixture範囲に限定する。実O3DE Mesh API、Skinned/deformed mesh、non-uniform scale、curved surface、production solverの動作保証ではない。
 
-## 9. Probe配布方針
+## 9. Phase OBF-04: BF-005 / BF-006 SR-001 Semantic Boundary
+
+Unity PCの`UNITY-SR-001-C0-G0`と同じSR-001 Flat入力意味論を、O3DE 26.05 C++ Validation Gemで確認する。
+
+対象Case:
+- Body Surface: SF-FLAT-001（validation-only analytic patch）
+- Cloth: CF-FLAT-001
+- CP: 21 U samples × 7 V samples = 147
+- Placement: PL-CONTACT-001（flat contact）
+- Anchor: AF-BOTH-EDGES-001（U=0, U=1の14点）
+- Gravity: Off = canonical (0,0,0) m/s²。O3DE World Gravityへ明示変換する。
+- Conformity: 0
+- CollisionTolerance: 0m
+- SurfaceReference: DomainId=1 + normalized U/V（triangle indexは含めない）
+
+O3DE座標写像:
+- Canonical CP Position = `((u-0.5)×0.20, 0, (v-0.5)×0.10)` [m]
+- O3DE CP Position = `((u-0.5)×0.20, (v-0.5)×0.10, 0)` [m]
+- Surface Normal = `(0,0,+1)`（canonical +Yから写像）
+- Stable CP ID = `vIndex×21 + uIndex`。代表IDは0/73/146。
+
+BF-005 Input Semantics:
+- ISF-001: 147 CPの構成。
+- ISF-002: Anchorは両端Uの14 CPのみ。
+- ISF-003: 147 CPすべてContact input=true。
+- ISF-004: Contact-only 133 CPはUnsupported、DirectSupportは14 CP。
+- ISF-005: World Gravity=(0,0,0)の明示入力。
+- ISF-006: Conformity=0を保持。非ゼロGravity/Conformityは未実装solverのため明示的に拒否する。
+- ISF-007: DomainId=1とnormalized UV、Stable IDを各CPに保持。
+
+BF-006 Output Semantics:
+- OSF-001: 147 CPのFinal Positionを取得し解析的な期待位置と照合。
+- OSF-002: 147 CPのSurfaceReferenceとStable IDを保持。
+- OSF-003: 147 CPのSurface Normalを取得し期待(0,0,1)と照合。
+- OSF-004: 147 CPのsigned SeparationをSurfaceQueryで取得。
+- OSF-005: 147 CPのSupport状態を取得。
+- OSF-006: Final Position deviation max=0m（許容差1e-5m）。
+- OSF-007: Normal deviation max=0（許容差1e-5）。
+- OSF-008: Separation absolute max=0m（許容差1e-5m）。
+- OSF-009: SupportCount=14。
+- OSF-010: `SeparationDistance <= CollisionTolerance`によるderived ContactCount=147。
+
+Validation-only実装:
+- `RunBf005006()` をC++ Gem BehaviorContextへ公開。
+- `sansacloth_sr001_boundary_probe.py` がC++ Probeを呼び出す。
+- `BuildProbeAssets.ps1` はPython Probe 4本とC++ Validation Gemを配置。
+- `SurfaceReference` の解決はBF-003/004と同じ4頂点・2三角形の解析平面。O3DE実Mesh APIやReference JSON importerではない。
+- Final PositionはC0/G0のidentity stage。非ゼロGravity/Conformityでは計算せず拒否する。**Reference Solverやproduction Runtime Backendの移植・数値一致の証明ではない。**
+- 判定は `BF-005.RESULT`、`BF-006.RESULT`、`SR-001.RESULT` がすべてPASSかつ各ISF/OSF結果PASSの場合のみ行う。
+
+状態: **BF-005 OPEN / BF-006 OPEN**（2026-10-08、probe実装済み、build/runtime未検証）。
+
+## 10. Probe配布方針
 
 Unity検証と同様、O3DE検証Project自体をSansaCloth repositoryへ含めることは要求しない。
 
@@ -305,7 +357,7 @@ Deploy target:
 
 Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、検証Project側は再生成可能な作業環境として扱う。
 
-## 10. 後続順序
+## 11. 後続順序
 
 1. OBF-001～004 Python Probe runtime確認。
 2. 必要ならC++ Probeを追加しOBF-004/005を確認。
@@ -313,13 +365,13 @@ Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、�
 4. O3DE BF-001/BF-002を判定。
 5. BF-003 SurfaceReference Mappingをvalidation fixtureで確認する。
 6. BF-004 SurfaceQueryをrigid flat fixtureで検証する。
-7. BF-005/006 Input/Output Semantics。
+7. BF-005/006 SR-001-C0-G0 Input/Output Semanticsをvalidation fixtureで検証する。
 8. BF-007 Basic Fixture Mapping。
 9. BF-008 Validation Capture。
 10. Fixture Exchange 30-case import/SurfaceResponse比較へ進む。
 11. Unity/O3DE双方で成立した境界だけをBackend-neutral contract候補として整理する。
 
-## 11. 未確定事項
+## 12. 未確定事項
 
 - Canonical handednessの全体仕様確定（O3DE math runtimeのCross orientationおよび変換時winding反転は確認済み）。
 - O3DE実メッシュAPIへtriangle winding/geometric normalを適用する統合経路（math probeでのwinding反転は確認済み）。
