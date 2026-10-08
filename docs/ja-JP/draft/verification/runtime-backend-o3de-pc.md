@@ -561,7 +561,7 @@ Rust Referenceが生成・commit済みの`reference/validation/fixture-exchange/
 
 ### 12A.1 対象・境界
 
-- Gate: OXF-011～OXF-019。**仕様定義済み・Runtime OPEN**。実装とEditor実行結果の確認までPASSにしない。
+- Gate: OXF-011～OXF-019。**2026-10-09 Editor Runtime PASS**（検証範囲は本節のvalidation-only importer）。
 - 入力: `reference/validation/fixture-exchange/basic-v1/` にcommit済みのRust Reference JSON 30件（SR-001～005 × G0/G1 × C0/C0.5/C1）。解析式によるO3DE側Fixture再生成は禁止。
 - O3DE Editor Python Bindingsを使用し、Git管理されたJSONを検証Projectへ配布する。既存のOXF-001～010のSR-001-C0-G0単体検証は維持する。
 - JSON形式は `sansacloth.validation.fixture-exchange/0`。canonical (x,y,z) → O3DE (x,z,y)、triangle [a,b,c] → [a,c,b]、長さm。StableId、Strip、DomainId、UV、Anchor、Contactの意味論を保持する。
@@ -595,6 +595,19 @@ Rust Referenceが生成・commit済みの`reference/validation/fixture-exchange/
 - Case count 30、Scenario count 5、各caseのPASS 30件、およびaggregate PASSを確認。
 - OXF-001～010を再実行し退行がないことを確認。
 - 失敗時は検証ID・case_id・理由を記録し、PASS判定を保留する。
+
+### 12A.4a Editor runtime evidence（2026-10-09）
+
+提示されたO3DE Editorログ（Project: `SansaClothBackendProbe`、起動ログ時刻 2026-10-09 06:50:19 JST）で次を確認した。
+
+- `OXF-011.RESULT|PASS` ～ `OXF-019.RESULT|PASS`：全9 Gate PASS。
+- `OXF.MATRIX_CASE|<case_id>|<sha256>|PASS`：SR-001～005、各6ケース、計30/30 PASS。Case IDは C0/C05/C1 × G0/G1。
+- `OXF-019.CASE_COUNT|30`、`OXF-019.SCENARIO_COUNT|5`、`OXF-019.RESULT|PASS`、`OXF.MATRIX_RESULT|PASS`。
+- 既存単一ケースの `OXF-001`～`OXF-010` も同一実行ログ内でPASS。異常系14/14拒否、`OXF.PYTHON_PROBE_RESULT|PASS`。
+- `OXF-010.SHA256|d63de3a9851bf72bf05c41e61f86955178669e198b7c569dc2b54bf70c2d1833`。
+- Editor起動時に `DiffuseProbeGridUpdatePassTemplate` 不在のPassFactoryエラーあり。OXF結果への影響は観測されていないが描画系の評価は別途必要。
+
+判定：**OXF-011～019 RUNTIME PASS（validation-only Python importer）**。根拠は提示されたEditorログであり、30 JSON本体の独立再ハッシュやC++へのgeometry受け渡しは未実施。
 
 ### 12A.5 後続Gate
 
