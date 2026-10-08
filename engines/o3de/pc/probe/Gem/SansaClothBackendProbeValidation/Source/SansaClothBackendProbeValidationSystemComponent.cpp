@@ -3,6 +3,7 @@
 #include <AzCore/Math/MathUtils.h>
 #include <AzCore/Math/Vector2.h>
 
+#include <algorithm>
 #include <array>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/RTTI/BehaviorContext.h>
@@ -681,13 +682,13 @@ namespace SansaClothBackendProbeValidation
                 && output.m_reference.m_uv.IsClose(input.m_reference.m_uv, Tolerance);
             allNonAnchorUnsupported &=
                 output.m_directSupport == input.m_anchor;
-            maxPositionDeviationM = AZStd::GetMax(
+            maxPositionDeviationM = std::max(
                 maxPositionDeviationM,
                 (output.m_finalPosition - input.m_initialPosition).GetLength());
-            maxNormalDeviation = AZStd::GetMax(
+            maxNormalDeviation = std::max(
                 maxNormalDeviation,
                 (output.m_surfaceNormal - expectedNormal).GetLength());
-            maxAbsSeparationM = AZStd::GetMax(
+            maxAbsSeparationM = std::max(
                 maxAbsSeparationM, AZ::GetAbs(output.m_separationM));
         }
 
@@ -776,9 +777,13 @@ namespace SansaClothBackendProbeValidation
         const bool bf006 = allMapped && osf001 && osf002 && osf003
             && osf004 && osf005 && osf006 && osf007 && osf008
             && osf009 && osf010;
-        LogBoundaryCheck("BF-005", "OVERALL", bf005);
-        LogBoundaryCheck("BF-006", "OVERALL", bf006);
-        LogBoundaryCheck("SR-001", "RESULT", bf005 && bf006);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|BF-005.RESULT|%s\n", bf005 ? "PASS" : "FAIL");
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|BF-006.RESULT|%s\n", bf006 ? "PASS" : "FAIL");
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|SR-001.RESULT|%s\n",
+            (bf005 && bf006) ? "PASS" : "FAIL");
         return bf005 && bf006;
     }
 
