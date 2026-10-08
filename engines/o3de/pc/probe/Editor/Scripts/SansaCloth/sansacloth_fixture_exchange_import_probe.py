@@ -108,11 +108,11 @@ def parse_json(text):
         raise FixtureImportError(f"invalid JSON: {exc}") from exc
 
 
-def import_fixture(doc):
+def import_fixture(doc, expected_case_id="SR-001-C0-G0"):
     root = obj(doc, ("format", "case_id", "coordinate", "body_surface",
                      "cloth", "inputs"), "$")
     require(root["format"] == FORMAT, "unsupported format")
-    require(root["case_id"] == "SR-001-C0-G0", "unexpected case_id")
+    require(root["case_id"] == expected_case_id, "unexpected case_id")
     coord = obj(root["coordinate"], ("length_unit", "gravity_unit", "x",
                                     "y", "z"), "coordinate")
     require(coord == {"length_unit": "m", "gravity_unit": "m/s^2",
