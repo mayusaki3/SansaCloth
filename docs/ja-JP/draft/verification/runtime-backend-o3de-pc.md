@@ -362,7 +362,44 @@ Validation-only実装:
 
 判定範囲は解析平面・単一Domain・C0/G0の入力/出力意味論に限定する。非ゼロ入力は明示的拒否が確認されたのみであり、非ゼロGravity/ConformityのSimulation結果、実O3DE Mesh API、Reference JSON importer、production Solverを検証したものではない。
 
-## 10. Probe配布方針
+## 10. Phase OBF-05: BF-007 Basic Fixture Mapping
+
+Unity PC BF-007の`SansaClothBasicFixtureProbe.cs`で定義されたSR-001～005解析Fixtureを、O3DE 26.05 EditorのC++ Validation Gemに再現する。既存Unity Probeと同じRaised Cosine式（幅0.10m）を使用する。
+
+- 各Fixture: 21 U × 7 V = 147 vertices / 147 CP、20×6×2 = 240 triangles。
+- Canonical `(x,y,z)` → O3DE `(x,z,y)`。Unityの`V00,V01,V11`に相当するTriangleはO3DEでは`V00,V11,V01`としてwindingを反転する。
+- SR-003 Sideはcanonical Z -90°に相当するO3DE Y +90°で回転する。
+- 5 Fixtureすべてでlocal height range、中央位置、中央analytic normal、最初のTriangle geometric normalを独立期待値と比較する。
+- さらに全240 Triangleの非退化と外向き法線成分を検査する。
+
+| Fixture | Kind | Local Height Min / Max (m) | O3DE Center Position (m) | O3DE Center/First Triangle Normal | Anchor |
+|---|---|---|---|---|---|
+| SR-001.FLAT | Flat | 0 / 0 | (0,0,0) | (0,0,1) | 14 |
+| SR-002.CONVEX_UP | Convex 0.03 | 0 / 0.03 | (0,0,0.03) | (0,0,1) | 14 |
+| SR-003.CONVEX_SIDE | Convex 0.03, Y +90° | 0 / 0.03 | (0.03,0,0) | (1,0,0) | 7 |
+| SR-004.CONCAVE_SHALLOW | Concave 0.02 | -0.02 / 0 | (0,0,-0.02) | (0,0,1) | 14 |
+| SR-005.CONCAVE_DEEP | Concave 0.05 | -0.05 / 0 | (0,0,-0.05) | (0,0,1) | 14 |
+
+Validation Case:
+- FMP-001 COUNTS (147 vertices, 147 CP, 240 triangles)
+- FMP-002 ANCHORS (14 / sideのみ7)
+- FMP-003 HEIGHT_RANGE (local min/max)
+- FMP-004 CENTER_POSITION
+- FMP-005 CENTER_NORMAL
+- FMP-006 FIRST_TRIANGLE_NORMAL
+- FMP-007 ALL_TRIANGLE_GEOMETRY (240 nondegenerate + outward)
+
+実装:
+- C++ `RunBf007()` をBehaviorContextの`azlmbr.sansacloth_probe`に公開。
+- Python `sansacloth_basic_fixture_probe.py` から呼び出す。
+- `BuildProbeAssets.ps1` は5本のPython ProbeとC++ Validation Gemを配置する。
+- `BF-007.<Fixture>.RESULT|PASS` 5件と `BF-007.RESULT|PASS`、`BF-007.PYTHON_BRIDGE_RESULT|PASS`、`BF-007.PYTHON_PROBE_RESULT|PASS`を確認する。
+
+**範囲:** 解析式から生成したvalidation-only mesh-like gridの数値写像。O3DE Mesh APIによる実メッシュ読み込み、Reference JSON importer、skinned/deformed mesh、production solverの動作を証明しない。
+
+状態: **BF-007 IMPLEMENTED / BUILD OPEN / RUNTIME OPEN**（2026-10-08）。実際のO3DE Editor実行ログを得るまでPASSとしない。
+
+## 11. Probe配布方針
 
 Unity検証と同様、O3DE検証Project自体をSansaCloth repositoryへ含めることは要求しない。
 
@@ -376,7 +413,7 @@ Deploy target:
 
 Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、検証Project側は再生成可能な作業環境として扱う。
 
-## 11. 後続順序
+## 12. 後続順序
 
 1. OBF-001～004 Python Probe runtime確認。
 2. 必要ならC++ Probeを追加しOBF-004/005を確認。
@@ -390,7 +427,7 @@ Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、�
 10. Fixture Exchange 30-case import/SurfaceResponse比較へ進む。
 11. Unity/O3DE双方で成立した境界だけをBackend-neutral contract候補として整理する。
 
-## 12. 未確定事項
+## 13. 未確定事項
 
 - Canonical handednessの全体仕様確定（O3DE math runtimeのCross orientationおよび変換時winding反転は確認済み）。
 - O3DE実メッシュAPIへtriangle winding/geometric normalを適用する統合経路（math probeでのwinding反転は確認済み）。
