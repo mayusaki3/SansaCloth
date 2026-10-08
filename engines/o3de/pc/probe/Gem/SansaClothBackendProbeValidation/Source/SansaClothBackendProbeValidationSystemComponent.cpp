@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <AzCore/Math/Transform.h>
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
@@ -206,6 +207,247 @@ namespace SansaClothBackendProbeValidation
                 "SANSA_O3DE|BF-004.%s|%s\n", key, result ? "PASS" : "FAIL");
         }
 
+        // BF-007 reproduces Unity's analytic SR-001..005 fixture formulas.
+        // Canonical +Y up is mapped to O3DE +Z up. The side fixture uses
+        // O3DE +90deg around Y, equivalent to canonical -90deg around Z.
+        constexpr int FixtureUSamples = 21;
+        constexpr int FixtureVSamples = 7;
+        constexpr int FixtureVertexCount = FixtureUSamples * FixtureVSamples;
+        constexpr int FixtureTriangleCount =
+            (FixtureUSamples - 1) * (FixtureVSamples - 1) * 2;
+        constexpr float FixtureWidthM = 0.20f;
+        constexpr float FixtureDepthM = 0.10f;
+        constexpr float FixtureFeatureWidthM = 0.10f;
+        constexpr float FixturePi = 3.14159265358979323846f;
+
+        enum class BasicFixtureKind
+        {
+            Flat,
+            Convex,
+            Concave
+        };
+
+        struct BasicFixtureCase
+        {
+            const char* m_key;
+            BasicFixtureKind m_kind;
+            float m_magnitudeM;
+            bool m_sideOrientation;
+            bool m_oneEdgeAnchor;
+            float m_expectedMinHeightM;
+            float m_expectedMaxHeightM;
+            AZ::Vector3 m_expectedCenterPosition;
+            AZ::Vector3 m_expectedNormal;
+            int m_expectedAnchorCount;
+        };
+
+        float BasicFixtureRaisedCosine(float x, float heightM)
+        {
+            if (AZ::GetAbs(x) > FixtureFeatureWidthM * 0.5f)
+            {
+                return 0.0f;
+            }
+            return heightM * 0.5f
+                * (1.0f + std::cos(2.0f * FixturePi * x / FixtureFeatureWidthM));
+        }
+
+        float BasicFixtureRaisedCosineDerivative(float x, float heightM)
+        {
+            if (AZ::GetAbs(x) > FixtureFeatureWidthM * 0.5f)
+            {
+                return 0.0f;
+            }
+            return -(heightM * FixturePi / FixtureFeatureWidthM)
+                * std::sin(2.0f * FixturePi * x / FixtureFeatureWidthM);
+        }
+
+        AZ::Vector3 BasicFixtureLocalPosition(
+            BasicFixtureKind kind, float magnitudeM, float u, float v)
+        {
+            const float x = (u - 0.5f) * FixtureWidthM;
+            const float y = (v - 0.5f) * FixtureDepthM;
+            const float feature = BasicFixtureRaisedCosine(x, magnitudeM);
+            const float height = kind == BasicFixtureKind::Flat
+                ? 0.0f
+                : (kind == BasicFixtureKind::Convex ? feature : -feature);
+            return AZ::Vector3(x, y, height);
+        }
+
+        AZ::Vector3 BasicFixtureLocalNormal(
+            BasicFixtureKind kind, float magnitudeM, float u)
+        {
+            const float x = (u - 0.5f) * FixtureWidthM;
+            const float derivative = BasicFixtureRaisedCosineDerivative(x, magnitudeM);
+            const float dzdx = kind == BasicFixtureKind::Flat
+                ? 0.0f
+                : (kind == BasicFixtureKind::Convex ? derivative : -derivative);
+            return AZ::Vector3(-dzdx, 0.0f, 1.0f).GetNormalized();
+        }
+
+        bool ProbeBasicFixture(const BasicFixtureCase& fixture)
+        {
+            const AZ::Transform rotation = fixture.m_sideOrientation
+                ? AZ::Transform::CreateRotationY(AZ::DegToRad(90.0f))
+                : AZ::Transform::CreateIdentity();
+
+            std::array<AZ::Vector3, FixtureVertexCount> positions{};
+            int vertexCount = 0;
+            int cpCount = 0;
+            int anchorCount = 0;
+            float minLocalHeightM = 1.0e10f;
+            float maxLocalHeightM = -1.0e10f;
+            AZ::Vector3 centerPosition = AZ::Vector3::CreateZero();
+            AZ::Vector3 centerNormal = AZ::Vector3::CreateZero();
+
+            for (int vIndex = 0; vIndex < FixtureVSamples; ++vIndex)
+            {
+                const float v = static_cast<float>(vIndex) / (FixtureVSamples - 1);
+                for (int uIndex = 0; uIndex < FixtureUSamples; ++uIndex)
+                {
+                    const float u = static_cast<float>(uIndex) / (FixtureUSamples - 1);
+                    const AZ::Vector3 localPosition =
+                        BasicFixtureLocalPosition(fixture.m_kind, fixture.m_magnitudeM, u, v);
+                    const AZ::Vector3 worldPosition = rotation.TransformPoint(localPosition);
+                    positions[vIndex * FixtureUSamples + uIndex] = worldPosition;
+
+                    minLocalHeightM = std::min(minLocalHeightM, localPosition.GetZ());
+                    maxLocalHeightM = std::max(maxLocalHeightM, localPosition.GetZ());
+                    ++vertexCount;
+                    ++cpCount;
+
+                    const bool anchor = fixture.m_oneEdgeAnchor
+                        ? uIndex == 0
+                        : (uIndex == 0 || uIndex == FixtureUSamples - 1);
+                    anchorCount += anchor ? 1 : 0;
+
+                    if (uIndex == FixtureUSamples / 2 && vIndex == FixtureVSamples / 2)
+                    {
+                        centerPosition = worldPosition;
+                        centerNormal = rotation.TransformVector(
+                            BasicFixtureLocalNormal(
+                                fixture.m_kind, fixture.m_magnitudeM, u)).GetNormalized();
+                    }
+                }
+            }
+
+            // Unity's V00,V01,V11 order points outward in canonical space.
+            // O3DE Y/Z basis swap reverses the handedness, so use V00,V11,V01.
+            const AZ::Vector3 v00 = positions[0];
+            const AZ::Vector3 v01 = positions[FixtureUSamples];
+            const AZ::Vector3 v11 = positions[FixtureUSamples + 1];
+            const AZ::Vector3 firstCross = (v11 - v00).Cross(v01 - v00);
+            const bool firstTriangleNondegenerate = firstCross.GetLengthSq() > 1.0e-12f;
+            const AZ::Vector3 firstTriangleNormal = firstTriangleNondegenerate
+                ? firstCross.GetNormalized() : AZ::Vector3::CreateZero();
+
+            // Every grid cell is represented by two triangles, not merely
+            // an inferred count. Check degeneracy and winding across all 240.
+            int triangleCount = 0;
+            bool allTrianglesNondegenerate = true;
+            bool allTrianglesOutward = true;
+            for (int vIndex = 0; vIndex < FixtureVSamples - 1; ++vIndex)
+            {
+                for (int uIndex = 0; uIndex < FixtureUSamples - 1; ++uIndex)
+                {
+                    const int v00Index = vIndex * FixtureUSamples + uIndex;
+                    const int v01Index = (vIndex + 1) * FixtureUSamples + uIndex;
+                    const int v11Index = v01Index + 1;
+                    const int v10Index = v00Index + 1;
+                    const std::array<std::array<int, 3>, 2> cellTriangles = {{
+                        {{ v00Index, v11Index, v01Index }},
+                        {{ v00Index, v10Index, v11Index }}
+                    }};
+                    for (const auto& indices : cellTriangles)
+                    {
+                        const AZ::Vector3& a = positions[indices[0]];
+                        const AZ::Vector3& b = positions[indices[1]];
+                        const AZ::Vector3& d = positions[indices[2]];
+                        const AZ::Vector3 geometricCross = (b - a).Cross(d - a);
+                        const bool nondegenerate =
+                            geometricCross.GetLengthSq() > 1.0e-12f;
+                        allTrianglesNondegenerate &= nondegenerate;
+                        if (nondegenerate)
+                        {
+                            // +Z (top) or +X (side) component must be positive.
+                            allTrianglesOutward &=
+                                geometricCross.GetNormalized().Dot(fixture.m_expectedNormal)
+                                > 0.0f;
+                        }
+                        ++triangleCount;
+                    }
+                }
+            }
+
+            const bool countsMatch = vertexCount == FixtureVertexCount
+                && cpCount == FixtureVertexCount
+                && triangleCount == FixtureTriangleCount;
+            const bool anchorsMatch = anchorCount == fixture.m_expectedAnchorCount;
+            const bool heightRangeMatches =
+                AZ::GetAbs(minLocalHeightM - fixture.m_expectedMinHeightM) <= Tolerance
+                && AZ::GetAbs(maxLocalHeightM - fixture.m_expectedMaxHeightM) <= Tolerance;
+            const bool centerMatches =
+                centerPosition.IsClose(fixture.m_expectedCenterPosition, Tolerance);
+            const bool centerNormalMatches =
+                centerNormal.IsClose(fixture.m_expectedNormal, Tolerance);
+            const bool firstTriangleNormalMatches = firstTriangleNondegenerate
+                && firstTriangleNormal.IsClose(fixture.m_expectedNormal, Tolerance);
+            const bool triangleGeometryMatches =
+                allTrianglesNondegenerate && allTrianglesOutward;
+
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.VERTEX_COUNT|%d\n",
+                fixture.m_key, vertexCount);
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.TRIANGLE_COUNT|%d\n",
+                fixture.m_key, triangleCount);
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.CP_COUNT|%d\n",
+                fixture.m_key, cpCount);
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.ANCHOR_COUNT|%d\n",
+                fixture.m_key, anchorCount);
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.LOCAL_MIN_HEIGHT_M|%.9g\n",
+                fixture.m_key, minLocalHeightM);
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.LOCAL_MAX_HEIGHT_M|%.9g\n",
+                fixture.m_key, maxLocalHeightM);
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.CENTER_POSITION|%.9g,%.9g,%.9g\n",
+                fixture.m_key, centerPosition.GetX(), centerPosition.GetY(),
+                centerPosition.GetZ());
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.CENTER_NORMAL|%.9g,%.9g,%.9g\n",
+                fixture.m_key, centerNormal.GetX(), centerNormal.GetY(),
+                centerNormal.GetZ());
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.FIRST_TRIANGLE_NORMAL|%.9g,%.9g,%.9g\n",
+                fixture.m_key, firstTriangleNormal.GetX(),
+                firstTriangleNormal.GetY(), firstTriangleNormal.GetZ());
+
+            const std::array<std::pair<const char*, bool>, 7> checks = {{
+                { "COUNTS", countsMatch },
+                { "ANCHORS", anchorsMatch },
+                { "HEIGHT_RANGE", heightRangeMatches },
+                { "CENTER_POSITION", centerMatches },
+                { "CENTER_NORMAL", centerNormalMatches },
+                { "FIRST_TRIANGLE_NORMAL", firstTriangleNormalMatches },
+                { "ALL_TRIANGLE_GEOMETRY", triangleGeometryMatches }
+            }};
+            bool passed = true;
+            for (const auto& check : checks)
+            {
+                AZ_Printf("SansaClothBackendProbe",
+                    "SANSA_O3DE|BF-007.%s.%s.RESULT|%s\n",
+                    fixture.m_key, check.first, check.second ? "PASS" : "FAIL");
+                passed &= check.second;
+            }
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|BF-007.%s.RESULT|%s\n",
+                fixture.m_key, passed ? "PASS" : "FAIL");
+            return passed;
+        }
+
         // BF-005/BF-006: validation-only SR-001-C0-G0 semantic boundary.
         // Contact and anchor are independent input facts; only anchors provide
         // direct support. A nonzero gravity/conformity case is not simulated.
@@ -338,6 +580,11 @@ namespace SansaClothBackendProbeValidation
 
         if (auto* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
+            behaviorContext->Method("RunBf007", &SystemComponent::RunBf007)
+                ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
+                ->Attribute(
+                    AZ::Script::Attributes::Scope,
+                    AZ::Script::Attributes::ScopeFlags::Common);
             behaviorContext->Method("RunBf005006", &SystemComponent::RunBf005006)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(
@@ -789,6 +1036,37 @@ namespace SansaClothBackendProbeValidation
             "SANSA_O3DE|SR-001.RESULT|%s\n",
             (bf005 && bf006) ? "PASS" : "FAIL");
         return bf005 && bf006;
+    }
+
+    bool SystemComponent::RunBf007()
+    {
+        // Independent expected values are supplied for each fixture, rather
+        // than deriving expectations from the generated vertex array.
+        const std::array<BasicFixtureCase, 5> fixtures = {{
+            { "SR-001.FLAT", BasicFixtureKind::Flat, 0.0f, false, false,
+                0.0f, 0.0f, AZ::Vector3(0.0f, 0.0f, 0.0f),
+                AZ::Vector3(0.0f, 0.0f, 1.0f), 14 },
+            { "SR-002.CONVEX_UP", BasicFixtureKind::Convex, 0.03f, false, false,
+                0.0f, 0.03f, AZ::Vector3(0.0f, 0.0f, 0.03f),
+                AZ::Vector3(0.0f, 0.0f, 1.0f), 14 },
+            { "SR-003.CONVEX_SIDE", BasicFixtureKind::Convex, 0.03f, true, true,
+                0.0f, 0.03f, AZ::Vector3(0.03f, 0.0f, 0.0f),
+                AZ::Vector3(1.0f, 0.0f, 0.0f), 7 },
+            { "SR-004.CONCAVE_SHALLOW", BasicFixtureKind::Concave, 0.02f, false, false,
+                -0.02f, 0.0f, AZ::Vector3(0.0f, 0.0f, -0.02f),
+                AZ::Vector3(0.0f, 0.0f, 1.0f), 14 },
+            { "SR-005.CONCAVE_DEEP", BasicFixtureKind::Concave, 0.05f, false, false,
+                -0.05f, 0.0f, AZ::Vector3(0.0f, 0.0f, -0.05f),
+                AZ::Vector3(0.0f, 0.0f, 1.0f), 14 }
+        }};
+        bool passed = true;
+        for (const BasicFixtureCase& fixture : fixtures)
+        {
+            passed &= ProbeBasicFixture(fixture);
+        }
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|BF-007.RESULT|%s\n", passed ? "PASS" : "FAIL");
+        return passed;
     }
 
 } // namespace SansaClothBackendProbeValidation
