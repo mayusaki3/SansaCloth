@@ -140,6 +140,71 @@ namespace SansaClothBackendProbeValidation
             return false;
         }
 
+        struct SurfaceQueryResult
+        {
+            AZ::Vector3 m_worldPosition = AZ::Vector3::CreateZero();
+            AZ::Vector3 m_worldNormal = AZ::Vector3::CreateZero();
+            float m_signedSeparation = 0.0f;
+        };
+
+        bool QuerySurface(
+            const SurfaceReference& reference,
+            const std::array<AZ::Vector3, 4>& vertices,
+            const std::array<AZ::Vector2, 4>& uvs,
+            const std::array<int, 6>& triangleIndices,
+            const AZ::Transform& localToWorld,
+            const AZ::Vector3& currentWorldPosition,
+            SurfaceQueryResult& result)
+        {
+            SurfaceResolveResult resolved;
+            if (!ResolveSurfaceReference(reference, vertices, uvs, triangleIndices, resolved))
+            {
+                return false;
+            }
+
+            const int base = resolved.m_resolvedTriangle * 3;
+            const int i0 = triangleIndices[base];
+            const int i1 = triangleIndices[base + 1];
+            const int i2 = triangleIndices[base + 2];
+            const AZ::Vector3 edge1 = vertices[i1] - vertices[i0];
+            const AZ::Vector3 edge2 = vertices[i2] - vertices[i0];
+            const AZ::Vector3 geometricNormal = edge1.Cross(edge2);
+            if (geometricNormal.GetLengthSq() <= 1.0e-12f)
+            {
+                return false;
+            }
+
+            // Rigid transform only. Non-uniform scale requires inverse transpose.
+            result.m_worldPosition = localToWorld.TransformPoint(resolved.m_localPosition);
+            result.m_worldNormal =
+                localToWorld.TransformVector(geometricNormal.GetNormalized()).GetNormalized();
+            result.m_signedSeparation =
+                (currentWorldPosition - result.m_worldPosition).Dot(result.m_worldNormal);
+            return true;
+        }
+
+        void LogBf004Vector(const char* key, const AZ::Vector3& value)
+        {
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|BF-004.%s|%.9g,%.9g,%.9g\n",
+                key, value.GetX(), value.GetY(), value.GetZ());
+        }
+
+        void LogBf004Scalar(const char* key, float value)
+        {
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|BF-004.%s|%.9g\n", key, value);
+        }
+
+        void LogBf004Check(const char* key, bool result)
+        {
+            AZ_Printf(
+                "SansaClothBackendProbe",
+                "SANSA_O3DE|BF-004.%s|%s\n", key, result ? "PASS" : "FAIL");
+        }
+
         void LogBf003Vector(const char* key, const AZ::Vector3& value)
         {
             AZ_Printf(
@@ -159,6 +224,11 @@ namespace SansaClothBackendProbeValidation
 
         if (auto* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
+            behaviorContext->Method("RunBf004", &SystemComponent::RunBf004)
+                ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
+                ->Attribute(
+                    AZ::Script::Attributes::Scope,
+                    AZ::Script::Attributes::ScopeFlags::Common);
             behaviorContext->Method("RunBf003", &SystemComponent::RunBf003)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(
@@ -293,6 +363,103 @@ namespace SansaClothBackendProbeValidation
             invalidUvRejected ? "TRUE" : "FALSE");
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|BF-003.RESULT|%s\n", result ? "PASS" : "FAIL");
+        return result;
+    }
+
+    bool SystemComponent::RunBf004()
+    {
+        // Validation-only flat 0.20m x 0.10m fixture. Triangle winding is
+        // reversed from canonical after the O3DE Y/Z axis permutation.
+        const std::array<AZ::Vector3, 4> vertices = {
+            AZ::Vector3(-0.10f, -0.05f, 0.0f),
+            AZ::Vector3(-0.10f,  0.05f, 0.0f),
+            AZ::Vector3( 0.10f, -0.05f, 0.0f),
+            AZ::Vector3( 0.10f,  0.05f, 0.0f)
+        };
+        const std::array<AZ::Vector2, 4> uvs = {
+            AZ::Vector2(0.0f, 0.0f),
+            AZ::Vector2(0.0f, 1.0f),
+            AZ::Vector2(1.0f, 0.0f),
+            AZ::Vector2(1.0f, 1.0f)
+        };
+        const std::array<int, 6> triangles = { 0, 3, 1, 0, 2, 3 };
+        const SurfaceReference reference{ FixtureDomainId, AZ::Vector2(0.25f, 0.75f) };
+
+        const AZ::Vector3 identityExpectedPosition(-0.05f, 0.025f, 0.0f);
+        const AZ::Vector3 identityExpectedNormal(0.0f, 0.0f, 1.0f);
+        const AZ::Vector3 transformedExpectedPosition(0.30f, -0.075f, 0.25f);
+        const AZ::Vector3 transformedExpectedNormal(1.0f, 0.0f, 0.0f);
+        constexpr float Offset = 0.01f;
+
+        const AZ::Transform identity = AZ::Transform::CreateIdentity();
+        AZ::Transform bodyTransform = AZ::Transform::CreateRotationY(AZ::DegToRad(90.0f));
+        bodyTransform.SetTranslation(AZ::Vector3(0.30f, -0.10f, 0.20f));
+
+        SurfaceQueryResult identityOutward;
+        SurfaceQueryResult identityInward;
+        SurfaceQueryResult transformedOutward;
+        SurfaceQueryResult transformedInward;
+        SurfaceQueryResult identityTangent;
+
+        const bool resolvedIdentityOutward = QuerySurface(
+            reference, vertices, uvs, triangles, identity,
+            identityExpectedPosition + identityExpectedNormal * Offset,
+            identityOutward);
+        const bool resolvedIdentityInward = QuerySurface(
+            reference, vertices, uvs, triangles, identity,
+            identityExpectedPosition - identityExpectedNormal * Offset,
+            identityInward);
+        const bool resolvedTransformedOutward = QuerySurface(
+            reference, vertices, uvs, triangles, bodyTransform,
+            transformedExpectedPosition + transformedExpectedNormal * Offset,
+            transformedOutward);
+        const bool resolvedTransformedInward = QuerySurface(
+            reference, vertices, uvs, triangles, bodyTransform,
+            transformedExpectedPosition - transformedExpectedNormal * Offset,
+            transformedInward);
+        const bool resolvedIdentityTangent = QuerySurface(
+            reference, vertices, uvs, triangles, identity,
+            identityExpectedPosition + AZ::Vector3(Offset, 0.0f, 0.0f),
+            identityTangent);
+
+        const bool sqf001 = resolvedIdentityOutward
+            && identityOutward.m_worldPosition.IsClose(identityExpectedPosition, Tolerance)
+            && identityOutward.m_worldNormal.IsClose(identityExpectedNormal, Tolerance);
+        const bool sqf002 = resolvedIdentityOutward
+            && AZ::GetAbs(identityOutward.m_signedSeparation - Offset) <= Tolerance;
+        const bool sqf003 = resolvedIdentityInward
+            && AZ::GetAbs(identityInward.m_signedSeparation + Offset) <= Tolerance;
+        const bool sqf004 = resolvedTransformedOutward
+            && transformedOutward.m_worldPosition.IsClose(transformedExpectedPosition, Tolerance)
+            && transformedOutward.m_worldNormal.IsClose(transformedExpectedNormal, Tolerance);
+        const bool sqf005 = resolvedTransformedOutward
+            && AZ::GetAbs(transformedOutward.m_signedSeparation - Offset) <= Tolerance;
+        const bool sqf006 = resolvedTransformedInward
+            && AZ::GetAbs(transformedInward.m_signedSeparation + Offset) <= Tolerance;
+        const bool sqf007 = resolvedIdentityTangent
+            && AZ::GetAbs(identityTangent.m_signedSeparation) <= Tolerance;
+
+        LogBf004Vector("IDENTITY_SURFACE_POSITION", identityOutward.m_worldPosition);
+        LogBf004Vector("IDENTITY_SURFACE_NORMAL", identityOutward.m_worldNormal);
+        LogBf004Scalar("IDENTITY_OUTWARD_SEPARATION_M", identityOutward.m_signedSeparation);
+        LogBf004Scalar("IDENTITY_INWARD_SEPARATION_M", identityInward.m_signedSeparation);
+        LogBf004Vector("TRANSFORMED_SURFACE_POSITION", transformedOutward.m_worldPosition);
+        LogBf004Vector("TRANSFORMED_SURFACE_NORMAL", transformedOutward.m_worldNormal);
+        LogBf004Scalar("TRANSFORMED_OUTWARD_SEPARATION_M", transformedOutward.m_signedSeparation);
+        LogBf004Scalar("TRANSFORMED_INWARD_SEPARATION_M", transformedInward.m_signedSeparation);
+        LogBf004Scalar("IDENTITY_TANGENT_SEPARATION_M", identityTangent.m_signedSeparation);
+
+        LogBf004Check("SQF-001.RESULT", sqf001);
+        LogBf004Check("SQF-002.RESULT", sqf002);
+        LogBf004Check("SQF-003.RESULT", sqf003);
+        LogBf004Check("SQF-004.RESULT", sqf004);
+        LogBf004Check("SQF-005.RESULT", sqf005);
+        LogBf004Check("SQF-006.RESULT", sqf006);
+        LogBf004Check("SQF-007.RESULT", sqf007);
+
+        const bool result = sqf001 && sqf002 && sqf003 && sqf004
+            && sqf005 && sqf006 && sqf007;
+        LogBf004Check("RESULT", result);
         return result;
     }
 
