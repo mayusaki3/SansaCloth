@@ -49,9 +49,9 @@ namespace SansaClothBackendProbeValidation
 
             const bool roundTripMatch =
                 reconstructedWorldGravity.IsClose(worldGravity, Tolerance);
-            const bool localDifferenceMatch =
-                !expectDifferentLocal
-                || !bodyLocalGravity.IsClose(worldGravity, Tolerance);
+            const bool localDifferenceMatch = expectDifferentLocal
+                ? !bodyLocalGravity.IsClose(worldGravity, Tolerance)
+                : bodyLocalGravity.IsClose(worldGravity, Tolerance);
             const bool result = roundTripMatch && localDifferenceMatch;
 
             AZ_Printf(
