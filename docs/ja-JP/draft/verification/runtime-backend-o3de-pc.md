@@ -145,7 +145,7 @@ PASS条件:
 - 旧OBF-006はO3DE Physics SceneからGravityを取得しようとしたが、Editor runtimeで `SceneInterface unavailable` となった。
 - 検証対象が「外部World Gravity入力」であることを再確認し、Physics Scene方式を撤回した。
 - 一時的に追加したPhysX5依存も撤回した。SansaClothのRuntime Backend契約にはPhysX5を要求しない。
-- 新方式のC++ Probeは実装済み。**変更後のO3DE build/runtimeは未検証**のためPASSにはしない。
+- 新方式のC++ ProbeはO3DE 26.05 Editorで2026-10-08にruntime実行済み。C01～C04、OBF-006、Python bridge、OBF-01はすべてPASS。ビルド成功はGemロードとC++関数実行から確認できるが、ビルドログ自体はこの回では提示されていない。
 
 ## 6. Phase判定
 
@@ -162,9 +162,9 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-003: **PASS** (2026-10-07)
 - OBF-004: **PASS** (2026-10-07)
 - OBF-005: **PASS** (2026-10-08)
-- OBF-006: EXTERNAL GRAVITY PROBE IMPLEMENTED / BUILD OPEN / RUNTIME OPEN (2026-10-08)
+- OBF-006: **PASS** (2026-10-08, external World Gravity runtime math probe, C01～C04)
 - BF-001: **PASS** (2026-10-07)
-- BF-002: OPEN
+- BF-002: **PASS** (2026-10-08, OBF-002～006 runtime evidence; coordinate/semantic mapping scope)
 
 2026-10-07 runtime evidence:
 - OBF-01 Python Probe: PASS。
@@ -180,6 +180,16 @@ O3DE BF-002 Coordinate Mapping:
 - expected mapped canonical normal=(0,0,+1)に一致するのはreversed windingのみ。
 - よってFixture Exchange triangleをO3DEへ渡す際は、component変換に加えてtriangle windingを反転する。
 - OBF-005: PASS。
+
+2026-10-08 OBF-006 runtime evidence (O3DE 26.05 Editor):
+- C++ Validation GemがPythonから公開され、`OBF-006.DISCOVERY|CPP_PROBE_AVAILABLE` を確認。
+- C01 arbitrary gravity + identity: world=(1.25,2.5,-3.75), local=(1.25,2.5,-3.75), reconstructed=(1.25,2.5,-3.75), PASS。
+- C02 arbitrary gravity + O3DE Y +90°: world=(1.25,2.5,-3.75), local=(3.75000024,2.50000024,1.24999976), reconstructed=(1.25000024,2.50000048,-3.75000048), PASS。
+- C03 vertical gravity + O3DE X -90°: world=(0,0,-9.81000042), local=(0,9.80999947,0), reconstructed=(0,0,-9.80999947), PASS。
+- C04 zero gravity + O3DE Y +90°: world/local/reconstructed=(0,0,0), PASS。
+- `OBF-006.RESULT|PASS`, `OBF-006.PYTHON_BRIDGE_RESULT|PASS`, `OBF-01.PYTHON_PROBE_RESULT|PASS` を確認。
+- OBF-001～006すべてPASSによりBF-001/BF-002をPASSと判定。
+- 本判定はO3DE座標・意味境界の検証に限り、production Runtime Backend / Solver / SurfaceQueryを検証したものではない。
 
 ## 7. Probe配布方針
 
@@ -211,10 +221,8 @@ Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、�
 
 ## 9. 未確定事項
 
-- O3DE runtime handednessの実測結果。
-- canonical rotationからO3DE rotationへのaxis/sign変換。
-- Python BindingでCross productを直接観測できるか。
-- O3DE mesh runtime APIでのtriangle winding/geometric normal取得経路。
+- Canonical handednessの全体仕様確定（O3DE math runtimeのCross orientationおよび変換時winding反転は確認済み）。
+- O3DE実メッシュAPIへtriangle winding/geometric normalを適用する統合経路（math probeでのwinding反転は確認済み）。
 - 外部World GravityのBackend入力経路（実Runtime Backend統合時に確認）。
 - stable SurfaceReference mapping。
 - runtime/deformed mesh access。
