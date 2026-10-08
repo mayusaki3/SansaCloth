@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|3
+SANSA_O3DE_BUILD|SCRIPT_COUNT|4
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -159,7 +159,7 @@ SANSA_O3DE|BF-003.PYTHON_PROBE_RESULT|PASS
 
 Float rounding differences in vector values are acceptable within 1e-5m.
 On the first compile or runtime error, stop and capture the first error.
-BF-003 remains OPEN until actual runtime evidence is recorded.
+BF-003 was confirmed PASS in O3DE Editor on 2026-10-08 for the validation-only fixture.
 
 ## Run BF-004 SurfaceQuery Feasibility
 
@@ -202,6 +202,73 @@ SANSA_O3DE|BF-004.PYTHON_PROBE_RESULT|PASS
 ~~~
 
 Float roundoff is allowed within 1e-5. Stop on the first build or runtime
-error. BF-004 remains OPEN until real Editor runtime evidence is recorded.
+error. BF-004 was confirmed PASS in O3DE Editor on 2026-10-08 for the validation-only fixture.
 This does not validate production Mesh API, deforming surfaces, non-uniform
 scale, or a full cloth solver.
+
+## Run BF-005 / BF-006 SR-001 Input/Output Semantics
+
+Deploy the 4 Python scripts and C++ Validation Gem, rebuild the project,
+and run in O3DE Editor (Tools > Other > Python Scripts):
+
+~~~text
+SansaCloth/sansacloth_sr001_boundary_probe.py
+~~~
+
+The Python script calls `azlmbr.sansacloth_probe.RunBf005006()`.
+
+The C++ probe constructs 147 SR-001 Flat CPs (21 U × 7 V) with stable IDs
+0–146, DomainId=1 and normalized UVs. Both U edges are anchors (14 CPs).
+All 147 CPs have Contact input, but the 133 non-anchors must remain
+Unsupported. World Gravity and Conformity are explicitly zero.
+It maps the final position, logical surface reference, geometric normal,
+signed separation and support to a validation-only result.
+
+The probe reuses the BF-003/004 O3DE math-only analytic surface. C=0/G=0
+is an identity stage, **not** an implementation of the SansaCloth solver.
+Nonzero Gravity or Conformity is deliberately rejected.
+
+Expected aggregate:
+
+~~~text
+SANSA_O3DE|SR-001.DISCOVERY|CPP_PROBE_AVAILABLE
+SANSA_O3DE|SR-001.CP_COUNT|147
+SANSA_O3DE|SR-001.ANCHOR_COUNT|14
+SANSA_O3DE|SR-001.CONTACT_INPUT_COUNT|147
+SANSA_O3DE|SR-001.DIRECT_SUPPORT_COUNT|14
+SANSA_O3DE|SR-001.CONTACT_ONLY_UNSUPPORTED_COUNT|133
+SANSA_O3DE|SR-001.OUTPUT_CP_COUNT|147
+SANSA_O3DE|SR-001.DERIVED_CONTACT_COUNT|147
+SANSA_O3DE|SR-001.WORLD_GRAVITY_INPUT|0,0,0
+SANSA_O3DE|SR-001.CONFORMITY_INPUT|0
+SANSA_O3DE|SR-001.COLLISION_TOLERANCE_M|0
+SANSA_O3DE|SR-001.FINAL_POSITION_DEVIATION_MAX_M|0
+SANSA_O3DE|SR-001.NORMAL_DEVIATION_MAX|0
+SANSA_O3DE|SR-001.SEPARATION_ABS_MAX_M|0
+SANSA_O3DE|SR-001.NONZERO_GRAVITY_REJECTED|TRUE
+SANSA_O3DE|SR-001.NONZERO_CONFORMITY_REJECTED|TRUE
+~~~
+
+Representative CP output (O3DE coordinates):
+
+~~~text
+SANSA_O3DE|SR-001.CP_FIRST|id=0;domain=1;uv=0,0;position=-0.1,-0.05,0;normal=0,0,1;separation_m=0;support=Anchor
+SANSA_O3DE|SR-001.CP_CENTER|id=73;domain=1;uv=0.5,0.5;position=0,0,0;normal=0,0,1;separation_m=0;support=Unsupported
+SANSA_O3DE|SR-001.CP_LAST|id=146;domain=1;uv=1,1;position=0.1,0.05,0;normal=0,0,1;separation_m=0;support=Anchor
+~~~
+
+Each `SANSA_O3DE|BF-005.ISF-001.RESULT` through `ISF-007.RESULT`
+and `SANSA_O3DE|BF-006.OSF-001.RESULT` through `OSF-010.RESULT`
+must be `PASS`, followed by:
+
+~~~text
+SANSA_O3DE|BF-005.RESULT|PASS
+SANSA_O3DE|BF-006.RESULT|PASS
+SANSA_O3DE|SR-001.RESULT|PASS
+SANSA_O3DE|SR-001.PYTHON_BRIDGE_RESULT|PASS
+SANSA_O3DE|SR-001.PYTHON_PROBE_RESULT|PASS
+~~~
+
+Tolerance for positions, normals and separation is 1e-5. Stop on the
+first build or runtime error. BF-005/006 remain OPEN until the real
+Editor runtime log is collected.
