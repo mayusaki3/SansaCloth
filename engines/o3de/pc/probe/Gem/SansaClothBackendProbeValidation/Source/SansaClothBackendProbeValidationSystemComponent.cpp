@@ -1,6 +1,7 @@
 #include "SansaClothBackendProbeValidationSystemComponent.h"
 
 #include <AzCore/Math/MathUtils.h>
+#include <rapidjson/document.h>
 #include <AzCore/std/string/string.h>
 #include <AzCore/Math/Vector2.h>
 
@@ -582,6 +583,9 @@ namespace SansaClothBackendProbeValidation
 
         if (auto* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
+            behaviorContext->Method("ProbeFixtureJson", &SystemComponent::ProbeFixtureJson)
+                ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
+                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common);
             behaviorContext->Method("ProbeHandoffString", &SystemComponent::ProbeHandoffString)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(
@@ -1093,6 +1097,77 @@ namespace SansaClothBackendProbeValidation
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-001.CPP_RESULT|%s\n", passed ? "PASS" : "FAIL");
         return passed ? AZStd::string("SANSA-HANDOFF-V0|ACK") : AZStd::string{};
+    }
+
+    AZStd::string SystemComponent::ProbeFixtureJson(const AZStd::string& payload)
+    {
+        // OXC-002: consume real Reference JSON, not a regenerated analytic fixture.
+        // Parsing and all derived counts are local to this call; no borrowed data
+        // survives the BehaviorContext boundary. Full semantic checks are later gates.
+        rapidjson::Document doc;
+        doc.Parse(payload.c_str());
+        bool valid = !doc.HasParseError() && doc.IsObject();
+        if (valid)
+        {
+            valid = doc.HasMember("format") && doc["format"].IsString()
+                && AZStd::string(doc["format"].GetString()) == "sansacloth.validation.fixture-exchange/0"
+                && doc.HasMember("case_id") && doc["case_id"].IsString()
+                && AZStd::string(doc["case_id"].GetString()) == "SR-001-C0-G0"
+                && doc.HasMember("body_surface") && doc["body_surface"].IsObject()
+                && doc.HasMember("cloth") && doc["cloth"].IsObject()
+                && doc.HasMember("inputs") && doc["inputs"].IsObject();
+        }
+        int vertexCount = -1;
+        int triangleCount = -1;
+        int cpCount = -1;
+        int anchorCount = 0;
+        int contactCount = 0;
+        if (valid)
+        {
+            const auto& body = doc["body_surface"];
+            const auto& cloth = doc["cloth"];
+            valid = body.HasMember("domain_id") && body["domain_id"].IsUint64()
+                && body["domain_id"].GetUint64() == 1
+                && body.HasMember("vertices") && body["vertices"].IsArray()
+                && body.HasMember("triangles") && body["triangles"].IsArray()
+                && cloth.HasMember("control_points") && cloth["control_points"].IsArray();
+            if (valid)
+            {
+                const auto& vertices = body["vertices"];
+                const auto& triangles = body["triangles"];
+                const auto& points = cloth["control_points"];
+                vertexCount = static_cast<int>(vertices.Size());
+                triangleCount = static_cast<int>(triangles.Size());
+                cpCount = static_cast<int>(points.Size());
+                valid = vertexCount == 147 && triangleCount == 240 && cpCount == 147;
+                for (const auto& point : points.GetArray())
+                {
+                    if (!point.IsObject() || !point.HasMember("anchor")
+                        || !point["anchor"].IsBool() || !point.HasMember("contact")
+                        || !point["contact"].IsBool())
+                    {
+                        valid = false;
+                        break;
+                    }
+                    anchorCount += point["anchor"].GetBool() ? 1 : 0;
+                    contactCount += point["contact"].GetBool() ? 1 : 0;
+                }
+                valid = valid && anchorCount == 14 && contactCount == 147;
+            }
+        }
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|%d\\n", vertexCount);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-002.CPP_BODY_TRIANGLE_COUNT|%d\\n", triangleCount);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-002.CPP_CP_COUNT|%d\\n", cpCount);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-002.CPP_ANCHOR_COUNT|%d\\n", anchorCount);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-002.CPP_CONTACT_COUNT|%d\\n", contactCount);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-002.CPP_RESULT|%s\\n", valid ? "PASS" : "FAIL");
+        return valid ? AZStd::string("OXC-002|ACK|147|240|147|14|147") : AZStd::string{};
     }
 
     AZStd::string SystemComponent::RunBf008Capture()
