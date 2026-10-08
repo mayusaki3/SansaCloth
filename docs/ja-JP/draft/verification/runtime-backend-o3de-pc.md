@@ -191,7 +191,40 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-001～006すべてPASSによりBF-001/BF-002をPASSと判定。
 - 本判定はO3DE座標・意味境界の検証に限り、production Runtime Backend / Solver / SurfaceQueryを検証したものではない。
 
-## 7. Probe配布方針
+## 7. Phase OBF-02: BF-003 SurfaceReference Mapping
+
+Unity PC BF-003のrigid single-domain fixtureに対応するO3DE validation-only Probe。
+
+論理参照:
+- `SurfaceReference = (DomainId, U, V)`
+- `DomainId = 1`, `UV = (0.25, 0.75)`
+- `SurfaceReference` にtriangle indexを保存しない。
+- 0.20m x 0.10mのflat fixture、4 vertices、2 triangles、fixed diagonal V00 -> V11。
+- canonical->O3DE軸写像 `(x,y,z)->(x,z,y)` に伴い、triangle windingを反転する。
+- O3DE `AZ::Vector2`, `AZ::Vector3`, `AZ::Transform` を用いてUV triangleをbarycentric解決する。
+
+Probe:
+- SRF-001: identityでDomainId/UVからsurface local positionを解決する。期待O3DE `(-0.05,0.025,0)`。
+- SRF-002: Body rigid transform後も同一DomainId/UVを使う。canonical rotation Z -90°はO3DE Y +90°、canonical translation (0.30,0.20,-0.10)はO3DE (0.30,-0.10,0.20)。期待O3DE world position `(0.30,-0.075,0.25)`。
+- SRF-003: triangle配列順序を交換しても、同じDomainId/UVが同じsurface positionを解決する。resolverが返すtriangle indexは変わることを確認する。
+- SRF-004: 異なるDomainId=2、範囲外UV=(1.25,0.75)は明示的にrejectする。
+
+検証範囲:
+- 本Probeは**O3DE math runtime上のvalidation fixture mapping**。O3DE Mesh APIや実際のskinned/deformed meshを読み取るものではない。
+- UV seam/overlap、複数domain、topology更新に対するproduction stable mappingは未確定。
+- Triangle配列の**順序変更**を確認するものであり、meshの**topology変更**への追従を保証しない。
+- BF-003の最終判定はruntime evidenceを得てから行う。
+
+実装:
+- C++ Gem: `SansaClothBackendProbeValidationSystemComponent.cpp` の `RunBf003`。
+- Editor Python: `sansacloth_surface_reference_probe.py`。
+- `BuildProbeAssets.ps1` は2本のPython scriptとValidation Gemを配置する。
+
+現在状態:
+- BF-003: **PROBE IMPLEMENTED / BUILD OPEN / RUNTIME OPEN** (2026-10-08)。
+- BF-004: OPEN。Surface Normal/signed SeparationはBF-004で検証する。
+
+## 8. Probe配布方針
 
 Unity検証と同様、O3DE検証Project自体をSansaCloth repositoryへ含めることは要求しない。
 
@@ -205,13 +238,13 @@ Deploy target:
 
 Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、検証Project側は再生成可能な作業環境として扱う。
 
-## 8. 後続順序
+## 9. 後続順序
 
 1. OBF-001～004 Python Probe runtime確認。
 2. 必要ならC++ Probeを追加しOBF-004/005を確認。
 3. OBF-006 World Gravityを確認。
 4. O3DE BF-001/BF-002を判定。
-5. BF-003 SurfaceReference Mappingへ進む。
+5. BF-003 SurfaceReference Mappingをvalidation fixtureで確認する。
 6. BF-004 SurfaceQuery。
 7. BF-005/006 Input/Output Semantics。
 8. BF-007 Basic Fixture Mapping。
@@ -219,7 +252,7 @@ Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、�
 10. Fixture Exchange 30-case import/SurfaceResponse比較へ進む。
 11. Unity/O3DE双方で成立した境界だけをBackend-neutral contract候補として整理する。
 
-## 9. 未確定事項
+## 10. 未確定事項
 
 - Canonical handednessの全体仕様確定（O3DE math runtimeのCross orientationおよび変換時winding反転は確認済み）。
 - O3DE実メッシュAPIへtriangle winding/geometric normalを適用する統合経路（math probeでのwinding反転は確認済み）。
