@@ -208,7 +208,7 @@ scale, or a full cloth solver.
 
 ## Run BF-005 / BF-006 SR-001 Input/Output Semantics
 
-Deploy the 4 Python scripts and C++ Validation Gem, rebuild the project,
+Deploy the current 6 Python scripts and C++ Validation Gem, rebuild the project,
 and run in O3DE Editor (Tools > Other > Python Scripts):
 
 ~~~text
@@ -275,7 +275,7 @@ validation-only SR-001 Flat C=0/G=0 fixture.
 
 ## Run BF-007 Basic Fixture Mapping
 
-After closing O3DE Editor, deploy the 5 Python scripts and validation Gem
+After closing O3DE Editor, deploy the current 6 Python scripts and validation Gem
 using `BuildProbeAssets.ps1`. Rebuild the O3DE project in Project Manager.
 In Editor > Tools > Other > Python Scripts, run:
 
