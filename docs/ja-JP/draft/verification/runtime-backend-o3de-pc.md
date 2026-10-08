@@ -236,7 +236,46 @@ Probe:
 - 以上からvalidation fixture範囲のBF-003はPASS。production Mesh API、skinned/deformed mesh、UV seam/overlap、topology更新は検証範囲外。
 
 
-## 8. Probe配布方針
+## 8. Phase OBF-03: BF-004 SurfaceQuery Feasibility
+
+Unity PC BF-004のrigid flat fixture semanticsをO3DE 26.05 Editorのvalidation-only C++ Gemで検証する。BF-003と同じ0.20m x 0.10m、DomainId=1、UV=(0.25,0.75)、4 vertices / 2 trianglesのfixtureを使用する。
+
+SurfaceQuery input:
+- `SurfaceReference = (DomainId, U, V)`
+- `Current Position`（O3DE world-space, m）
+- `Body Transform`（rigid）
+
+SurfaceQuery output:
+- `Surface Position`（UV triangle barycentric interpolation後のworld-space）
+- `Surface Normal`（triangle windingから`(V1-V0).Cross(V2-V0)`を計算し、rigid Transformでworldへ写像・正規化）
+- `signed Separation = Dot(Current Position - Surface Position, Surface Normal)`（m）
+
+検証ケースと独立した期待値:
+
+| Case | 入力 | 期待値 |
+|---|---|---|
+| SQF-001 | Identity、UV=(0.25,0.75) | Position=(-0.05,0.025,0), Normal=(0,0,+1) |
+| SQF-002 | Identity、Surface+expected Normal×0.01m | Separation=+0.01m |
+| SQF-003 | Identity、Surface−expected Normal×0.01m | Separation=−0.01m |
+| SQF-004 | O3DE Y +90°、Translation=(0.30,-0.10,0.20) | Position=(0.30,-0.075,0.25), Normal=(+1,0,0) |
+| SQF-005 | Transform後、Surface+expected Normal×0.01m | Separation=+0.01m |
+| SQF-006 | Transform後、Surface−expected Normal×0.01m | Separation=−0.01m |
+| SQF-007 | Identity、Surface+X×0.01m（接線方向） | Separation=0m |
+
+期待位置と期待NormalはQuery計算結果から生成せず、既知fixtureの定数として与える。Normalの符号が逆転した場合に、Separationだけの自己整合性で誤PASSにならないようにする。許容誤差は `1e-5`（Position/Normal/Separationの数値比較）。
+
+実装:
+- `RunBf004()`（`SansaClothBackendProbeValidationSystemComponent.cpp`）をBehaviorContextに公開。
+- `sansacloth_surface_query_probe.py` からC++ Probeを呼ぶ。
+- `BuildProbeAssets.ps1` は3本のPython ProbeとValidation Gemを配置。
+- PhysX/Physics Sceneは不要。
+
+検証範囲:
+- **O3DE math runtime上のrigid flat validation fixture**。O3DE Mesh API、Skinned Mesh、deformed mesh、non-uniform scale、curved surface、production solverは未検証。
+- 完全なSurfaceFrame tangent U/Vは本Checkpointで要求しない。
+- BF-004は **IMPLEMENTED / BUILD OPEN / RUNTIME OPEN** (2026-10-08)。実際のEditor runtime logを確認するまでPASSにしない。
+
+## 9. Probe配布方針
 
 Unity検証と同様、O3DE検証Project自体をSansaCloth repositoryへ含めることは要求しない。
 
@@ -250,21 +289,21 @@ Deploy target:
 
 Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、検証Project側は再生成可能な作業環境として扱う。
 
-## 9. 後続順序
+## 10. 後続順序
 
 1. OBF-001～004 Python Probe runtime確認。
 2. 必要ならC++ Probeを追加しOBF-004/005を確認。
 3. OBF-006 World Gravityを確認。
 4. O3DE BF-001/BF-002を判定。
 5. BF-003 SurfaceReference Mappingをvalidation fixtureで確認する。
-6. BF-004 SurfaceQuery。
+6. BF-004 SurfaceQueryをrigid flat fixtureで検証する。
 7. BF-005/006 Input/Output Semantics。
 8. BF-007 Basic Fixture Mapping。
 9. BF-008 Validation Capture。
 10. Fixture Exchange 30-case import/SurfaceResponse比較へ進む。
 11. Unity/O3DE双方で成立した境界だけをBackend-neutral contract候補として整理する。
 
-## 10. 未確定事項
+## 11. 未確定事項
 
 - Canonical handednessの全体仕様確定（O3DE math runtimeのCross orientationおよび変換時winding反転は確認済み）。
 - O3DE実メッシュAPIへtriangle winding/geometric normalを適用する統合経路（math probeでのwinding反転は確認済み）。
