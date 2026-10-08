@@ -118,29 +118,34 @@ PASS条件:
 
 ### OBF-006 World Gravity Independence
 
-Body rotationとWorld Gravityを独立に設定・観測し、Body rotationがGravity vectorを暗黙回転させない境界を確認する。
+検証対象は **SansaCloth Runtime Backend境界で外部入力されるWorld Gravity** であり、O3DE Physics Sceneの既定GravityやPhysXの動作ではない。
 
-Physics既定Gravity値そのものをReference既定値と一致させることは要求しない。
+検証内容:
+- Canonical World Gravity（m/s²）を明示入力し、O3DEのworld-space vectorへ `(x,y,z) -> (x,z,y)` で写像する。
+- Body Transformを独立に設定する。GravityをBody rotationから生成・暗黙回転しない。
+- Body-local Gravityが必要な場合のみO3DE `Transform::GetInverse().TransformVector()` で変換する。
+- O3DE `Transform::TransformVector()` でworldへ戻し、元のworld-space入力と許容差 `1e-5` 以内で一致することを確認する。
+- 非自明なrotationではbody-local Gravityがworld-space入力と異なることも確認し、identity変換だけによる見かけのPASSを避ける。
+- ゼロGravityを含む4ケースで検証する。
 
-実装順序:
-1. Python runtimeで `azlmbr.physics` のGravity/Scene/World関連公開symbolを列挙する。
-2. direct Gravity APIが公開されていれば、そのruntime APIでWorld Gravityを観測する。
-3. direct Gravity APIが公開されていなければ `CPP_REQUIRED` とし、`AzPhysics::SceneInterface::GetGravity` を使う最小C++ Probeへ移る。
-4. Python側で独自にGravityを計算・固定してPASS扱いにはしない。
+| ケース | Canonical World Gravity (m/s²) | Body Transform | 確認 |
+|---|---|---|---|
+| C01 | (1.25, -3.75, 2.5) | identity | world/local一致、round-trip |
+| C02 | (1.25, -3.75, 2.5) | O3DE Y +90° | localはworldと異なる、round-trip |
+| C03 | (0, -9.81, 0) | O3DE X -90° | localはworldと異なる、round-trip |
+| C04 | (0, 0, 0) | O3DE Y +90° | zero維持、round-trip |
 
-2026-10-08 Python runtime discovery:
-- `azlmbr.physics` の関連公開symbolは `PhysicsScene`, `PhysicsScene_GetOnGravityChangeEvent`, Scene Query系のみ。
-- O3DEの `PhysicsScene.cpp` BehaviorContext reflectionでも `PhysicsScene` に公開されるのは `GetOnGravityChangeEvent` と `QueryScene` で、`GetGravity` / `SetGravity` は公開されない。
-- よって `PYTHON_GRAVITY_API_CANDIDATE` は変更イベントAPIを拾ったfalse positiveであり、Gravity値の直接観測経路ではない。
-- OBF-006は `AzPhysics::SceneInterface::GetGravity` を直接使う最小C++ Probeへ進む。
-- C++ Probeはvalidation-only Gem `SansaClothBackendProbeValidation` として実装。
-- Editor Physics Sceneへtest Gravityを一時設定し、probe rigid bodyのorientation変更前後でScene Gravityが同一world vectorを保持することを確認する。
-- probe body削除後に元のScene Gravityを復元する。
-- O3DE SDK 26.05 (Windows / MSVC) でのC++ Gem buildは2026-10-08にユーザー報告によりPASS確認。runtimeは未検証のため、OBF-006はまだPASSにしない。
-- 2026-10-08 Editor runtime: `azlmbr.sansacloth_probe` import / `RunObf006` callは成功したが、`AZ::Interface<AzPhysics::SceneInterface>::Get()` がnullで `OBF-006.RESULT|FAIL|SceneInterface unavailable`。OBF-006のgravity independenceは未判定。
-- O3DE PhysX5の `PhysXSceneInterface` が `AZ::Interface<AzPhysics::SceneInterface>::Registrar` としてサービスを提供することを公式sourceで確認。
-- Validation Gemの `gem.json` に `PhysX5` dependencyを明示した。次回は検証ProjectでPhysX5が有効になっていることを確認してからrebuild/runtimeを再検証する。
-- Gem dependency追加だけでruntime serviceの存在を保証したと扱わない。
+実装:
+- validation-only C++ Gem `SansaClothBackendProbeValidation` の `RunObf006` をEditor Pythonから呼び出す。
+- O3DE `AZ::Vector3` / `AZ::Transform` のruntime math APIのみ使用する。
+- PhysX5、`AzPhysics::SceneInterface`、Physics Scene、RigidBodyを必要としない。
+- ProbeはGravityを外部入力として扱う**座標・意味境界の検証**であり、未実装のSansaCloth production Runtime BackendでGravityが正しく使われることまで証明しない。
+
+2026-10-08の経緯:
+- 旧OBF-006はO3DE Physics SceneからGravityを取得しようとしたが、Editor runtimeで `SceneInterface unavailable` となった。
+- 検証対象が「外部World Gravity入力」であることを再確認し、Physics Scene方式を撤回した。
+- 一時的に追加したPhysX5依存も撤回した。SansaClothのRuntime Backend契約にはPhysX5を要求しない。
+- 新方式のC++ Probeは実装済み。**変更後のO3DE build/runtimeは未検証**のためPASSにはしない。
 
 ## 6. Phase判定
 
@@ -157,7 +162,7 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-003: **PASS** (2026-10-07)
 - OBF-004: **PASS** (2026-10-07)
 - OBF-005: **PASS** (2026-10-08)
-- OBF-006: C++ GEM BUILD PASS / C++ BRIDGE LOAD PASS / RUNTIME BLOCKED (SceneInterface unavailable, 2026-10-08)
+- OBF-006: EXTERNAL GRAVITY PROBE IMPLEMENTED / BUILD OPEN / RUNTIME OPEN (2026-10-08)
 - BF-001: **PASS** (2026-10-07)
 - BF-002: OPEN
 
@@ -210,7 +215,7 @@ Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、�
 - canonical rotationからO3DE rotationへのaxis/sign変換。
 - Python BindingでCross productを直接観測できるか。
 - O3DE mesh runtime APIでのtriangle winding/geometric normal取得経路。
-- Physics scene Gravityの取得/設定API。
+- 外部World GravityのBackend入力経路（実Runtime Backend統合時に確認）。
 - stable SurfaceReference mapping。
 - runtime/deformed mesh access。
 - Validation Captureの最終出力経路。
