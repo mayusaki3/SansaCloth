@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|6
+SANSA_O3DE_BUILD|SCRIPT_COUNT|7
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -386,3 +386,59 @@ production solver, actual O3DE Mesh API or production serialization.
 
 If the Gem or capture method is not exposed in a subsequent run,
 the script reports OPEN; any capture or read-back error reports FAIL.
+
+## Run OXF-001..010 Reference Fixture Exchange import
+
+This stage uses the **committed Rust Reference resolved JSON**, not an
+O3DE-generated analytic shape. It is a validation-only Python importer,
+not an O3DE Mesh API or C++ solver integration.
+
+After closing Editor, deploy with `BuildProbeAssets.ps1`. The deploy
+script copies the baseline from
+`reference/validation/fixture-exchange/basic-v1/SR-001-C0-G0.json`
+to `<O3DE project>/Editor/Scripts/SansaCloth/Fixtures/SR-001-C0-G0.json`.
+It compares the source and deployed SHA-256 and reports
+`SCRIPT_COUNT|7`, `FIXTURE_SHA256`, `RESULT|PASS`.
+
+Run in O3DE Editor > Tools > Other > Python Scripts:
+
+~~~text
+SansaCloth/sansacloth_fixture_exchange_import_probe.py
+~~~
+
+The script imports the JSON, strictly validates the format, IDs,
+SurfaceReferences, topology, Anchor/Contact semantics and case inputs,
+then maps canonical (x,y,z) to O3DE (x,z,y) and reverses triangle winding.
+All 240 mapped triangles must be nondegenerate and outward-facing.
+It also runs 14 negative importer tests.
+
+Expected summary:
+
+~~~text
+SANSA_O3DE|OXF-001.RESULT|PASS
+SANSA_O3DE|OXF-002.RESULT|PASS
+SANSA_O3DE|OXF-003.RESULT|PASS
+SANSA_O3DE|OXF-004.RESULT|PASS
+SANSA_O3DE|OXF-005.RESULT|PASS
+SANSA_O3DE|OXF-006.RESULT|PASS
+SANSA_O3DE|OXF-007.RESULT|PASS
+SANSA_O3DE|OXF-008.REJECTED_CASE_COUNT|14
+SANSA_O3DE|OXF-008.RESULT|PASS
+SANSA_O3DE|OXF-009.RESULT|PASS
+SANSA_O3DE|OXF-010.RESULT|PASS
+SANSA_O3DE|OXF.BODY_VERTEX_COUNT|147
+SANSA_O3DE|OXF.BODY_TRIANGLE_COUNT|240
+SANSA_O3DE|OXF.CP_COUNT|147
+SANSA_O3DE|OXF.ANCHOR_COUNT|14
+SANSA_O3DE|OXF.CONTACT_INPUT_COUNT|147
+SANSA_O3DE|OXF.CONTACT_ONLY_UNSUPPORTED_COUNT|133
+SANSA_O3DE|OXF.CASE_ID|SR-001-C0-G0
+SANSA_O3DE|OXF.RESULT|PASS
+SANSA_O3DE|OXF.PYTHON_PROBE_RESULT|PASS
+~~~
+
+The importer also reports the deployed source path and SHA-256.
+A missing baseline reports OPEN; malformed or inconsistent data reports
+FAIL. OXF-001..010 remain OPEN until real Editor runtime logs are
+reviewed. Subsequent gates will validate the 30-case matrix and C++
+backend integration separately.
