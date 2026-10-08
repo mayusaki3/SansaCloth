@@ -21,5 +21,6 @@ namespace SansaClothBackendProbeValidation
         static bool RunBf003();
         static bool RunBf004();
         static bool RunBf005006();
+        static bool RunBf007();
     };
 } // namespace SansaClothBackendProbeValidation
