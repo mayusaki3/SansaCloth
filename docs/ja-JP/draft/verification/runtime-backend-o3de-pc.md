@@ -213,7 +213,7 @@ Probe:
 - 本Probeは**O3DE math runtime上のvalidation fixture mapping**。O3DE Mesh APIや実際のskinned/deformed meshを読み取るものではない。
 - UV seam/overlap、複数domain、topology更新に対するproduction stable mappingは未確定。
 - Triangle配列の**順序変更**を確認するものであり、meshの**topology変更**への追従を保証しない。
-- BF-003の最終判定はruntime evidenceを得てから行う。
+- 本validation fixture範囲のBF-003判定は2026-10-08のruntime evidenceに基づきPASSとする。production stable mappingは別途検証する。
 
 実装:
 - C++ Gem: `SansaClothBackendProbeValidationSystemComponent.cpp` の `RunBf003`。
@@ -221,8 +221,20 @@ Probe:
 - `BuildProbeAssets.ps1` は2本のPython scriptとValidation Gemを配置する。
 
 現在状態:
-- BF-003: **PROBE IMPLEMENTED / BUILD OPEN / RUNTIME OPEN** (2026-10-08)。
+- BF-003: **PASS** (2026-10-08, O3DE 26.05 Editor, validation-only single-domain rigid fixture; actual Mesh API / deformed mesh未検証)。
 - BF-004: OPEN。Surface Normal/signed SeparationはBF-004で検証する。
+
+2026-10-08 BF-003 runtime evidence (O3DE 26.05 Editor):
+- `BF-003.DISCOVERY|CPP_PROBE_AVAILABLE` によりC++ Validation GemとPython bridgeの利用を確認。
+- DomainId=1、UV=(0.25,0.75)。
+- Identity resolved triangle=0、surface position=(-0.0500000007,0.0250000004,0)。
+- Body transform後のsurface position=(0.300000012,-0.075000003,0.25)。
+- Triangle配列順序変更後のresolved triangle=1、surface position=(-0.0500000007,0.0250000004,0)。
+- `BF-003.IDENTITY_RESULT|PASS`、`BF-003.TRANSFORM_RESULT|PASS`、`BF-003.TRIANGLE_REORDER_RESULT|PASS`。
+- `BF-003.INVALID_DOMAIN_REJECTED|TRUE`、`BF-003.INVALID_UV_REJECTED|TRUE`。
+- `BF-003.RESULT|PASS`、`BF-003.PYTHON_BRIDGE_RESULT|PASS`、`BF-003.PYTHON_PROBE_RESULT|PASS`。
+- 以上からvalidation fixture範囲のBF-003はPASS。production Mesh API、skinned/deformed mesh、UV seam/overlap、topology更新は検証範囲外。
+
 
 ## 8. Probe配布方針
 
