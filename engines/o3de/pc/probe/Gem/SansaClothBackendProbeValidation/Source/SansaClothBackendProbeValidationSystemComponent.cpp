@@ -144,7 +144,7 @@ namespace SansaClothBackendProbeValidation
         {
             AZ_Printf(
                 "SansaClothBackendProbe",
-                "SANSA_O3DE|BF-003.%s|%.9g,%.9g,%.9g\\n",
+                "SANSA_O3DE|BF-003.%s|%.9g,%.9g,%.9g\n",
                 key, value.GetX(), value.GetY(), value.GetZ());
         }
     } // namespace
@@ -261,16 +261,16 @@ namespace SansaClothBackendProbeValidation
             vertices, uvs, triangles, invalidResult);
 
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.DOMAIN_ID|%llu\\n",
+            "SANSA_O3DE|BF-003.DOMAIN_ID|%llu\n",
             static_cast<unsigned long long>(reference.m_domainId));
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.SURFACE_REFERENCE_UV|%.9g,%.9g\\n",
+            "SANSA_O3DE|BF-003.SURFACE_REFERENCE_UV|%.9g,%.9g\n",
             reference.m_uv.GetX(), reference.m_uv.GetY());
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.RESOLVED_TRIANGLE|%d\\n",
+            "SANSA_O3DE|BF-003.RESOLVED_TRIANGLE|%d\n",
             identityResult.m_resolvedTriangle);
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.REORDERED_RESOLVED_TRIANGLE|%d\\n",
+            "SANSA_O3DE|BF-003.REORDERED_RESOLVED_TRIANGLE|%d\n",
             reorderedResult.m_resolvedTriangle);
         LogBf003Vector("IDENTITY_SURFACE_POSITION", identityResult.m_localPosition);
         LogBf003Vector("TRANSFORMED_SURFACE_POSITION", transformedPosition);
@@ -280,20 +280,20 @@ namespace SansaClothBackendProbeValidation
             identityMatch && transformMatch && reorderedMatch
             && invalidDomainRejected && invalidUvRejected;
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.IDENTITY_RESULT|%s\\n", identityMatch ? "PASS" : "FAIL");
+            "SANSA_O3DE|BF-003.IDENTITY_RESULT|%s\n", identityMatch ? "PASS" : "FAIL");
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.TRANSFORM_RESULT|%s\\n", transformMatch ? "PASS" : "FAIL");
+            "SANSA_O3DE|BF-003.TRANSFORM_RESULT|%s\n", transformMatch ? "PASS" : "FAIL");
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.TRIANGLE_REORDER_RESULT|%s\\n",
+            "SANSA_O3DE|BF-003.TRIANGLE_REORDER_RESULT|%s\n",
             reorderedMatch ? "PASS" : "FAIL");
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.INVALID_DOMAIN_REJECTED|%s\\n",
+            "SANSA_O3DE|BF-003.INVALID_DOMAIN_REJECTED|%s\n",
             invalidDomainRejected ? "TRUE" : "FALSE");
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.INVALID_UV_REJECTED|%s\\n",
+            "SANSA_O3DE|BF-003.INVALID_UV_REJECTED|%s\n",
             invalidUvRejected ? "TRUE" : "FALSE");
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|BF-003.RESULT|%s\\n", result ? "PASS" : "FAIL");
+            "SANSA_O3DE|BF-003.RESULT|%s\n", result ? "PASS" : "FAIL");
         return result;
     }
 
