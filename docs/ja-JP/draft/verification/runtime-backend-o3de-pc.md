@@ -137,6 +137,10 @@ Physics既定Gravity値そのものをReference既定値と一致させること
 - Editor Physics Sceneへtest Gravityを一時設定し、probe rigid bodyのorientation変更前後でScene Gravityが同一world vectorを保持することを確認する。
 - probe body削除後に元のScene Gravityを復元する。
 - O3DE SDK 26.05 (Windows / MSVC) でのC++ Gem buildは2026-10-08にユーザー報告によりPASS確認。runtimeは未検証のため、OBF-006はまだPASSにしない。
+- 2026-10-08 Editor runtime: `azlmbr.sansacloth_probe` import / `RunObf006` callは成功したが、`AZ::Interface<AzPhysics::SceneInterface>::Get()` がnullで `OBF-006.RESULT|FAIL|SceneInterface unavailable`。OBF-006のgravity independenceは未判定。
+- O3DE PhysX5の `PhysXSceneInterface` が `AZ::Interface<AzPhysics::SceneInterface>::Registrar` としてサービスを提供することを公式sourceで確認。
+- Validation Gemの `gem.json` に `PhysX5` dependencyを明示した。次回は検証ProjectでPhysX5が有効になっていることを確認してからrebuild/runtimeを再検証する。
+- Gem dependency追加だけでruntime serviceの存在を保証したと扱わない。
 
 ## 6. Phase判定
 
@@ -153,7 +157,7 @@ O3DE BF-002 Coordinate Mapping:
 - OBF-003: **PASS** (2026-10-07)
 - OBF-004: **PASS** (2026-10-07)
 - OBF-005: **PASS** (2026-10-08)
-- OBF-006: C++ GEM BUILD PASS (2026-10-08) / RUNTIME OPEN
+- OBF-006: C++ GEM BUILD PASS / C++ BRIDGE LOAD PASS / RUNTIME BLOCKED (SceneInterface unavailable, 2026-10-08)
 - BF-001: **PASS** (2026-10-07)
 - BF-002: OPEN
 
