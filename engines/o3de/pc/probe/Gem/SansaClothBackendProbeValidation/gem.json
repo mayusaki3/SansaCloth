@@ -8,5 +8,5 @@
     "summary": "Validation-only O3DE PC runtime backend probe for SansaCloth.",
     "canonical_tags": ["Gem"],
     "user_tags": ["SansaCloth", "Validation"],
-    "dependencies": ["PhysX5"]
+    "dependencies": []
 }
