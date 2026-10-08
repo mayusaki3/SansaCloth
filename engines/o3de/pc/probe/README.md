@@ -19,7 +19,7 @@ From the SansaCloth repository root:
 Expected:
 
 ~~~text
-SANSA_O3DE_BUILD|SCRIPT_COUNT|2
+SANSA_O3DE_BUILD|SCRIPT_COUNT|3
 SANSA_O3DE_BUILD|DEPLOY_TARGET|...\Editor\Scripts\SansaCloth
 SANSA_O3DE_BUILD|GEM_FILE_COUNT|6
 SANSA_O3DE_BUILD|GEM_DEPLOY_TARGET|...\Gems\SansaClothBackendProbeValidation
@@ -160,3 +160,48 @@ SANSA_O3DE|BF-003.PYTHON_PROBE_RESULT|PASS
 Float rounding differences in vector values are acceptable within 1e-5m.
 On the first compile or runtime error, stop and capture the first error.
 BF-003 remains OPEN until actual runtime evidence is recorded.
+
+## Run BF-004 SurfaceQuery Feasibility
+
+After deploying and rebuilding the C++ validation Gem, run this script in
+O3DE Editor using Tools > Other > Python Scripts:
+
+~~~text
+SansaCloth/sansacloth_surface_query_probe.py
+~~~
+
+The script calls `azlmbr.sansacloth_probe.RunBf004()`. The C++ probe
+resolves DomainId=1 and UV=(0.25,0.75) on the same validation-only flat
+fixture used by BF-003. It calculates triangle geometric normal from
+O3DE Vector3.Cross and signed separation from the current world-space
+position. No physics Gem or PhysX dependency is required.
+
+Expected runtime log:
+
+~~~text
+SANSA_O3DE|BF-004.DISCOVERY|CPP_PROBE_AVAILABLE
+SANSA_O3DE|BF-004.IDENTITY_SURFACE_POSITION|-0.05,0.025,0
+SANSA_O3DE|BF-004.IDENTITY_SURFACE_NORMAL|0,0,1
+SANSA_O3DE|BF-004.IDENTITY_OUTWARD_SEPARATION_M|0.01
+SANSA_O3DE|BF-004.IDENTITY_INWARD_SEPARATION_M|-0.01
+SANSA_O3DE|BF-004.TRANSFORMED_SURFACE_POSITION|0.3,-0.075,0.25
+SANSA_O3DE|BF-004.TRANSFORMED_SURFACE_NORMAL|1,0,0
+SANSA_O3DE|BF-004.TRANSFORMED_OUTWARD_SEPARATION_M|0.01
+SANSA_O3DE|BF-004.TRANSFORMED_INWARD_SEPARATION_M|-0.01
+SANSA_O3DE|BF-004.IDENTITY_TANGENT_SEPARATION_M|0
+SANSA_O3DE|BF-004.SQF-001.RESULT|PASS
+SANSA_O3DE|BF-004.SQF-002.RESULT|PASS
+SANSA_O3DE|BF-004.SQF-003.RESULT|PASS
+SANSA_O3DE|BF-004.SQF-004.RESULT|PASS
+SANSA_O3DE|BF-004.SQF-005.RESULT|PASS
+SANSA_O3DE|BF-004.SQF-006.RESULT|PASS
+SANSA_O3DE|BF-004.SQF-007.RESULT|PASS
+SANSA_O3DE|BF-004.RESULT|PASS
+SANSA_O3DE|BF-004.PYTHON_BRIDGE_RESULT|PASS
+SANSA_O3DE|BF-004.PYTHON_PROBE_RESULT|PASS
+~~~
+
+Float roundoff is allowed within 1e-5. Stop on the first build or runtime
+error. BF-004 remains OPEN until real Editor runtime evidence is recorded.
+This does not validate production Mesh API, deforming surfaces, non-uniform
+scale, or a full cloth solver.
