@@ -1156,17 +1156,17 @@ namespace SansaClothBackendProbeValidation
             }
         }
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|%d\\n", vertexCount);
+            "SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|%d\n", vertexCount);
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-002.CPP_BODY_TRIANGLE_COUNT|%d\\n", triangleCount);
+            "SANSA_O3DE|OXC-002.CPP_BODY_TRIANGLE_COUNT|%d\n", triangleCount);
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-002.CPP_CP_COUNT|%d\\n", cpCount);
+            "SANSA_O3DE|OXC-002.CPP_CP_COUNT|%d\n", cpCount);
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-002.CPP_ANCHOR_COUNT|%d\\n", anchorCount);
+            "SANSA_O3DE|OXC-002.CPP_ANCHOR_COUNT|%d\n", anchorCount);
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-002.CPP_CONTACT_COUNT|%d\\n", contactCount);
+            "SANSA_O3DE|OXC-002.CPP_CONTACT_COUNT|%d\n", contactCount);
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-002.CPP_RESULT|%s\\n", valid ? "PASS" : "FAIL");
+            "SANSA_O3DE|OXC-002.CPP_RESULT|%s\n", valid ? "PASS" : "FAIL");
         return valid ? AZStd::string("OXC-002|ACK|147|240|147|14|147") : AZStd::string{};
     }
 
