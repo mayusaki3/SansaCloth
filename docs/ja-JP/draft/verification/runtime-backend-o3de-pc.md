@@ -664,7 +664,7 @@ O3DE 26.05 / Windows 11 / `SansaClothBackendProbe` のEditorログ（起動時�
 2. 受け渡し表現と座標変換責任を固定する。C++側の独立validationと所有権を実装する。
 3. SR-001-C0-G0単一ケース（OXC-001～008）をEditor runtimeで確認する。
 4. 30ケース（OXC-009～010）へ拡張し、既存BF-001～008、OXF-001～019の退行を確認する。
-5. 実Editorログの確認までは**OXC-001～010 OPEN**。本Phase PASSでもproduction Mesh API、deformed mesh lifecycle、SurfaceResponse solver/Reference数値一致は未検証とする。
+5. 実Editorログで**OXC-001 PASS**を確認済み。**OXC-002～010 OPEN**（OXC-002は実装済み、Runtime未検証）。本Phase PASSでもproduction Mesh API、deformed mesh lifecycle、SurfaceResponse solver/Reference数値一致は未検証とする。
 
 ## 13. Probe配布方針
 
