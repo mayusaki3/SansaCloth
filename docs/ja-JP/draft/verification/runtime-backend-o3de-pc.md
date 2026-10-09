@@ -680,13 +680,24 @@ O3DE 26.05 / Windows 11 のEditorログ（起動時刻10:31:31 JST）で、`SR-0
 
 **OXC-001～003 Runtime PASS、OXC-004～010 OPEN。** OXC-003は現在のSR-001 Body形状の完全照合であり、実Mesh API/solver統合は未検証。
 
+### 12B.3d OXC-004 Editor Runtime実績（2026-10-09）
+
+O3DE 26.05 / Windows 11 のEditorログ（起動時刻10:42:03 JST）で、SR-001-C0-G0の147制御点についてStableId、7×21 StripId/Order、SurfaceReference DomainId/UV、Body対応位置をC++で検証。
+
+- 正常入力：`OXC-004.CPP_CHECKED_CP_COUNT|147`、`OXC-004.CPP_RESULT|PASS`、`OXC-003.CPP_RESULT|PASS`、`OXC-002.RESULT|PASS`。
+- 不正JSON：`OXC-004.CPP_CHECKED_CP_COUNT|0`、`OXC-004.CPP_RESULT|FAIL`（期待した拒否）。個別fieldの負例検証はOXC-008で実施。
+- Source SHA-256: `d63de3a9851bf72bf05c41e61f86955178669e198b7c569dc2b54bf70c2d1833`。
+- OXC-004のC++ログにリテラル`\\n`が出る表示不具合を確認。機能判定とは独立に修正する。
+
+**OXC-001～004 Runtime PASS、OXC-005～010 OPEN。**
+
 ### 12B.4 実装順序と判定
 
 1. O3DE側で確実に呼び出せるBehaviorContext引数型を最小のspikeで確認する（validation-only試作）。
 2. 受け渡し表現と座標変換責任を固定する。C++側の独立validationと所有権を実装する。
 3. SR-001-C0-G0単一ケース（OXC-001～008）をEditor runtimeで確認する。
 4. 30ケース（OXC-009～010）へ拡張し、既存BF-001～008、OXF-001～019の退行を確認する。
-5. 実Editorログで**OXC-001 PASS**を確認済み。**OXC-002 PASS**、**OXC-003 PASS**、**OXC-004～010 OPEN**。本Phase PASSでもproduction Mesh API、deformed mesh lifecycle、SurfaceResponse solver/Reference数値一致は未検証とする。
+5. 実Editorログで**OXC-001 PASS**を確認済み。**OXC-002 PASS**、**OXC-003～004 PASS**、**OXC-005～010 OPEN**。本Phase PASSでもproduction Mesh API、deformed mesh lifecycle、SurfaceResponse solver/Reference数値一致は未検証とする。
 
 ## 13. Probe配布方針
 
