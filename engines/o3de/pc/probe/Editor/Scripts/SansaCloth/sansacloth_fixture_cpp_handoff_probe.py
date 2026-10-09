@@ -157,30 +157,60 @@ try:
     ]
     if len(matrix_ids) != 30 or len(set(matrix_ids)) != 30:
         raise ValueError("OXC-009 expected exactly 30 unique case IDs")
+    # OXC-010: aggregate evidence from the same 30-case C++ acceptance run.
+    # Each case is emitted even on failure; a failed case cannot become PASS.
     cpp_accepted = 0
+    cpp_rejected = 0
+    evidence = []
     for case_id in matrix_ids:
         case_path = fixture_dir / f"{case_id}.json"
-        case_source = case_path.read_text(encoding="utf-8")
-        case_doc = importer.parse_json(case_source)
-        if case_doc.get("case_id") != case_id:
-            raise ValueError(f"OXC-009 fixture ID mismatch: {case_id}")
-        digest = hashlib.sha256(case_source.encode("utf-8")).hexdigest()
-        response = fn(case_source)
-        if case_id == "SR-001-C0-G0":
-            if response != expected:
-                raise ValueError("OXC-009 SR-001 baseline ACK changed")
-        else:
-            scenario = int(case_id.split("-")[1])
-            anchors = 7 if scenario == 3 else 14
-            contacts = 84 if scenario >= 4 else 147
-            expected_matrix = f"OXC-009|ACK|{scenario}|147|240|147|{anchors}|{contacts}"
-            if response != expected_matrix:
-                raise ValueError(f"OXC-009 incorrect ACK for {case_id}: {response!r}")
-        cpp_accepted += 1
-        print(f"{PREFIX}OXC-009.CASE|{case_id}|SHA256={digest}|CPP=PASS")
+        digest = "UNAVAILABLE"
+        response = ""
+        reason = ""
+        try:
+            case_source = case_path.read_text(encoding="utf-8")
+            digest = hashlib.sha256(case_source.encode("utf-8")).hexdigest()
+            case_doc = importer.parse_json(case_source)
+            if case_doc.get("case_id") != case_id:
+                raise ValueError("fixture case_id mismatch")
+            response = fn(case_source)
+            if case_id == "SR-001-C0-G0":
+                expected_case_ack = expected
+            else:
+                scenario = int(case_id.split("-")[1])
+                anchors = 7 if scenario == 3 else 14
+                contacts = 84 if scenario >= 4 else 147
+                expected_case_ack = f"OXC-009|ACK|{scenario}|147|240|147|{anchors}|{contacts}"
+            if response != expected_case_ack:
+                raise ValueError(f"unexpected C++ ACK: {response!r}")
+            cpp_accepted += 1
+            status = "PASS"
+        except Exception as exc:
+            cpp_rejected += 1
+            status = "FAIL"
+            reason = f"{type(exc).__name__}: {exc}"
+        evidence.append((case_id, digest, status, reason))
+        print(f"{PREFIX}OXC-009.CASE|{case_id}|SHA256={digest}|CPP={status}")
+        print(f"{PREFIX}OXC-010.CASE|{case_id}|CPP={status}|SOURCE_SHA256={digest}"
+              + (f"|ERROR={reason}" if reason else ""))
+    matrix_pass = cpp_accepted == 30 and cpp_rejected == 0
     print(f"{PREFIX}OXC-009.FIXTURE_COUNT|{len(matrix_ids)}")
     print(f"{PREFIX}OXC-009.CPP_ACCEPTED_COUNT|{cpp_accepted}")
-    print(f"{PREFIX}OXC-009.RESULT|{'PASS' if cpp_accepted == 30 else 'FAIL'}")
+    print(f"{PREFIX}OXC-009.RESULT|{'PASS' if matrix_pass else 'FAIL'}")
+    print(f"{PREFIX}OXC-010.API_VERSION|ProbeFixtureJson/OXC-009-ACK-v1")
+    print(f"{PREFIX}OXC-010.FORMAT_VERSION|{document.get('format', 'MISSING')}")
+    print(f"{PREFIX}OXC-010.GATE|OXC-002|PASS")
+    print(f"{PREFIX}OXC-010.GATE|OXC-005|PASS")
+    print(f"{PREFIX}OXC-010.GATE|OXC-006|PASS")
+    print(f"{PREFIX}OXC-010.GATE|OXC-007|PASS")
+    print(f"{PREFIX}OXC-010.GATE|OXC-008|PASS")
+    print(f"{PREFIX}OXC-010.GATE|OXC-009|{'PASS' if matrix_pass else 'FAIL'}")
+    print(f"{PREFIX}OXC-010.CASE_COUNT|{len(evidence)}")
+    print(f"{PREFIX}OXC-010.PASS_COUNT|{cpp_accepted}")
+    print(f"{PREFIX}OXC-010.FAIL_COUNT|{cpp_rejected}")
+    print(f"{PREFIX}OXC-010.RESULT|{'PASS' if matrix_pass else 'FAIL'}")
+    if not matrix_pass:
+        raise ValueError(f"OXC-010 evidence aggregation failed: {cpp_rejected} cases")
 
     print(f"{PREFIX}OXC-002.RESULT|PASS")
 except Exception as exc:
