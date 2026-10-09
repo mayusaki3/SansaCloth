@@ -1372,6 +1372,44 @@ namespace SansaClothBackendProbeValidation
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-005.CPP_RESULT|%s\n", semanticsValid ? "PASS" : "FAIL");
         valid = valid && semanticsValid;
+        // OXC-006: the SR-001-C0-G0 input contract is zero gravity,
+        // zero conformity and zero collision tolerance (meters).
+        bool inputsValid = valid;
+        if (inputsValid)
+        {
+            const auto& inputs = doc["inputs"];
+            inputsValid = inputs.HasMember("world_gravity_m_per_s2")
+                && inputs.HasMember("conformity")
+                && inputs.HasMember("collision_tolerance_m");
+            if (inputsValid)
+            {
+                const auto& gravity = inputs["world_gravity_m_per_s2"];
+                const auto& conformity = inputs["conformity"];
+                const auto& tolerance = inputs["collision_tolerance_m"];
+                inputsValid = gravity.IsArray() && gravity.Size() == 3
+                    && conformity.IsNumber() && tolerance.IsNumber()
+                    && std::isfinite(conformity.GetDouble())
+                    && std::isfinite(tolerance.GetDouble())
+                    && conformity.GetDouble() == 0.0
+                    && tolerance.GetDouble() == 0.0;
+                if (inputsValid)
+                {
+                    for (const auto& component : gravity.GetArray())
+                    {
+                        if (!component.IsNumber()
+                            || !std::isfinite(component.GetDouble())
+                            || component.GetDouble() != 0.0)
+                        {
+                            inputsValid = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-006.CPP_RESULT|%s\n", inputsValid ? "PASS" : "FAIL");
+        valid = valid && inputsValid;
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|%d\n", vertexCount);
         AZ_Printf("SansaClothBackendProbe",
