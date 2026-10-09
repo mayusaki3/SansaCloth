@@ -660,22 +660,27 @@ after pulling and deploying the updated script. No C++ rebuild is required
 for this Python-only addition. **OXC-008 Runtime OPEN** until Editor logs
 confirm all rejection and recovery markers.
 
-## OXC-009 30-case C++ extension — discovery phase
+## OXC-009 30-case C++ extension — final runtime acceptance
 
-The Python C++ handoff script inventories all 30 deployed SR-001..005 ×
-C0/C05/C1 × G0/G1 JSON files, checks each embedded case ID, emits the SHA-256
-and sends each payload directly to C++. The present C++ implementation is
-intentionally fixed to SR-001-C0-G0 and therefore rejects the other 29 cases.
-This phase reports **OXC-009.RESULT|OPEN** (not PASS), with expected markers:
+The C++ bridge now independently checks the scenario surface coordinates,
+analytic normals, triangle topology, control-point base-plane positions,
+UV references, per-point Anchor/Contact patterns and matrix input values.
+The 2026-10-09 Editor log confirmed 29/29 nonbaseline pre-ACK gates PASS.
+The bridge now returns a scenario-specific ACK only when all checks pass;
+the Python handoff script requires exactly 30 matching ACKs.
+
+After pulling `develop`, deploy using `BuildProbeAssets.ps1`, close the
+Editor, rebuild with O3DE Project Manager **Build Project**, reopen Editor,
+and run **Tools > Python Scripts >
+SansaCloth/sansacloth_fixture_cpp_handoff_probe.py**.
+
+Expected final markers:
 
 ~~~text
 SANSA_O3DE|OXC-009.FIXTURE_COUNT|30
-SANSA_O3DE|OXC-009.CPP_ACCEPTED_COUNT|1
-SANSA_O3DE|OXC-009.RESULT|OPEN
+SANSA_O3DE|OXC-009.CPP_ACCEPTED_COUNT|30
+SANSA_O3DE|OXC-009.RESULT|PASS
 SANSA_O3DE|OXC-002.RESULT|PASS
 ~~~
 
-Next: generalize C++ scenario-specific geometry, control-point layout,
-Anchor/Contact semantics and nonzero input conditions; then require 30
-independent verified ACKs and aggregate PASS. Deploy the updated Python
-script with BuildProbeAssets.ps1; no C++ rebuild is needed for discovery.
+**Runtime acceptance remains OPEN** until the new Editor log is reviewed.
