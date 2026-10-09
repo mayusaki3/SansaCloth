@@ -780,3 +780,15 @@ Editor実行ログで非Baseline29件の`OXC-009.CPP_STRUCTURE|PASS`を確認。
 O3DE Project Managerで再ビルドしたEditor実機ログ（20261009-043440）を確認。30件すべてのFixtureについてC++側の事前判定および正式ACK照合が成立し、`OXC-009.FIXTURE_COUNT|30`、`OXC-009.CPP_ACCEPTED_COUNT|30`、`OXC-009.RESULT|PASS`を確認。非BaselineのC++ログは`OXC-009.CPP_PREACK_GATE|PASS`、`OXC-009.CPP_MATRIX_RESULT|PASS`。Baselineは既存のOXC-002 ACKを維持する。これは30ケースのFixture Exchange C++境界検証であり、実際の布Solverの出力一致やBackend間SurfaceResponse一致を示すものではない。
 
 **OXC-001～009 Runtime PASS、OXC-010 OPEN。**
+
+### OXC-010 Aggregate / Evidence Editor Runtime実績（2026-10-09 13:56 JST）
+
+O3DE Editor実機ログ（20261009-045659）を確認。30件のFixtureを再度C++境界に渡し、ケースごとのSHA-256とACKを集約した。以下の実測ログを確認。
+
+- `OXC-009.FIXTURE_COUNT|30`、`OXC-009.CPP_ACCEPTED_COUNT|30`、`OXC-009.RESULT|PASS`。
+- `OXC-010.API_VERSION|ProbeFixtureJson/OXC-009-ACK-v1`。
+- `OXC-010.FORMAT_VERSION|sansacloth.validation.fixture-exchange/0`。
+- `OXC-010.GATE|OXC-002|PASS`、`OXC-005|PASS`、`OXC-006|PASS`、`OXC-007|PASS`、`OXC-008|PASS`、`OXC-009|PASS`。
+- `OXC-010.CASE_COUNT|30`、`OXC-010.PASS_COUNT|30`、`OXC-010.FAIL_COUNT|0`、`OXC-010.RESULT|PASS`。
+
+**OXC-001～010 Runtime PASS（Fixture Exchange / validation-only）。** この結果はC++ブリッジと証跡集計の実機検証であり、Solver計算結果やBackend間の物理応答一致の検証とは区別する。
