@@ -902,3 +902,12 @@ Windowsのリポジトリルートで`git pull --ff-only`後、`python -m unitte
 - `Ran 6 tests in 0.025s`、`OK`。
 
 **OSR比較器のHost Python単体テスト6/6 PASS。** この結果は比較器の正常系・負例検証であり、O3DE C++ Solver実行・Referenceとの数値一致・OSR-002～008 Runtime PASSを意味しない。
+
+### 16.10 OSR-004 初回C++ Solver実装・実機検証待ち（2026-10-09）
+
+- C++ Gemに独立BehaviorContext API `ProbeSurfaceResponseJson`を追加。現段階では**SR-001-C0-G0のみ**を受け付け、C0/G0以外はfail-closed。147点をdouble精度で計算し`surface-response-result/0`を返す。既存`ProbeFixtureJson`のACKとは別経路。
+- `sansacloth_osr001_probe.py`がC++結果とコミット済みRust Reference JSONを比較。実測用暫定許容差`1e-9`（位置[m]・Separation[m]・法線成分）、StableId・Support・Contact等は厳密一致。差分最大値・入力/Reference SHA256をログへ記録。
+- `BuildProbeAssets.ps1`はEditor Python runnerと`SurfaceResponseResults/SR-001-C0-G0.json`をSHA256検査付きで配布。
+- この段階のC++実装はSR-001 baseline限定。重力非ゼロ、Conformity非ゼロ、SR-002～005は未実装。入力の一般的なFixture妥当性検査は既存ACKほど網羅していないため、実験用APIとしてのみ使用する。
+
+**ビルド・Editor実行・数値一致の実測は未実施。OSR-004はOPEN。** Windows実機で`BuildProbeAssets.ps1`実行後、O3DE Project ManagerでGemを再ビルドし、Editor Pythonから`sansacloth_osr001_probe.py`を実行する。コンパイルエラー・Runtime差分があればログを採取して修正する。
