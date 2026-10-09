@@ -619,3 +619,23 @@ SANSA_O3DE|OXC-002.RESULT|PASS
 ~~~
 
 OXC-006 is **Runtime OPEN** until actual Editor log evidence is reviewed.
+
+## OXC-007 ownership/lifetime regression
+
+The C++ fixture bridge parses each payload into a call-local RapidJSON Document
+and returns an owned string, without storing a pointer to the Python input.
+The Editor Python handoff script now tests 32 valid/invalid interleaved pairs,
+releases temporary Python strings and triggers garbage collection, then tests
+8 invalid-to-valid recovery cycles. Expected log markers:
+
+~~~text
+SANSA_O3DE|OXC-007.INTERLEAVED_32|PASS
+SANSA_O3DE|OXC-007.RECOVERY_8|PASS
+SANSA_O3DE|OXC-007.RESULT|PASS
+SANSA_O3DE|OXC-002.RESULT|PASS
+~~~
+
+Run via **Tools > Python Scripts** after deploying the updated script.
+A Project Manager rebuild is unnecessary if only this Python script changed.
+This behavioral regression does not replace ASan/heap profiling or prove absence
+of all lifetime bugs. **OXC-007 Runtime OPEN** until an Editor log is reviewed.
