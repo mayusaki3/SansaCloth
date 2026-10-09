@@ -553,3 +553,21 @@ SANSA_O3DE|OXC-002.RESULT|PASS
 ~~~
 
 OXC-003 is not marked Runtime PASS until actual Editor evidence is provided.
+
+## Run OXC-004 Cloth CP identity / SurfaceReference validation
+
+Close Editor, deploy with `BuildProbeAssets.ps1`, rebuild Editor, reopen,
+and select **Tools > Python Scripts**. Run the existing
+`SansaCloth/sansacloth_fixture_cpp_handoff_probe.py`.
+The C++ probe now validates all 147 control points, unique StableIds,
+7×21 unique StripId/Order pairs, DomainId=1, SurfaceReference UVs and
+positions against the corresponding body vertices. Expected:
+
+~~~text
+SANSA_O3DE|OXC-003.CPP_RESULT|PASS
+SANSA_O3DE|OXC-004.CPP_CHECKED_CP_COUNT|147
+SANSA_O3DE|OXC-004.CPP_RESULT|PASS
+SANSA_O3DE|OXC-002.RESULT|PASS
+~~~
+
+OXC-004 is **Runtime OPEN** until actual Editor evidence is reviewed.
