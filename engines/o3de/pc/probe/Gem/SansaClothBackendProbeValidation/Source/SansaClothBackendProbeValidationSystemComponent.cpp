@@ -2003,7 +2003,13 @@ namespace SansaClothBackendProbeValidation
                 collision=collision+afterConformity.normal*(tolerance-afterConformity.separation);
             Q final{};
             if (!query(p,collision,final)) return {};
-            bool contact=final.separation<=tolerance;
+            // Collision projection is computed in double precision. A signed distance
+            // within roundoff of the collision boundary is contact, not a gap.
+            // Keep this epsilon local to the discrete contact classification;
+            // the exported separation and positional parity remain unmodified.
+            const double contactRoundoff = 32.0 * std::numeric_limits<double>::epsilon()
+                * std::max({1.0, std::abs(tolerance), std::abs(final.separation)});
+            bool contact = final.separation <= tolerance + contactRoundoff;
             supports+=p.anchor;contacts+=contact;
             w.StartObject();
             w.Key("stable_id");w.Uint(p.id);
