@@ -1876,7 +1876,7 @@ namespace SansaClothBackendProbeValidation
         d.Parse(payload.c_str());
         if (d.HasParseError() || !d.IsObject() || !d.HasMember("case_id")
             || !d["case_id"].IsString()
-            || AZStd::string(d["case_id"].GetString()) != "SR-001-C0-G0"
+            || AZStd::string(d["case_id"].GetString()).find("SR-001-") != 0
             || !d.HasMember("format") || !d["format"].IsString()
             || AZStd::string(d["format"].GetString()) != "sansacloth.validation.fixture-exchange/0"
             || !d.HasMember("body_surface") || !d["body_surface"].IsObject()
@@ -1898,8 +1898,10 @@ namespace SansaClothBackendProbeValidation
             return {};
         const double conformity = inputs["conformity"].GetDouble();
         const double tolerance = inputs["collision_tolerance_m"].GetDouble();
-        if (conformity!=0 || tolerance!=0 || vec(inputs["world_gravity_m_per_s2"]).dot(vec(inputs["world_gravity_m_per_s2"]))!=0)
+        if (!std::isfinite(conformity) || conformity < 0 || conformity > 1
+            || !std::isfinite(tolerance) || tolerance < 0)
             return {};
+        const V gravityDirection = vec(inputs["world_gravity_m_per_s2"]).normalized();
         const auto& vertices = body["vertices"];
         const auto& triangles = body["triangles"];
         struct CP { unsigned id, strip, order; V pos; double u,v; bool anchor,contact; };
@@ -1963,7 +1965,7 @@ namespace SansaClothBackendProbeValidation
         auto writeVec = [&](V v) { w.StartArray();w.Double(v.x);w.Double(v.y);w.Double(v.z);w.EndArray(); };
         w.StartObject();
         w.Key("format");w.String("sansacloth.validation.surface-response-result/0");
-        w.Key("case_id");w.String("SR-001-C0-G0");
+        w.Key("case_id");w.String(d["case_id"].GetString());
         w.Key("profile");w.StartObject();
         w.Key("characteristic_length_m");w.Double(0.1);
         w.Key("quasi_static_gravity_scale");w.Double(0.1);
@@ -1979,10 +1981,19 @@ namespace SansaClothBackendProbeValidation
             const CP& left=points[p.strip*21], &right=points[p.strip*21+20];
             if (!left.anchor || !right.anchor) return {};
             V bridge=p.anchor ? p.pos : left.pos*(1.0-p.order/20.0)+right.pos*(p.order/20.0);
-            V gravity=bridge; // G0: gravity zero, independently checked above.
+            const double t = p.order / 20.0;
+            const double weight = 4.0*t*(1.0-t);
+            V gravity = p.anchor ? bridge : bridge + gravityDirection*(0.1*0.1*weight);
             Q afterGravity{};
             if (!query(p,gravity,afterGravity)) return {};
-            V conform=gravity; // C0: no conformity.
+            V conform=gravity;
+            if (!p.anchor && conformity > 0 && afterGravity.separation >= 0)
+            {
+                const double distanceWeight = std::max(0.0, std::min(1.0,
+                    1.0-afterGravity.separation/0.02));
+                const double effective = conformity*distanceWeight;
+                conform = gravity*(1.0-effective)+afterGravity.surface*effective;
+            }
             Q afterConformity{};
             if (!query(p,conform,afterConformity)) return {};
             V collision=conform;
