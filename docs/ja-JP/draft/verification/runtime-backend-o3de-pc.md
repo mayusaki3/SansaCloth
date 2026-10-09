@@ -888,3 +888,17 @@ Basic Profileは`characteristic_length_m=0.1`、`quasi_static_gravity_scale=0.1`
 - **閾値は比較器の引数**。未確定の既定閾値は設定しない。OSR-007の負例テストを用意したが、O3DE Solver未実装のためRuntime PASSにはしない。
 
 **注意：C++ Solver API `ProbeSurfaceResponseJson`はまだ未実装。OSR-002～008はOPEN。** 比較器単体のテストはSolver数値一致の証拠ではない。
+
+### 16.9 OSR比較器 Host Python回帰テスト実績（2026-10-09）
+
+Windowsのリポジトリルートで`git pull --ff-only`後、`python -m unittest discover -s engines/o3de/pc/probe/tests -v`を実行したユーザー提供ログを確認。
+
+- `test_identity`：PASS。
+- `test_missing_point_rejected`：PASS。
+- `test_nonfinite_rejected`：PASS。
+- `test_numeric_mismatch_rejected`：PASS。
+- `test_stable_id_order_independent`：PASS。
+- `test_support_mismatch_rejected`：PASS。
+- `Ran 6 tests in 0.025s`、`OK`。
+
+**OSR比較器のHost Python単体テスト6/6 PASS。** この結果は比較器の正常系・負例検証であり、O3DE C++ Solver実行・Referenceとの数値一致・OSR-002～008 Runtime PASSを意味しない。
