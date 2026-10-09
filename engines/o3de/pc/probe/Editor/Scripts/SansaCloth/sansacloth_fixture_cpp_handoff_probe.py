@@ -1,5 +1,6 @@
 """OXC-002: pass a validated, committed Reference JSON to C++ Gem."""
 import hashlib
+import gc
 import importlib.util
 import json
 from pathlib import Path
@@ -71,6 +72,42 @@ try:
         print(f"{PREFIX}OXC-006.MISSING_{field.upper()}|REJECTED")
     print(f"{PREFIX}OXC-006.NEGATIVE_RESULT|PASS")
 
+
+    # OXC-007: exercise the Python/C++ ownership boundary repeatedly.
+    # The C++ method parses into a call-local RapidJSON Document and returns
+    # an owned AZStd::string; Python must not depend on prior input buffers.
+    # Interleave valid/invalid calls and release temporary Python objects.
+    invalid_payload = json.loads(source)
+    invalid_payload["inputs"]["conformity"] = 0.25
+    invalid_text = json.dumps(invalid_payload, ensure_ascii=False)
+    del invalid_payload
+    for iteration in range(32):
+        # New temporary strings force separate Python-side allocations.
+        valid_text = source.encode("utf-8").decode("utf-8")
+        result = fn(valid_text)
+        del valid_text
+        if result != expected:
+            raise ValueError(f"OXC-007 valid iteration {iteration} ACK mismatch: {result!r}")
+        if fn(invalid_text) != "":
+            raise ValueError(f"OXC-007 invalid iteration {iteration} was accepted")
+        del result
+        if iteration % 8 == 7:
+            gc.collect()
+    print(f"{PREFIX}OXC-007.INTERLEAVED_32|PASS")
+
+    # A previously rejected temporary input must not affect subsequent calls.
+    for iteration in range(8):
+        transient = json.loads(source)
+        transient["inputs"]["collision_tolerance_m"] = 0.001
+        transient_text = json.dumps(transient, ensure_ascii=False)
+        if fn(transient_text) != "":
+            raise ValueError(f"OXC-007 transient invalid iteration {iteration} accepted")
+        del transient, transient_text
+        gc.collect()
+        if fn(source) != expected:
+            raise ValueError(f"OXC-007 valid recovery iteration {iteration} failed")
+    print(f"{PREFIX}OXC-007.RECOVERY_8|PASS")
+    print(f"{PREFIX}OXC-007.RESULT|PASS")
 
     print(f"{PREFIX}OXC-002.RESULT|PASS")
 except Exception as exc:
