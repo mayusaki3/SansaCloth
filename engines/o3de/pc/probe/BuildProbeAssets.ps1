@@ -28,7 +28,8 @@ $requiredScripts = @(
     "sansacloth_fixture_exchange_matrix_probe.py",
     "sansacloth_handoff_string_probe.py",
     "sansacloth_fixture_cpp_handoff_probe.py",
-    "sansacloth_surface_response_compare.py"
+    "sansacloth_surface_response_compare.py",
+    "sansacloth_osr001_probe.py"
 )
 foreach ($requiredScript in $requiredScripts) {
     if (-not (Test-Path -LiteralPath (Join-Path $source $requiredScript) -PathType Leaf)) {
@@ -85,6 +86,17 @@ foreach ($caseId in $expectedCaseIds) {
     if ($caseId -eq "SR-001-C0-G0") { $singleFixtureHash = $targetHash; $singleFixtureTarget = $fixtureTarget }
     Write-Host "SANSA_O3DE_BUILD|MATRIX_CASE|$caseId|$targetHash|PASS"
 }
+
+$resultSource = [System.IO.Path]::GetFullPath((Join-Path $probeRoot "..\..\..\..\reference\validation\surface-response-result\basic-v1\SR-001-C0-G0.json"))
+if (-not (Test-Path -LiteralPath $resultSource -PathType Leaf)) { throw "Reference SurfaceResponse result missing: $resultSource" }
+$resultTargetDir = Join-Path $target "SurfaceResponseResults"
+New-Item -ItemType Directory -Path $resultTargetDir -Force | Out-Null
+$resultTarget = Join-Path $resultTargetDir "SR-001-C0-G0.json"
+Copy-Item -LiteralPath $resultSource -Destination $resultTarget -Force
+if ((Get-FileHash -LiteralPath $resultSource -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $resultTarget -Algorithm SHA256).Hash) {
+    throw "Reference SurfaceResponse SHA256 mismatch after deploy"
+}
+Write-Host "SANSA_O3DE_BUILD|OSR001_REFERENCE_SHA256|$((Get-FileHash -LiteralPath $resultTarget -Algorithm SHA256).Hash)"
 
 $gemFiles = @(Get-ChildItem -LiteralPath $gemTarget -File -Recurse)
 
