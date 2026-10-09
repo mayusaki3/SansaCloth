@@ -1385,6 +1385,15 @@ namespace SansaClothBackendProbeValidation
             AZ_Printf("SansaClothBackendProbe",
                 "SANSA_O3DE|OXC-009.CPP_PREACK_GATE|%s\\n",
                 matrixValid && numericValid && patternValid ? "PASS" : "FAIL");
+            if (matrixValid && numericValid && patternValid)
+            {
+                AZ_Printf("SansaClothBackendProbe",
+                    "SANSA_O3DE|OXC-009.CPP_MATRIX_RESULT|PASS\\n");
+                return AZStd::string::format("OXC-009|ACK|%d|147|240|147|%d|%d",
+                    matrixScenario, matrixAnchors, matrixContacts);
+            }
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|OXC-009.CPP_MATRIX_RESULT|FAIL\\n");
             return {};
         }
         int vertexCount = -1;
