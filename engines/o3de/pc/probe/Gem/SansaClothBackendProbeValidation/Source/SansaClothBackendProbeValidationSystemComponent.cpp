@@ -1155,6 +1155,95 @@ namespace SansaClothBackendProbeValidation
                 valid = valid && anchorCount == 14 && contactCount == 147;
             }
         }
+        // OXC-003: validate every mapped body vertex, normal, UV and triangle.
+        // Canonical Y/Z swap is applied once; triangle winding must be reversed.
+        bool bodyValid = valid;
+        if (bodyValid)
+        {
+            const auto& body = doc["body_surface"];
+            const auto& vertices = body["vertices"];
+            const auto& triangles = body["triangles"];
+            auto finite = [](const rapidjson::Value& v) -> bool
+            {
+                return v.IsNumber() && std::isfinite(v.GetDouble());
+            };
+            auto close = [](double a, double b) -> bool
+            {
+                return std::abs(a - b) <= 1.0e-6;
+            };
+            for (rapidjson::SizeType i = 0; i < vertices.Size() && bodyValid; ++i)
+            {
+                const auto& vertex = vertices[i];
+                if (!vertex.IsObject() || !vertex.HasMember("position_m")
+                    || !vertex.HasMember("normal") || !vertex.HasMember("uv"))
+                {
+                    bodyValid = false;
+                    break;
+                }
+                const auto& p = vertex["position_m"];
+                const auto& n = vertex["normal"];
+                const auto& uv = vertex["uv"];
+                if (!p.IsArray() || p.Size() != 3 || !n.IsArray() || n.Size() != 3
+                    || !uv.IsArray() || uv.Size() != 2)
+                {
+                    bodyValid = false;
+                    break;
+                }
+                for (rapidjson::SizeType j = 0; j < 3; ++j)
+                {
+                    bodyValid = bodyValid && finite(p[j]) && finite(n[j]);
+                }
+                for (rapidjson::SizeType j = 0; j < 2; ++j)
+                {
+                    bodyValid = bodyValid && finite(uv[j]);
+                }
+                if (!bodyValid)
+                {
+                    break;
+                }
+                const int row = static_cast<int>(i) / 21;
+                const int col = static_cast<int>(i) % 21;
+                const double x = -0.1 + static_cast<double>(col) * 0.01;
+                const double y = -0.05 + static_cast<double>(row) / 60.0;
+                // O3DE coordinate: (canonical X, canonical Z, canonical Y).
+                const double ox = p[0].GetDouble();
+                const double oy = p[2].GetDouble();
+                const double oz = p[1].GetDouble();
+                const double nx = n[0].GetDouble();
+                const double ny = n[2].GetDouble();
+                const double nz = n[1].GetDouble();
+                bodyValid = close(ox, x) && close(oy, y) && close(oz, 0.0)
+                    && close(nx, 0.0) && close(ny, 0.0) && close(nz, 1.0)
+                    && close(uv[0].GetDouble(), static_cast<double>(col) / 20.0)
+                    && close(uv[1].GetDouble(), static_cast<double>(row) / 6.0);
+            }
+            for (rapidjson::SizeType i = 0; i < triangles.Size() && bodyValid; ++i)
+            {
+                const auto& tri = triangles[i];
+                if (!tri.IsArray() || tri.Size() != 3 || !tri[0].IsUint()
+                    || !tri[1].IsUint() || !tri[2].IsUint())
+                {
+                    bodyValid = false;
+                    break;
+                }
+                const int row = static_cast<int>(i / 2) / 20;
+                const int col = static_cast<int>(i / 2) % 20;
+                const unsigned int v00 = static_cast<unsigned int>(row * 21 + col);
+                const unsigned int v01 = v00 + 21;
+                const unsigned int v11 = v01 + 1;
+                const unsigned int v10 = v00 + 1;
+                // Canonical triangle (a,b,c) maps to O3DE (a,c,b).
+                const unsigned int a = tri[0].GetUint();
+                const unsigned int b = tri[2].GetUint();
+                const unsigned int d = tri[1].GetUint();
+                bodyValid = (i % 2 == 0)
+                    ? (a == v00 && b == v11 && d == v01)
+                    : (a == v00 && b == v10 && d == v11);
+            }
+        }
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-003.CPP_RESULT|%s\\n", bodyValid ? "PASS" : "FAIL");
+        valid = valid && bodyValid;
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|%d\n", vertexCount);
         AZ_Printf("SansaClothBackendProbe",
