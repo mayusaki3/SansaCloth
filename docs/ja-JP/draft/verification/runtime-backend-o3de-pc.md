@@ -737,3 +737,12 @@ Probe sourceとdeploy scriptはSansaCloth repositoryをsource of truthとし、�
 - Validation Captureのproduction出力経路（BF-008では一時JSONL出力を検証対象とする）。
 
 > SansaCloth > docs > ja-JP > draft > verification > O3DEPC.RuntimeBackend
+
+### OXC-005 Editor Runtime実績（2026-10-09 10:53 JST）
+
+O3DE Project ManagerでビルドしたEditorの実行ログを確認。正常なSR-001-C0-G0入力で`OXC-005.CPP_ANCHOR_COUNT|14`、`OXC-005.CPP_CONTACT_INPUT_COUNT|147`、`OXC-005.CPP_CONTACT_ONLY_UNSUPPORTED_COUNT|133`、`OXC-005.CPP_RESULT|PASS`。OXC-003/004およびOXC-002の正常系もPASS。
+
+C++へ直接渡した2件の改変JSONについて、`OXC-005.ANCHOR_PATTERN|REJECTED`、`OXC-005.CONTACT_MISSING|REJECTED`、`OXC-005.NEGATIVE_RESULT|PASS`。負例でのC++ FAIL表示は期待した拒否。Contact-only unsupportedは入力の分類であり、solver Support成立を意味しない。
+
+**OXC-001～005 Runtime PASS、OXC-006～010 OPEN。**
+
