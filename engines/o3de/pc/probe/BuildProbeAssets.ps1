@@ -29,7 +29,8 @@ $requiredScripts = @(
     "sansacloth_handoff_string_probe.py",
     "sansacloth_fixture_cpp_handoff_probe.py",
     "sansacloth_surface_response_compare.py",
-    "sansacloth_osr001_probe.py"
+    "sansacloth_osr001_probe.py",
+    "sansacloth_osr006_contact_diagnostic.py"
 )
 foreach ($requiredScript in $requiredScripts) {
     if (-not (Test-Path -LiteralPath (Join-Path $source $requiredScript) -PathType Leaf)) {
