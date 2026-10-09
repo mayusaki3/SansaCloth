@@ -22,6 +22,16 @@ def stage_differences(expected, got):
         for axis, (a, b) in enumerate(zip(expected[field], got[field])):
             if a != b:
                 print(f"{prefix}STAGE|{field}|AXIS={axis}|REF_HEX={a.hex()}|ACT_HEX={b.hex()}|ULP={ulp_distance(a, b)}")
+    query = got.get("diagnostic_query")
+    if query is None:
+        print(f"{prefix}QUERY_INTERMEDIATES|UNAVAILABLE|REBUILD_O3DE_GEM")
+    else:
+        for field, value in query.items():
+            if isinstance(value, list):
+                encoded = ",".join(x.hex() for x in value)
+            else:
+                encoded = value.hex()
+            print(f"{prefix}QUERY_INTERMEDIATE|{field}|{encoded}")
     a, b = expected["separation_m"], got["separation_m"]
     print(f"{prefix}SEPARATION_HEX|REF={a.hex()}|ACT={b.hex()}|ULP={ulp_distance(a, b)}")
 
