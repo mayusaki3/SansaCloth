@@ -571,3 +571,31 @@ SANSA_O3DE|OXC-002.RESULT|PASS
 ~~~
 
 OXC-004 is **Runtime OPEN** until actual Editor evidence is reviewed.
+
+## Run OXC-005 Anchor/Contact input semantics
+
+Close Editor, pull and deploy the latest scripts, rebuild the Validation Gem
+(`Editor` target), and reopen Editor. In **Tools > Python Scripts** run
+`SansaCloth/sansacloth_fixture_cpp_handoff_probe.py`.
+
+OXC-005 checks all 147 CP input flags: 14 boundary anchors (strip orders
+0 and 20), 147 contact inputs, and 133 contact-only unsupported points.
+Contact input is **not** interpreted as solver Support output.
+Two negative mutations are sent directly to C++ (without importer prevalidation):
+an unexpected interior anchor and a missing contact input.
+
+Expected log excerpts:
+
+~~~text
+SANSA_O3DE|OXC-005.CPP_ANCHOR_COUNT|14
+SANSA_O3DE|OXC-005.CPP_CONTACT_INPUT_COUNT|147
+SANSA_O3DE|OXC-005.CPP_CONTACT_ONLY_UNSUPPORTED_COUNT|133
+SANSA_O3DE|OXC-005.CPP_RESULT|PASS
+SANSA_O3DE|OXC-005.ANCHOR_PATTERN|REJECTED
+SANSA_O3DE|OXC-005.CONTACT_MISSING|REJECTED
+SANSA_O3DE|OXC-005.NEGATIVE_RESULT|PASS
+SANSA_O3DE|OXC-002.RESULT|PASS
+~~~
+
+C++ `OXC-005.CPP_RESULT|FAIL` is expected for the two negative calls.
+OXC-005 remains **Runtime OPEN** pending actual Editor logs.
