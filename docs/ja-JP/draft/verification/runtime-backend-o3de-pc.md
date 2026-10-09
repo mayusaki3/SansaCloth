@@ -754,3 +754,9 @@ O3DE Project ManagerからビルドしたEditorで、SR-001-C0-G0の入力（wor
 C++境界に直接渡した負例12件（gravity非ゼロ/配列長/型/非有限、conformity非ゼロ/型、tolerance非ゼロ/負値/型、各入力の欠落3件）はすべて`REJECTED`、`OXC-006.NEGATIVE_RESULT|PASS`、最終`OXC-002.RESULT|PASS`。負例に伴うCPP_RESULT FAILは期待された拒否。
 
 **OXC-001～006 Runtime PASS、OXC-007～010 OPEN。**
+
+### OXC-007 Editor Runtime実績（2026-10-09 11:25 JST）
+
+O3DE Editorの実行ログで`OXC-007.INTERLEAVED_32|PASS`、`OXC-007.RECOVERY_8|PASS`、`OXC-007.RESULT|PASS`、最終`OXC-002.RESULT|PASS`を確認。Python→C++の正常・異常入力を32組交互実行し、Python一時文字列の破棄・GCを挟んだ後、不正入力→正常入力への復帰8回を検証した。C++側は呼び出しローカルRapidJSON Documentと値返却文字列を利用。これは動作上の独立性の検証であり、メモリリークや全種類のライフタイム問題の不存在を保証しない。
+
+**OXC-001～007 Runtime PASS、OXC-008～010 OPEN。**
