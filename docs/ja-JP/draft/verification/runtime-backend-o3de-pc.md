@@ -774,3 +774,9 @@ Editor実行ログで、全30件の`OXC-009.CASE`と各SHA-256を確認。`SR-00
 ### OXC-009 C++構造・入力ゲート Editor Runtime実績（2026-10-09 12:59 JST）
 
 Editor実行ログで非Baseline29件の`OXC-009.CPP_STRUCTURE|PASS`を確認。SR-001～002はAnchor14/Contact147、SR-003はAnchor7/Contact147、SR-004～005はAnchor14/Contact84。全30 Fixtureを走査し`OXC-009.FIXTURE_COUNT|30`、`OXC-009.CPP_ACCEPTED_COUNT|1`、`OXC-009.RESULT|OPEN`、`OXC-002.RESULT|PASS`。これは構造・入力ゲートの実機PASSであり、形状座標・法線・SurfaceReference等の数値照合が未完了のためOXC-009総合はOPENを維持する。C++診断ログのリテラル`\\n`は後続コミットで改行へ修正した（修正後のRuntimeは未検証）。
+
+### OXC-009 30-case C++正式ACK Editor Runtime実績（2026-10-09 13:34 JST）
+
+O3DE Project Managerで再ビルドしたEditor実機ログ（20261009-043440）を確認。30件すべてのFixtureについてC++側の事前判定および正式ACK照合が成立し、`OXC-009.FIXTURE_COUNT|30`、`OXC-009.CPP_ACCEPTED_COUNT|30`、`OXC-009.RESULT|PASS`を確認。非BaselineのC++ログは`OXC-009.CPP_PREACK_GATE|PASS`、`OXC-009.CPP_MATRIX_RESULT|PASS`。Baselineは既存のOXC-002 ACKを維持する。これは30ケースのFixture Exchange C++境界検証であり、実際の布Solverの出力一致やBackend間SurfaceResponse一致を示すものではない。
+
+**OXC-001～009 Runtime PASS、OXC-010 OPEN。**
