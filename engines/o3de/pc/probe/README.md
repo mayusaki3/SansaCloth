@@ -639,3 +639,23 @@ Run via **Tools > Python Scripts** after deploying the updated script.
 A Project Manager rebuild is unnecessary if only this Python script changed.
 This behavioral regression does not replace ASan/heap profiling or prove absence
 of all lifetime bugs. **OXC-007 Runtime OPEN** until an Editor log is reviewed.
+
+## OXC-008 C++ boundary negative regression
+
+The Python handoff probe now directly invokes the C++ bridge with 16
+malformed/boundary payloads (five malformed/root JSON inputs, two fixture
+identifiers, four body mutations and five control-point mutations). All must
+return an empty string. A final valid fixture must still return the standard
+ACK. Expected summary markers:
+
+~~~text
+SANSA_O3DE|OXC-008.REJECTED_CASE_COUNT|16
+SANSA_O3DE|OXC-008.RECOVERY|PASS
+SANSA_O3DE|OXC-008.RESULT|PASS
+SANSA_O3DE|OXC-002.RESULT|PASS
+~~~
+
+Run **Tools > Python Scripts > SansaCloth/sansacloth_fixture_cpp_handoff_probe.py**
+after pulling and deploying the updated script. No C++ rebuild is required
+for this Python-only addition. **OXC-008 Runtime OPEN** until Editor logs
+confirm all rejection and recovery markers.
