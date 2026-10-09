@@ -792,3 +792,37 @@ O3DE Editor実機ログ（20261009-045659）を確認。30件のFixtureを再度
 - `OXC-010.CASE_COUNT|30`、`OXC-010.PASS_COUNT|30`、`OXC-010.FAIL_COUNT|0`、`OXC-010.RESULT|PASS`。
 
 **OXC-001～010 Runtime PASS（Fixture Exchange / validation-only）。** この結果はC++ブリッジと証跡集計の実機検証であり、Solver計算結果やBackend間の物理応答一致の検証とは区別する。
+
+## 16. 次フェーズ案：O3DE Solver / Reference SurfaceResponse 比較（OSR）
+
+### 16.1 目的と境界
+
+OXC-001～010はFixture ExchangeとC++境界の検証であり、Solverによる変形・接触応答の一致を保証しない。本フェーズは、Referenceが定義するSurfaceResponseを同一入力条件で計算したO3DE Backendの出力と比較する。**Fixture入力のACKや事前計算済み期待値の再掲をSolver PASSとして扱わない。**
+
+実装開始前に、既存Rust ReferenceとSurfaceResponse schema、数値許容差、実行可能なSolver経路を調査し、検証対象・比較方法を確定する。未実装・未公開の計算APIはOPENとして扱う。O3DE C++ Probeの受理確認とSolver評価は独立させる。
+
+### 16.2 実装前テストケース（ドラフト）
+
+| ID | Gate | PASS条件 |
+|---|---|---|
+| OSR-001 | Reference discovery | Reference実行経路・SurfaceResponse出力形式・入力Fixture対応・実装versionを特定し、再現可能なコマンドまたはAPIを記録 |
+| OSR-002 | Solver discovery | O3DE側で**実計算**するSolver入口を特定し、Fixtureの受理専用ACKとは異なる計算結果を返す。入口が存在しなければOPEN |
+| OSR-003 | Identity/coordinate | StableId・DomainId・CP順序・canonical座標・単位・法線・gravityの対応を保持。Y/Z変換やwindingを二重適用しない |
+| OSR-004 | SR-001 baseline | SR-001-C0-G0のReferenceとO3DE出力を各StableIdで照合。比較対象の全数・差分最大値・許容差を記録 |
+| OSR-005 | Contact/Support semantics | Contact入力とSolverが決定したSupportを混同せず、Referenceの定義に従って分類と応答を比較 |
+| OSR-006 | Scenario extension | SR-002～005、C=0/0.5/1、G=0/1の30ケースについて、両実計算結果を照合。未対応ケースはOPENとして報告 |
+| OSR-007 | Negative/mismatch detection | 期待出力を意図的に改変すると比較GateがFAILする。Solverを呼ばずにACKのみ返す実装は拒否 |
+| OSR-008 | Aggregate/evidence | ケース別PASS/FAIL/OPEN、比較項目、最大絶対誤差・許容差、Fixture/Reference/BackendのversionとSHA-256を記録。未実行や未対応をPASSに数えない |
+
+### 16.3 比較の原則
+
+- Referenceの出力項目と計算定義を確認するまで、比較対象の変位・距離・力・状態値を推定しない。
+- 許容差はReferenceの数値精度・出力単位・アルゴリズムを調査してから固定する。便宜的な閾値でPASSさせない。
+- 同じStableIdの実計算結果を比較する。順序だけで対応付けない。
+- まずSR-001-C0-G0の最小ケースで実計算経路と比較器を確認し、その後30ケースへ拡張する。
+- C++の既存`ProbeFixtureJson`は入力検証専用のまま維持し、Solver出力を別APIまたは別の構造化結果として取得する。
+- PythonのみのReference比較器を先に作っても、それだけでO3DE SolverのRuntime PASSとは判定しない。
+
+### 16.4 判定と次の作業
+
+**OSR-001～008はすべてOPEN（未実装・未実機検証）。** 最初にRust Referenceの実装・テストと既存SurfaceResponse形式を調査し、OSR-001の具体的な実行方法とOSR-004の比較対象を確定する。次にOSR-002のO3DE Solver実装経路を決める。実機操作が必要になった段階でO3DE Editorの手順を案内する。
