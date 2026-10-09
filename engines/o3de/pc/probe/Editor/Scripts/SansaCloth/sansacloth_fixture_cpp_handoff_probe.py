@@ -46,6 +46,31 @@ try:
             raise ValueError(f"C++ accepted invalid OXC-005 {label}")
         print(f"{PREFIX}OXC-005.{label}|REJECTED")
     print(f"{PREFIX}OXC-005.NEGATIVE_RESULT|PASS")
+    # OXC-006: send corrupted input parameters directly to C++.
+    for label, field, replacement in (
+        ("GRAVITY_NONZERO", "world_gravity_m_per_s2", [0.0, -9.81, 0.0]),
+        ("GRAVITY_LENGTH", "world_gravity_m_per_s2", [0.0, 0.0]),
+        ("GRAVITY_TYPE", "world_gravity_m_per_s2", [0.0, "bad", 0.0]),
+        ("CONFORMITY_NONZERO", "conformity", 0.1),
+        ("CONFORMITY_TYPE", "conformity", "bad"),
+        ("TOLERANCE_NONZERO", "collision_tolerance_m", 0.001),
+        ("TOLERANCE_NEGATIVE", "collision_tolerance_m", -0.001),
+        ("TOLERANCE_TYPE", "collision_tolerance_m", "bad"),
+        ("GRAVITY_NONFINITE", "world_gravity_m_per_s2", [0.0, 1e309, 0.0]),
+    ):
+        invalid = json.loads(source)
+        invalid["inputs"][field] = replacement
+        if fn(json.dumps(invalid, ensure_ascii=False)) != "":
+            raise ValueError(f"C++ accepted invalid OXC-006 {label}")
+        print(f"{PREFIX}OXC-006.{label}|REJECTED")
+    for field in ("world_gravity_m_per_s2", "conformity", "collision_tolerance_m"):
+        invalid = json.loads(source)
+        del invalid["inputs"][field]
+        if fn(json.dumps(invalid, ensure_ascii=False)) != "":
+            raise ValueError(f"C++ accepted missing OXC-006 {field}")
+        print(f"{PREFIX}OXC-006.MISSING_{field.upper()}|REJECTED")
+    print(f"{PREFIX}OXC-006.NEGATIVE_RESULT|PASS")
+
 
     print(f"{PREFIX}OXC-002.RESULT|PASS")
 except Exception as exc:
