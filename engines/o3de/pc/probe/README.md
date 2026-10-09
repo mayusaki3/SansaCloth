@@ -599,3 +599,23 @@ SANSA_O3DE|OXC-002.RESULT|PASS
 
 C++ `OXC-005.CPP_RESULT|FAIL` is expected for the two negative calls.
 OXC-005 remains **Runtime OPEN** pending actual Editor logs.
+
+## Run OXC-006 input parameter validation
+
+Build the project using **O3DE Project Manager** (no shell CMake needed).
+After pulling and deploying the latest scripts with `BuildProbeAssets.ps1`,
+close/rebuild/reopen Editor. Select **Tools > Python Scripts** and run
+`SansaCloth/sansacloth_fixture_cpp_handoff_probe.py`.
+
+OXC-006 checks zero gravity (3 components in m/s²), zero conformity and
+zero collision tolerance (meters). Twelve direct C++ negative calls test
+nonzero, negative, wrong-length, wrong-type, nonfinite and missing inputs.
+Expected final markers:
+
+~~~text
+SANSA_O3DE|OXC-006.CPP_RESULT|PASS
+SANSA_O3DE|OXC-006.NEGATIVE_RESULT|PASS
+SANSA_O3DE|OXC-002.RESULT|PASS
+~~~
+
+OXC-006 is **Runtime OPEN** until actual Editor log evidence is reviewed.
