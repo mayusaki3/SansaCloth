@@ -1260,6 +1260,25 @@ namespace SansaClothBackendProbeValidation
                     const double lengthSq = normal[0].GetDouble() * normal[0].GetDouble()
                         + normal[1].GetDouble() * normal[1].GetDouble()
                         + normal[2].GetDouble() * normal[2].GetDouble();
+                    // Scenario reference shape: a cosine bump centered on
+                    // strip column 10. The cloth remains on its base plane.
+                    const unsigned col = static_cast<unsigned>(i % 21);
+                    const unsigned row = static_cast<unsigned>(i / 21);
+                    const double lateral = -0.1 + static_cast<double>(col) * 0.01;
+                    const double longitudinal = -0.05 + static_cast<double>(row) / 60.0;
+                    const double bump = (col >= 6 && col <= 14)
+                        ? 0.5 * (1.0 + std::cos(3.14159265358979323846
+                            * (static_cast<double>(col) - 10.0) / 5.0)) : 0.0;
+                    const double amplitude = matrixScenario == 2 ? 0.03
+                        : (matrixScenario == 3 ? 0.03
+                        : (matrixScenario == 4 ? -0.02
+                        : (matrixScenario == 5 ? -0.05 : 0.0)));
+                    const double expectedX = matrixScenario == 3 ? amplitude * bump : lateral;
+                    const double expectedY = matrixScenario == 3 ? -lateral : amplitude * bump;
+                    numericValid = numericValid
+                        && std::abs(pos[0].GetDouble() - expectedX) < 1.0e-6
+                        && std::abs(pos[1].GetDouble() - expectedY) < 1.0e-6
+                        && std::abs(pos[2].GetDouble() - longitudinal) < 1.0e-6;
                     numericValid = std::abs(lengthSq - 1.0) < 1.0e-5
                         && std::abs(uv[0].GetDouble() - static_cast<double>(i % 21) / 20.0) < 1.0e-6
                         && std::abs(uv[1].GetDouble() - static_cast<double>(i / 21) / 6.0) < 1.0e-6;
