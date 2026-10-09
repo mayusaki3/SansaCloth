@@ -1321,6 +1321,57 @@ namespace SansaClothBackendProbeValidation
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-004.CPP_RESULT|%s\n", cpValid ? "PASS" : "FAIL");
         valid = valid && cpValid;
+        // OXC-005: Anchor and Contact are independent input flags.
+        // Contact-only points are unsupported here: no solver Support is inferred.
+        bool semanticsValid = valid;
+        int contactOnlyUnsupported = 0;
+        int semanticAnchors = 0;
+        int semanticContacts = 0;
+        if (semanticsValid)
+        {
+            const auto& points = doc["cloth"]["control_points"];
+            for (const auto& point : points.GetArray())
+            {
+                if (!point.IsObject() || !point.HasMember("stable_id")
+                    || !point["stable_id"].IsUint() || !point.HasMember("anchor")
+                    || !point["anchor"].IsBool() || !point.HasMember("contact")
+                    || !point["contact"].IsBool())
+                {
+                    semanticsValid = false;
+                    break;
+                }
+                const unsigned int id = point["stable_id"].GetUint();
+                if (id >= 147)
+                {
+                    semanticsValid = false;
+                    break;
+                }
+                const bool expectedAnchor = (id % 21 == 0 || id % 21 == 20);
+                const bool anchor = point["anchor"].GetBool();
+                const bool contact = point["contact"].GetBool();
+                if (anchor != expectedAnchor || !contact)
+                {
+                    semanticsValid = false;
+                    break;
+                }
+                semanticAnchors += anchor ? 1 : 0;
+                semanticContacts += contact ? 1 : 0;
+                // Unsupported is a classification of contact-only input,
+                // not a claim about a computed contact/Support output.
+                contactOnlyUnsupported += (contact && !anchor) ? 1 : 0;
+            }
+            semanticsValid = semanticsValid && semanticAnchors == 14
+                && semanticContacts == 147 && contactOnlyUnsupported == 133;
+        }
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-005.CPP_ANCHOR_COUNT|%d\n", semanticAnchors);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-005.CPP_CONTACT_INPUT_COUNT|%d\n", semanticContacts);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-005.CPP_CONTACT_ONLY_UNSUPPORTED_COUNT|%d\n", contactOnlyUnsupported);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-005.CPP_RESULT|%s\n", semanticsValid ? "PASS" : "FAIL");
+        valid = valid && semanticsValid;
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|%d\n", vertexCount);
         AZ_Printf("SansaClothBackendProbe",
