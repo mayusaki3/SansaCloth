@@ -147,6 +147,39 @@ try:
     print(f"{PREFIX}OXC-008.RECOVERY|PASS")
     print(f"{PREFIX}OXC-008.RESULT|PASS")
 
+    # OXC-009 discovery: all 30 committed fixture files must be present.
+    # The current C++ bridge is SR-001-C0-G0-specific. Report OPEN rather
+    # than claiming a 30-case PASS until the C++ geometry/inputs are generalized.
+    fixture_dir = path.parent
+    matrix_ids = [
+        f"SR-{scenario:03d}-C{conformity}-G{gravity}"
+        for scenario in range(1, 6)
+        for conformity in ("0", "05", "1")
+        for gravity in (0, 1)
+    ]
+    if len(matrix_ids) != 30 or len(set(matrix_ids)) != 30:
+        raise ValueError("OXC-009 expected exactly 30 unique case IDs")
+    cpp_accepted = 0
+    for case_id in matrix_ids:
+        case_path = fixture_dir / f"{case_id}.json"
+        case_source = case_path.read_text(encoding="utf-8")
+        case_doc = importer.parse_json(case_source)
+        if case_doc.get("case_id") != case_id:
+            raise ValueError(f"OXC-009 fixture ID mismatch: {case_id}")
+        digest = hashlib.sha256(case_source.encode("utf-8")).hexdigest()
+        response = fn(case_source)
+        if case_id == "SR-001-C0-G0":
+            if response != expected:
+                raise ValueError("OXC-009 SR-001 baseline ACK changed")
+        elif response != "":
+            # Never mistake a nonempty, unverified ACK for semantic PASS.
+            raise ValueError(f"OXC-009 unexpected unverified ACK for {case_id}: {response!r}")
+        cpp_accepted += bool(response)
+        print(f"{PREFIX}OXC-009.CASE|{case_id}|SHA256={digest}|CPP={'BASELINE_PASS' if response else 'OPEN'}")
+    print(f"{PREFIX}OXC-009.FIXTURE_COUNT|{len(matrix_ids)}")
+    print(f"{PREFIX}OXC-009.CPP_ACCEPTED_COUNT|{cpp_accepted}")
+    print(f"{PREFIX}OXC-009.RESULT|OPEN")
+
     print(f"{PREFIX}OXC-002.RESULT|PASS")
 except Exception as exc:
     print(f"{PREFIX}OXC-002.RESULT|FAIL|{type(exc).__name__}: {exc}")
