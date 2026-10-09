@@ -1143,7 +1143,7 @@ namespace SansaClothBackendProbeValidation
             }
         }
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-009.CPP_MATRIX_ID|SCENARIO=%d|C=%.1f|G=%d\\n",
+            "SANSA_O3DE|OXC-009.CPP_MATRIX_ID|SCENARIO=%d|C=%.1f|G=%d\n",
             matrixScenario, matrixConformity, matrixGravity);
         // OXC-009 phase 2: independent non-baseline matrix structural gate.
         // No ACK is issued until scenario-specific numeric geometry checks are ready.
@@ -1223,7 +1223,7 @@ namespace SansaClothBackendProbeValidation
                 }
             }
             AZ_Printf("SansaClothBackendProbe",
-                "SANSA_O3DE|OXC-009.CPP_STRUCTURE|%s|ANCHORS=%d|CONTACTS=%d\\n",
+                "SANSA_O3DE|OXC-009.CPP_STRUCTURE|%s|ANCHORS=%d|CONTACTS=%d\n",
                 matrixValid ? "PASS" : "FAIL", matrixAnchors, matrixContacts);
             return {};
         }
