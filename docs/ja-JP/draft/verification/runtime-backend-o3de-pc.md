@@ -766,3 +766,7 @@ O3DE Editorの実行ログで`OXC-007.INTERLEAVED_32|PASS`、`OXC-007.RECOVERY_8
 O3DE Editor実機ログで、C++境界に直接渡した異常入力16件（不正JSON/ルート型5、Fixture識別2、Body4、Control Point5）がすべて`REJECTED`。最終`OXC-008.REJECTED_CASE_COUNT|16`、`OXC-008.RECOVERY|PASS`、`OXC-008.RESULT|PASS`、`OXC-002.RESULT|PASS`を確認。異常入力に対するC++側FAILは期待された拒否である。
 
 **OXC-001～008 Runtime PASS、OXC-009～010 OPEN。**
+
+### OXC-009 30-case discovery Editor Runtime実績（2026-10-09）
+
+Editor実行ログで、全30件の`OXC-009.CASE`と各SHA-256を確認。`SR-001-C0-G0`のみ`CPP=BASELINE_PASS`、他29件は`CPP=OPEN`。集計は`OXC-009.FIXTURE_COUNT|30`、`OXC-009.CPP_ACCEPTED_COUNT|1`、`OXC-009.RESULT|OPEN`、最終`OXC-002.RESULT|PASS`。現時点ではC++ブリッジが単一ケース専用のため、これは診断の期待結果であり30ケースRuntime PASSを意味しない。次段階はC++のgeometry/CP/inputsのScenario対応と全30件の独立照合。
