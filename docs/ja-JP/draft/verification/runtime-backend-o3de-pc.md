@@ -858,3 +858,23 @@ SurfaceQueryは`SurfaceReference`のUVを使いBody triangle上でbarycentric補
 比較する`surface-response-result/0`のCPフィールドは`stable_id`、`support`、`bridge_position_m`、`gravity_position_m`、`conformity_position_m`、`collision_position_m`、`final_position_m`、`surface_position_m`、`surface_normal`、`separation_m`、`contact`。出力はcanonical座標・m単位を契約とし、O3DE変換を重複させない。
 
 OSR-001は実装・成果物発見済み／Runtime未検証、OSR-002～008はOPEN。C++新APIの追加・ビルド前にRust演算順序と数値許容差を確定する。
+
+### 16.7 Reference演算契約の確定（2026-10-09）
+
+`reference/crates/sansacloth-reference/src/lib.rs`の`solve_with_debug`と`export_surface_response_result_matrix.rs`の`solve_exchange`を確認。OSR実装の順序と条件を次のように固定する。
+
+1. **Strip生成**：`strip_id`でグループ化し、各stripを`strip_order`で昇順に並べる。各21点を独立計算し、結果を`stable_id`で再結合する。SR-003のみ`OneEdge`、それ以外は`BothEdges`。
+2. **Support**：`anchor=true`のみ`Anchor`。Contact入力だけではSupportに昇格させない。
+3. **Bridge**：strip両端がSupportされる場合、両端を保持し内部点を`p0.lerp(p1,index/(count-1))`で線形補間。片端のみSupportなら初期位置を保持。
+4. **Gravity**：ゼロベクトルなら変位なし。非ゼロ時は重力方向のみ正規化し、非Anchorに`characteristic_length_m * quasi_static_gravity_scale * weight`を加算。BothEdgesのweight=`4*t*(1-t)`、OneEdge=`t`。
+5. **SurfaceQuery after Gravity**：UV三角形のbarycentric補間でsurface positionを求め、三角形の幾何法線と現在位置との差から符号付きseparationを算出。
+6. **Conformity**：非Anchorかつsupported_strip=true、separationが有限かつ非負の場合のみ適用。係数は`conformity * clamp(1 - separation/conformity_reach_m, 0, 1)`。reach=0またはconformity=0なら無変更。
+7. **SurfaceQuery after Conformity**：新しい位置でseparationを再計算する。
+8. **Collision**：separationがcollision_tolerance未満なら外向き単位法線に沿って`collision_tolerance - separation`だけ補正。
+9. **Final SurfaceQuery**：Collision後の位置でsurface position・normal・separationを再評価し、`contact = separation <= collision_tolerance_m`で結果を作る。
+
+Basic Profileは`characteristic_length_m=0.1`、`quasi_static_gravity_scale=0.1`、`conformity_reach_m=0.02`、`collision_tolerance_m`はFixture入力から取得する。全演算はReference側で`f64`/`glam::DVec3`を使用。O3DE側の`AZ::Vector3`（float）へ早期変換すると差が生じ得るため、Solver演算はdouble精度で保持する設計を優先する。
+
+**重要**：UV barycentric解決の三角形選択・頂点順序・法線向きもReferenceに合わせる。差分比較の閾値はO3DE実装精度を確認してから明示的に確定し、Gateに適用する。既存Fixture ACKはOSRの計算証跡ではない。
+
+**次の実装対象**：`ProbeSurfaceResponseJson`という独立C++ BehaviorContext API（validation-only）と、Reference JSONを読み込むPython比較プローブ。まずSR-001-C0-G0の7 strip/147点を実計算し、Referenceとの差を記録する。OSR-002～008のRuntime判定は引き続きOPEN。
