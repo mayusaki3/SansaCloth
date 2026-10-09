@@ -34,7 +34,27 @@ try:
             raise RuntimeError(f"{case}: C++ SurfaceResponse returned empty result")
         actual = json.loads(output)
         tolerance = 1.0e-9
-        maxima = compare(expected, actual, absolute_tolerance_m=tolerance, normal_tolerance=tolerance)
+        try:
+            maxima = compare(expected, actual, absolute_tolerance_m=tolerance, normal_tolerance=tolerance)
+        except ValueError as error:
+            expected_points = {p["stable_id"]: p for p in expected["control_points"]}
+            actual_points = {p["stable_id"]: p for p in actual["control_points"]}
+            for stable_id in sorted(expected_points):
+                ref_point = expected_points[stable_id]
+                got_point = actual_points.get(stable_id)
+                if got_point is None or ref_point["contact"] != got_point["contact"]:
+                    print(f"{PREFIX}DIAGNOSTIC.CASE_ID|{case}")
+                    print(f"{PREFIX}DIAGNOSTIC.STABLE_ID|{stable_id}")
+                    print(f"{PREFIX}DIAGNOSTIC.REFERENCE_CONTACT|{ref_point['contact']}")
+                    print(f"{PREFIX}DIAGNOSTIC.ACTUAL_CONTACT|{got_point['contact'] if got_point else 'MISSING'}")
+                    print(f"{PREFIX}DIAGNOSTIC.REFERENCE_SEPARATION|{ref_point['separation_m']:.17g}")
+                    if got_point:
+                        print(f"{PREFIX}DIAGNOSTIC.ACTUAL_SEPARATION|{got_point['separation_m']:.17g}")
+                        for field in ("collision_position_m", "surface_position_m", "surface_normal"):
+                            print(f"{PREFIX}DIAGNOSTIC.REFERENCE_{field}|{ref_point[field]}")
+                            print(f"{PREFIX}DIAGNOSTIC.ACTUAL_{field}|{got_point[field]}")
+                    break
+            raise
         print(f"{PREFIX}CASE_ID|{case}")
         print(f"{PREFIX}FIXTURE_SHA256|{hashlib.sha256(source.encode('utf-8')).hexdigest()}")
         print(f"{PREFIX}REFERENCE_SHA256|{hashlib.sha256(expected_text.encode('utf-8')).hexdigest()}")
