@@ -34,6 +34,19 @@ try:
     if fn('{"format":"invalid"}') != "":
         raise ValueError("C++ accepted invalid fixture JSON")
     print(f"{PREFIX}OXC-002.INVALID_REJECTED|PASS")
+    # OXC-005 negative cases cross the C++ boundary directly; the Python
+    # importer is deliberately not called for these mutated payloads.
+    for label, point_id, field, replacement in (
+        ("ANCHOR_PATTERN", 1, "anchor", True),
+        ("CONTACT_MISSING", 1, "contact", False),
+    ):
+        invalid = json.loads(source)
+        invalid["cloth"]["control_points"][point_id][field] = replacement
+        if fn(json.dumps(invalid, ensure_ascii=False)) != "":
+            raise ValueError(f"C++ accepted invalid OXC-005 {label}")
+        print(f"{PREFIX}OXC-005.{label}|REJECTED")
+    print(f"{PREFIX}OXC-005.NEGATIVE_RESULT|PASS")
+
     print(f"{PREFIX}OXC-002.RESULT|PASS")
 except Exception as exc:
     print(f"{PREFIX}OXC-002.RESULT|FAIL|{type(exc).__name__}: {exc}")
