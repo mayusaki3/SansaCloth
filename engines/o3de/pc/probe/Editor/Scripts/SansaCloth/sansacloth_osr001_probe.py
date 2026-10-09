@@ -1,10 +1,20 @@
 """OSR-004: compare independent O3DE C++ solver against committed Rust result."""
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 
 import azlmbr.sansacloth_probe as probe
-from sansacloth_surface_response_compare import compare
+
+# runpy.run_path does not add the script directory to sys.path.
+# Load the sibling comparator by absolute path, without changing global imports.
+_comparator_path = Path(__file__).resolve().parent / "sansacloth_surface_response_compare.py"
+_spec = importlib.util.spec_from_file_location("sansacloth_surface_response_compare", _comparator_path)
+if _spec is None or _spec.loader is None:
+    raise ImportError(f"Cannot load OSR comparator: {_comparator_path}")
+_comparator = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_comparator)
+compare = _comparator.compare
 
 PREFIX = "SANSA_O3DE|OSR-004."
 root = Path(__file__).resolve().parent
