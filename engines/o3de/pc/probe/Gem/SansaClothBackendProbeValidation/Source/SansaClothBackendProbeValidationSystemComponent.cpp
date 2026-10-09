@@ -1930,7 +1930,7 @@ namespace SansaClothBackendProbeValidation
                 vec(item["position_m"]),ref["u"].GetDouble(),ref["v"].GetDouble(),
                 item["anchor"].GetBool(),item["contact"].GetBool()};
         }
-        struct Q { V surface,normal; double separation; };
+        struct Q { V surface,normal; double separation; V rawNormal,delta; double normalLength,weights[3],dotTerms[3]; };
         auto query = [&](const CP& point,V position,Q& out) -> bool {
             for (const auto& tri : triangles.GetArray())
             {
@@ -1953,10 +1953,14 @@ namespace SansaClothBackendProbeValidation
                 if (std::abs(denom)<=1e-15) continue;
                 double w1=(px*by-py*bx)/denom,w2=(ax*py-ay*px)/denom,w0=1-w1-w2;
                 if (w0 < -1e-12 || w1 < -1e-12 || w2 < -1e-12) continue;
-                V normal=(xyz[1]-xyz[0]).cross(xyz[2]-xyz[0]).normalized();
+                V rawNormal=(xyz[1]-xyz[0]).cross(xyz[2]-xyz[0]);
+                const double normalLength=std::sqrt(rawNormal.dot(rawNormal));
+                V normal=rawNormal.normalized();
                 if (normal.dot(normal)==0) return false;
                 V surface=xyz[0]*w0+xyz[1]*w1+xyz[2]*w2;
-                out={surface,normal,(position-surface).dot(normal)};
+                V delta=position-surface;
+                out={surface,normal,delta.dot(normal),rawNormal,delta,normalLength,
+                    {w0,w1,w2},{delta.x*normal.x,delta.y*normal.y,delta.z*normal.z}};
                 return true;
             }
             return false;
@@ -2018,6 +2022,17 @@ namespace SansaClothBackendProbeValidation
             w.Key("surface_normal");writeVec(final.normal);
             w.Key("separation_m");w.Double(final.separation);
             w.Key("contact");w.Bool(contact);
+            w.Key("diagnostic_query");w.StartObject();
+            w.Key("barycentric_weights");w.StartArray();
+            for (double value : final.weights) w.Double(value);
+            w.EndArray();
+            w.Key("raw_normal");writeVec(final.rawNormal);
+            w.Key("normal_length");w.Double(final.normalLength);
+            w.Key("delta_position_m");writeVec(final.delta);
+            w.Key("separation_dot_terms");w.StartArray();
+            for (double value : final.dotTerms) w.Double(value);
+            w.EndArray();
+            w.EndObject();
             w.EndObject();
         }
         w.EndArray();
