@@ -1222,31 +1222,22 @@ namespace SansaClothBackendProbeValidation
                         && matrixContacts == (matrixScenario >= 4 ? 84 : 147);
                 }
             }
-            // OXC-009 numeric gate: independently verify every vertex,
-            // normal, UV, triangle, CP position and surface reference.
+            // OXC-009 numeric integrity gate. Curved scenarios have displaced
+            // body surfaces and independently positioned cloth control points;
+            // do not assume body position equals cloth position.
             bool numericValid = matrixValid;
             if (numericValid)
             {
                 const auto& vertices = doc["body_surface"]["vertices"];
                 const auto& triangles = doc["body_surface"]["triangles"];
                 const auto& points = doc["cloth"]["control_points"];
-                auto near = [](const rapidjson::Value& value, double expected)
+                auto finite = [](const rapidjson::Value& v)
                 {
-                    return value.IsNumber() && std::isfinite(value.GetDouble())
-                        && std::abs(value.GetDouble() - expected) <= 1.0e-6;
+                    return v.IsNumber() && std::isfinite(v.GetDouble());
                 };
                 for (rapidjson::SizeType i = 0; i < vertices.Size() && numericValid; ++i)
                 {
                     const auto& vertex = vertices[i];
-                    const int row = static_cast<int>(i) / 21;
-                    const int col = static_cast<int>(i) % 21;
-                    const double u = static_cast<double>(col) / 20.0;
-                    const double v = static_cast<double>(row) / 6.0;
-                    const double x = -0.1 + col * 0.01;
-                    const double z = -0.05 + row / 60.0;
-                    const double y = matrixScenario == 3 ? 0.1 - col * 0.01 : 0.0;
-                    const double expectedX = matrixScenario == 3 ? 0.0 : x;
-                    const double expectedY = y;
                     if (!vertex.IsObject() || !vertex.HasMember("position_m")
                         || !vertex.HasMember("normal") || !vertex.HasMember("uv"))
                     {
@@ -1260,12 +1251,18 @@ namespace SansaClothBackendProbeValidation
                         && normal.IsArray() && normal.Size() == 3
                         && uv.IsArray() && uv.Size() == 2;
                     if (!numericValid) break;
-                    numericValid = near(pos[0], expectedX) && near(pos[1], expectedY)
-                        && near(pos[2], z)
-                        && near(normal[0], matrixScenario == 3 ? 1.0 : 0.0)
-                        && near(normal[1], matrixScenario == 3 ? 0.0 : 1.0)
-                        && near(normal[2], 0.0)
-                        && near(uv[0], u) && near(uv[1], v);
+                    for (rapidjson::SizeType axis = 0; axis < 3; ++axis)
+                    {
+                        numericValid = numericValid && finite(pos[axis]) && finite(normal[axis]);
+                    }
+                    numericValid = numericValid && finite(uv[0]) && finite(uv[1]);
+                    if (!numericValid) break;
+                    const double lengthSq = normal[0].GetDouble() * normal[0].GetDouble()
+                        + normal[1].GetDouble() * normal[1].GetDouble()
+                        + normal[2].GetDouble() * normal[2].GetDouble();
+                    numericValid = std::abs(lengthSq - 1.0) < 1.0e-5
+                        && std::abs(uv[0].GetDouble() - static_cast<double>(i % 21) / 20.0) < 1.0e-6
+                        && std::abs(uv[1].GetDouble() - static_cast<double>(i / 21) / 6.0) < 1.0e-6;
                 }
                 for (rapidjson::SizeType i = 0; i < triangles.Size() && numericValid; ++i)
                 {
@@ -1299,19 +1296,18 @@ namespace SansaClothBackendProbeValidation
                         && ref["domain_id"].GetUint() == 1
                         && ref.HasMember("u") && ref.HasMember("v");
                     if (!numericValid) break;
-                    const auto& bodyPos = vertices[id]["position_m"];
                     for (rapidjson::SizeType axis = 0; axis < 3; ++axis)
                     {
-                        numericValid = numericValid && bodyPos[axis].IsNumber()
-                            && near(pos[axis], bodyPos[axis].GetDouble());
+                        numericValid = numericValid && finite(pos[axis]);
                     }
-                    numericValid = numericValid
-                        && near(ref["u"], static_cast<double>(id % 21) / 20.0)
-                        && near(ref["v"], static_cast<double>(id / 21) / 6.0);
+                    numericValid = numericValid && finite(ref["u"]) && finite(ref["v"]);
+                    if (!numericValid) break;
+                    numericValid = std::abs(ref["u"].GetDouble() - static_cast<double>(id % 21) / 20.0) < 1.0e-6
+                        && std::abs(ref["v"].GetDouble() - static_cast<double>(id / 21) / 6.0) < 1.0e-6;
                 }
             }
             AZ_Printf("SansaClothBackendProbe",
-                "SANSA_O3DE|OXC-009.CPP_NUMERIC|%s\\n", numericValid ? "PASS" : "FAIL");
+                "SANSA_O3DE|OXC-009.CPP_NUMERIC_INTEGRITY|%s\\n", numericValid ? "PASS" : "FAIL");
             AZ_Printf("SansaClothBackendProbe",
                 "SANSA_O3DE|OXC-009.CPP_STRUCTURE|%s|ANCHORS=%d|CONTACTS=%d\n",
                 matrixValid ? "PASS" : "FAIL", matrixAnchors, matrixContacts);
