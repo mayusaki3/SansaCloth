@@ -1856,12 +1856,13 @@ namespace SansaClothBackendProbeValidation
             V operator+(V b) const { return {x+b.x,y+b.y,z+b.z}; }
             V operator-(V b) const { return {x-b.x,y-b.y,z-b.z}; }
             V operator*(double s) const { return {x*s,y*s,z*s}; }
+            V operator/(double s) const { return {x/s,y/s,z/s}; }
             double dot(V b) const { return x*b.x+y*b.y+z*b.z; }
             V cross(V b) const { return {y*b.z-z*b.y,z*b.x-x*b.z,x*b.y-y*b.x}; }
             V normalized() const
             {
                 const double n = std::sqrt(dot(*this));
-                return n > 0 && std::isfinite(n) ? (*this)*(1.0/n) : V{0,0,0};
+                return n > 0 && std::isfinite(n) ? (*this)/n : V{0,0,0};
             }
         };
         auto vec = [](const rapidjson::Value& v) -> V {
@@ -2000,7 +2001,7 @@ namespace SansaClothBackendProbeValidation
             if (!query(p,conform,afterConformity)) return {};
             V collision=conform;
             if (afterConformity.separation<tolerance)
-                collision=collision+afterConformity.normal*(tolerance-afterConformity.separation);
+                collision=collision+afterConformity.normal.normalized()*(tolerance-afterConformity.separation);
             Q final{};
             if (!query(p,collision,final)) return {};
             bool contact=final.separation<=tolerance;
