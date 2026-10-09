@@ -770,3 +770,7 @@ O3DE Editor実機ログで、C++境界に直接渡した異常入力16件（不�
 ### OXC-009 30-case discovery Editor Runtime実績（2026-10-09）
 
 Editor実行ログで、全30件の`OXC-009.CASE`と各SHA-256を確認。`SR-001-C0-G0`のみ`CPP=BASELINE_PASS`、他29件は`CPP=OPEN`。集計は`OXC-009.FIXTURE_COUNT|30`、`OXC-009.CPP_ACCEPTED_COUNT|1`、`OXC-009.RESULT|OPEN`、最終`OXC-002.RESULT|PASS`。現時点ではC++ブリッジが単一ケース専用のため、これは診断の期待結果であり30ケースRuntime PASSを意味しない。次段階はC++のgeometry/CP/inputsのScenario対応と全30件の独立照合。
+
+### OXC-009 C++構造・入力ゲート Editor Runtime実績（2026-10-09 12:59 JST）
+
+Editor実行ログで非Baseline29件の`OXC-009.CPP_STRUCTURE|PASS`を確認。SR-001～002はAnchor14/Contact147、SR-003はAnchor7/Contact147、SR-004～005はAnchor14/Contact84。全30 Fixtureを走査し`OXC-009.FIXTURE_COUNT|30`、`OXC-009.CPP_ACCEPTED_COUNT|1`、`OXC-009.RESULT|OPEN`、`OXC-002.RESULT|PASS`。これは構造・入力ゲートの実機PASSであり、形状座標・法線・SurfaceReference等の数値照合が未完了のためOXC-009総合はOPENを維持する。C++診断ログのリテラル`\\n`は後続コミットで改行へ修正した（修正後のRuntimeは未検証）。
