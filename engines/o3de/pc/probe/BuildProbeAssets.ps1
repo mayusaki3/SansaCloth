@@ -87,16 +87,22 @@ foreach ($caseId in $expectedCaseIds) {
     Write-Host "SANSA_O3DE_BUILD|MATRIX_CASE|$caseId|$targetHash|PASS"
 }
 
-$resultSource = [System.IO.Path]::GetFullPath((Join-Path $probeRoot "..\..\..\..\reference\validation\surface-response-result\basic-v1\SR-001-C0-G0.json"))
-if (-not (Test-Path -LiteralPath $resultSource -PathType Leaf)) { throw "Reference SurfaceResponse result missing: $resultSource" }
+$resultSourceDir = [System.IO.Path]::GetFullPath((Join-Path $probeRoot "..\..\..\..\reference\validation\surface-response-result\basic-v1"))
 $resultTargetDir = Join-Path $target "SurfaceResponseResults"
 New-Item -ItemType Directory -Path $resultTargetDir -Force | Out-Null
-$resultTarget = Join-Path $resultTargetDir "SR-001-C0-G0.json"
-Copy-Item -LiteralPath $resultSource -Destination $resultTarget -Force
-if ((Get-FileHash -LiteralPath $resultSource -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $resultTarget -Algorithm SHA256).Hash) {
-    throw "Reference SurfaceResponse SHA256 mismatch after deploy"
+foreach ($conformity in @("0", "05", "1")) {
+    foreach ($gravity in @("0", "1")) {
+        $caseId = "SR-001-C$conformity-G$gravity"
+        $resultSource = Join-Path $resultSourceDir "$caseId.json"
+        $resultTarget = Join-Path $resultTargetDir "$caseId.json"
+        if (-not (Test-Path -LiteralPath $resultSource -PathType Leaf)) { throw "Reference SurfaceResponse missing: $caseId" }
+        Copy-Item -LiteralPath $resultSource -Destination $resultTarget -Force
+        $sourceHash = (Get-FileHash -LiteralPath $resultSource -Algorithm SHA256).Hash
+        $targetHash = (Get-FileHash -LiteralPath $resultTarget -Algorithm SHA256).Hash
+        if ($sourceHash -ne $targetHash) { throw "Reference SurfaceResponse SHA256 mismatch: $caseId" }
+        Write-Host "SANSA_O3DE_BUILD|OSR_REFERENCE|$caseId|$targetHash|PASS"
+    }
 }
-Write-Host "SANSA_O3DE_BUILD|OSR001_REFERENCE_SHA256|$((Get-FileHash -LiteralPath $resultTarget -Algorithm SHA256).Hash)"
 
 $gemFiles = @(Get-ChildItem -LiteralPath $gemTarget -File -Recurse)
 
