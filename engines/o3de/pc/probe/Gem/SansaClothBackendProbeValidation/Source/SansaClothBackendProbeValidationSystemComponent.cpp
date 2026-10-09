@@ -1219,7 +1219,7 @@ namespace SansaClothBackendProbeValidation
                         matrixContacts += point["contact"].GetBool() ? 1 : 0;
                     }
                     matrixValid = matrixValid && matrixAnchors == (matrixScenario == 3 ? 7 : 14)
-                        && matrixContacts == 147;
+                        && matrixContacts == (matrixScenario >= 4 ? 84 : 147);
                 }
             }
             AZ_Printf("SansaClothBackendProbe",
