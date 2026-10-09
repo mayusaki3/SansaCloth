@@ -841,3 +841,20 @@ Reference結果の各CPは`stable_id`、`support`、`bridge_position_m`、`gravi
 SurfaceQueryは`SurfaceReference`のUVを使いBody triangle上でbarycentric補間し、三角形から求めた面法線と現在CP位置によってSeparationを再計算する。Reference結果の数値はGit管理の生成済みJSONから取得できるが、これをO3DE計算結果と取り違えてはいけない。
 
 **OSR-001：実装・成果物の発見は完了。再生成コマンドと生成結果の再現性は実行未確認のためRuntime PASS未判定。OSR-002～008：OPEN。** 次はO3DEの実Solver入口の有無を調査し、比較器の入力契約を確定する。
+
+### 16.6 OSR-002 O3DE Solver入口の現状調査（2026-10-09）
+
+`engines/o3de/pc/probe/Gem/SansaClothBackendProbeValidation/Source/SansaClothBackendProbeValidationSystemComponent.h`で公開メソッドを確認。既存APIは`RunObf006`、`RunBf003`、`RunBf004`、`RunBf005006`、`RunBf007`、`RunBf008Capture`、`ProbeHandoffString`、`ProbeFixtureJson`。実装CPPにはSurfaceReference解決や検証用の計算が存在するが、**Fixture Exchange JSONを受け取りReference相当の全段階SurfaceResponseを返す公開Solver APIは存在しない**。
+
+従ってOSR-002は**OPEN（Solver計算経路未実装）**。OXC-009 ACKやBFの局所検証計算をSolver出力として代用しない。
+
+次の実装の順序：
+
+1. Rustの`ReferenceSurfaceSolver`の各段階（Bridge→Gravity→Conformity→Collision）とstrip分割、SurfaceQuery再評価を読み、O3DE validation-only solverの入出力契約を確定する。
+2. 既存`ProbeFixtureJson`を変更せず、別名の`ProbeSurfaceResponseJson`等のBehaviorContext APIで、Fixture JSONから実際に計算した各CPの結果を構造化JSONとして返す。固定の期待結果や保存済みReference JSONをC++の計算出力にコピーしない。
+3. まずSR-001-C0-G0の147点・7 stripでReference結果との比較を実装し、意図的に結果を改変する負例も作成する。
+4. 単一ケースで一致を実測してから残り29ケースに拡張する。
+
+比較する`surface-response-result/0`のCPフィールドは`stable_id`、`support`、`bridge_position_m`、`gravity_position_m`、`conformity_position_m`、`collision_position_m`、`final_position_m`、`surface_position_m`、`surface_normal`、`separation_m`、`contact`。出力はcanonical座標・m単位を契約とし、O3DE変換を重複させない。
+
+OSR-001は実装・成果物発見済み／Runtime未検証、OSR-002～008はOPEN。C++新APIの追加・ビルド前にRust演算順序と数値許容差を確定する。
