@@ -746,3 +746,11 @@ C++へ直接渡した2件の改変JSONについて、`OXC-005.ANCHOR_PATTERN|REJ
 
 **OXC-001～005 Runtime PASS、OXC-006～010 OPEN。**
 
+
+### OXC-006 Editor Runtime実績（2026-10-09 11:16 JST）
+
+O3DE Project ManagerからビルドしたEditorで、SR-001-C0-G0の入力（world_gravity_m_per_s2=[0,0,0]、conformity=0、collision_tolerance_m=0）をC++で検証し、`OXC-006.CPP_RESULT|PASS`。OXC-002～005の正常系もPASS。
+
+C++境界に直接渡した負例12件（gravity非ゼロ/配列長/型/非有限、conformity非ゼロ/型、tolerance非ゼロ/負値/型、各入力の欠落3件）はすべて`REJECTED`、`OXC-006.NEGATIVE_RESULT|PASS`、最終`OXC-002.RESULT|PASS`。負例に伴うCPP_RESULT FAILは期待された拒否。
+
+**OXC-001～006 Runtime PASS、OXC-007～010 OPEN。**
