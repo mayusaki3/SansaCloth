@@ -826,3 +826,18 @@ OXC-001～010はFixture ExchangeとC++境界の検証であり、Solverによる
 ### 16.4 判定と次の作業
 
 **OSR-001～008はすべてOPEN（未実装・未実機検証）。** 最初にRust Referenceの実装・テストと既存SurfaceResponse形式を調査し、OSR-001の具体的な実行方法とOSR-004の比較対象を確定する。次にOSR-002のO3DE Solver実装経路を決める。実機操作が必要になった段階でO3DE Editorの手順を案内する。
+
+### 16.5 OSR-001 Reference discovery調査（2026-10-09）
+
+Rust Reference実装と生成済み30ケースの成果物をリポジトリ上で確認した。対象：
+
+- `reference/crates/sansacloth-reference/src/lib.rs`：`ReferenceSurfaceSolver`、`ReferenceSurfaceSolverInput`、`SurfaceResponseResult`、`ReferenceSurfaceSolverDebug`、`SurfaceQuery`。
+- `reference/crates/sansacloth-reference/examples/export_surface_response_result_matrix.rs`：30ケース生成器。実行例は`cd reference && cargo run -p sansacloth-reference --example export_surface_response_result_matrix`（Cargo package名・実行環境の検証は未実施）。
+- `reference/validation/surface-response-result/basic-v1/SR-001-C0-G0.json`など30件：`sansacloth.validation.surface-response-result/0`。
+- `docs/ja-JP/draft/verification/surface-response-basic.md`：21点strip×7本で計算し147点へ再結合するFixture Runner仕様。
+
+Reference結果の各CPは`stable_id`、`support`、`bridge_position_m`、`gravity_position_m`、`conformity_position_m`、`collision_position_m`、`final_position_m`、`surface_position_m`、`surface_normal`、`separation_m`、`contact`を持つ。`profile`は`characteristic_length_m=0.1`、`quasi_static_gravity_scale=0.1`、`conformity_reach_m=0.02`、`support_layout=BothEdges`（SR-001 baselineで確認）。このProfileはvalidation-onlyで製品既定値ではない。
+
+SurfaceQueryは`SurfaceReference`のUVを使いBody triangle上でbarycentric補間し、三角形から求めた面法線と現在CP位置によってSeparationを再計算する。Reference結果の数値はGit管理の生成済みJSONから取得できるが、これをO3DE計算結果と取り違えてはいけない。
+
+**OSR-001：実装・成果物の発見は完了。再生成コマンドと生成結果の再現性は実行未確認のためRuntime PASS未判定。OSR-002～008：OPEN。** 次はO3DEの実Solver入口の有無を調査し、比較器の入力契約を確定する。
