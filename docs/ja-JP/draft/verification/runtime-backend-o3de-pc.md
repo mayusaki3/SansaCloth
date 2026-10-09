@@ -658,13 +658,24 @@ O3DE 26.05 / Windows 11 / `SansaClothBackendProbe` のEditorログ（起動時�
 
 **OXC-001 Runtime PASS。OXC-002～010 OPEN。** これは文字列引数/返値の境界spikeであり、Fixture JSONのC++ parse・検証・所有権や数値一致は未検証。Editor起動時の`DiffuseProbeGridUpdatePassTemplate`エラーは別途継続観測する。
 
+### 12B.3b OXC-002 Editor Runtime実績（2026-10-09）
+
+O3DE 26.05 / Windows 11 のEditorログ（起動時刻 10:09:26 JST）で、`SR-001-C0-G0.json`をPython importerで検証後、`ProbeFixtureJson`に原文を渡し、C++側のRapidJSON parseと件数確認を実施。
+
+- Source SHA-256: `d63de3a9851bf72bf05c41e61f86955178669e198b7c569dc2b54bf70c2d1833`
+- C++: Body 147 vertices / 240 triangles、Cloth 147 CP、Anchor 14、Contact 147、`OXC-002.CPP_RESULT|PASS`
+- Python: `OXC-002.REAL_JSON_ROUNDTRIP|PASS`、`OXC-002.INVALID_REJECTED|PASS`、`OXC-002.RESULT|PASS`
+- 意図的な不正JSONはC++で`CPP_RESULT|FAIL`を返し、Pythonが拒否を確認。
+
+**OXC-001～002 Runtime PASS、OXC-003～010 OPEN。** C++ログにリテラル`\\n`が出力される表示上の不具合を確認。OXC-002は件数検証までで、Body全属性やCP詳細の検証は未実施。
+
 ### 12B.4 実装順序と判定
 
 1. O3DE側で確実に呼び出せるBehaviorContext引数型を最小のspikeで確認する（validation-only試作）。
 2. 受け渡し表現と座標変換責任を固定する。C++側の独立validationと所有権を実装する。
 3. SR-001-C0-G0単一ケース（OXC-001～008）をEditor runtimeで確認する。
 4. 30ケース（OXC-009～010）へ拡張し、既存BF-001～008、OXF-001～019の退行を確認する。
-5. 実Editorログで**OXC-001 PASS**を確認済み。**OXC-002～010 OPEN**（OXC-002は実装済み、Runtime未検証）。本Phase PASSでもproduction Mesh API、deformed mesh lifecycle、SurfaceResponse solver/Reference数値一致は未検証とする。
+5. 実Editorログで**OXC-001 PASS**を確認済み。**OXC-002 PASS**、**OXC-003～010 OPEN**。本Phase PASSでもproduction Mesh API、deformed mesh lifecycle、SurfaceResponse solver/Reference数値一致は未検証とする。
 
 ## 13. Probe配布方針
 
