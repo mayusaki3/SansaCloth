@@ -1279,7 +1279,7 @@ namespace SansaClothBackendProbeValidation
                         && std::abs(pos[0].GetDouble() - expectedX) < 1.0e-6
                         && std::abs(pos[1].GetDouble() - expectedY) < 1.0e-6
                         && std::abs(pos[2].GetDouble() - longitudinal) < 1.0e-6;
-                    numericValid = std::abs(lengthSq - 1.0) < 1.0e-5
+                    numericValid = numericValid && std::abs(lengthSq - 1.0) < 1.0e-5
                         && std::abs(uv[0].GetDouble() - static_cast<double>(i % 21) / 20.0) < 1.0e-6
                         && std::abs(uv[1].GetDouble() - static_cast<double>(i / 21) / 6.0) < 1.0e-6;
                 }
@@ -1319,6 +1319,18 @@ namespace SansaClothBackendProbeValidation
                     {
                         numericValid = numericValid && finite(pos[axis]);
                     }
+                    // Cloth control points remain on the undisplaced base
+                    // plane even when the body surface is curved.
+                    const unsigned col = id % 21;
+                    const unsigned row = id / 21;
+                    const double lateral = -0.1 + static_cast<double>(col) * 0.01;
+                    const double longitudinal = -0.05 + static_cast<double>(row) / 60.0;
+                    const double clothX = matrixScenario == 3 ? 0.0 : lateral;
+                    const double clothY = matrixScenario == 3 ? -lateral : 0.0;
+                    numericValid = numericValid
+                        && std::abs(pos[0].GetDouble() - clothX) < 1.0e-6
+                        && std::abs(pos[1].GetDouble() - clothY) < 1.0e-6
+                        && std::abs(pos[2].GetDouble() - longitudinal) < 1.0e-6;
                     numericValid = numericValid && finite(ref["u"]) && finite(ref["v"]);
                     if (!numericValid) break;
                     numericValid = std::abs(ref["u"].GetDouble() - static_cast<double>(id % 21) / 20.0) < 1.0e-6
