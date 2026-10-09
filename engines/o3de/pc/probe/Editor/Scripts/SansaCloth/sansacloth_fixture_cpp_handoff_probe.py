@@ -109,6 +109,44 @@ try:
     print(f"{PREFIX}OXC-007.RECOVERY_8|PASS")
     print(f"{PREFIX}OXC-007.RESULT|PASS")
 
+    # OXC-008: malformed JSON and schema/boundary mutations are sent
+    # straight to C++ without Python importer pre-validation.
+    def reject_cpp(label, payload):
+        if fn(payload) != "":
+            raise ValueError(f"OXC-008 accepted {label}")
+        print(f"{PREFIX}OXC-008.{label}|REJECTED")
+
+    for label, payload in (
+        ("EMPTY", ""),
+        ("TRUNCATED_JSON", source[:100]),
+        ("ROOT_ARRAY", "[]"),
+        ("ROOT_NULL", "null"),
+        ("ROOT_STRING", '"not an object"'),
+    ):
+        reject_cpp(label, payload)
+
+    def mutated(label, change):
+        data = json.loads(source)
+        change(data)
+        reject_cpp(label, json.dumps(data, ensure_ascii=False))
+
+    mutated("FORMAT", lambda d: d.update(format="invalid"))
+    mutated("CASE_ID", lambda d: d.update(case_id="SR-999-C0-G0"))
+    mutated("MISSING_BODY", lambda d: d.pop("body_surface"))
+    mutated("VERTEX_COUNT", lambda d: d["body_surface"]["vertices"].pop())
+    mutated("TRIANGLE_INDEX", lambda d: d["body_surface"]["triangles"][0].__setitem__(0, 147))
+    mutated("VERTEX_NAN", lambda d: d["body_surface"]["vertices"][0]["position_m"].__setitem__(0, float("nan")))
+    mutated("CP_DUPLICATE_ID", lambda d: d["cloth"]["control_points"][1].__setitem__("stable_id", 0))
+    mutated("CP_STRIP_ORDER", lambda d: d["cloth"]["control_points"][1].__setitem__("strip_order", 21))
+    mutated("CP_UV_OUT_OF_RANGE", lambda d: d["cloth"]["control_points"][1]["surface_reference"].__setitem__("u", 1.1))
+    mutated("CP_DOMAIN", lambda d: d["cloth"]["control_points"][1]["surface_reference"].__setitem__("domain_id", 2))
+    mutated("CP_POSITION_TYPE", lambda d: d["cloth"]["control_points"][1].__setitem__("position_m", ["bad", 0, 0]))
+    print(f"{PREFIX}OXC-008.REJECTED_CASE_COUNT|16")
+    if fn(source) != expected:
+        raise ValueError("OXC-008 valid fixture not accepted after negative tests")
+    print(f"{PREFIX}OXC-008.RECOVERY|PASS")
+    print(f"{PREFIX}OXC-008.RESULT|PASS")
+
     print(f"{PREFIX}OXC-002.RESULT|PASS")
 except Exception as exc:
     print(f"{PREFIX}OXC-002.RESULT|FAIL|{type(exc).__name__}: {exc}")
