@@ -1145,6 +1145,88 @@ namespace SansaClothBackendProbeValidation
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-009.CPP_MATRIX_ID|SCENARIO=%d|C=%.1f|G=%d\\n",
             matrixScenario, matrixConformity, matrixGravity);
+        // OXC-009 phase 2: independent non-baseline matrix structural gate.
+        // No ACK is issued until scenario-specific numeric geometry checks are ready.
+        if (matrixScenario != 0 &&
+            !(matrixScenario == 1 && matrixConformity == 0.0 && matrixGravity == 0))
+        {
+            bool matrixValid = doc.HasMember("format") && doc["format"].IsString()
+                && AZStd::string(doc["format"].GetString()) == "sansacloth.validation.fixture-exchange/0"
+                && doc.HasMember("body_surface") && doc["body_surface"].IsObject()
+                && doc.HasMember("cloth") && doc["cloth"].IsObject()
+                && doc.HasMember("inputs") && doc["inputs"].IsObject();
+            int matrixAnchors = 0;
+            int matrixContacts = 0;
+            if (matrixValid)
+            {
+                const auto& body = doc["body_surface"];
+                const auto& cloth = doc["cloth"];
+                const auto& inputs = doc["inputs"];
+                matrixValid = body.HasMember("domain_id") && body["domain_id"].IsUint64()
+                    && body["domain_id"].GetUint64() == 1
+                    && body.HasMember("vertices") && body["vertices"].IsArray()
+                    && body["vertices"].Size() == 147
+                    && body.HasMember("triangles") && body["triangles"].IsArray()
+                    && body["triangles"].Size() == 240
+                    && cloth.HasMember("control_points") && cloth["control_points"].IsArray()
+                    && cloth["control_points"].Size() == 147
+                    && inputs.HasMember("conformity") && inputs["conformity"].IsNumber()
+                    && std::isfinite(inputs["conformity"].GetDouble())
+                    && std::abs(inputs["conformity"].GetDouble() - matrixConformity) < 1.0e-9
+                    && inputs.HasMember("collision_tolerance_m")
+                    && inputs["collision_tolerance_m"].IsNumber()
+                    && inputs["collision_tolerance_m"].GetDouble() == 0.0
+                    && inputs.HasMember("world_gravity_m_per_s2")
+                    && inputs["world_gravity_m_per_s2"].IsArray()
+                    && inputs["world_gravity_m_per_s2"].Size() == 3;
+                if (matrixValid)
+                {
+                    const auto& gravity = inputs["world_gravity_m_per_s2"];
+                    for (rapidjson::SizeType axis = 0; axis < 3; ++axis)
+                    {
+                        matrixValid = matrixValid && gravity[axis].IsNumber()
+                            && std::isfinite(gravity[axis].GetDouble());
+                    }
+                    if (matrixValid)
+                    {
+                        const double magnitudeSq = gravity[0].GetDouble() * gravity[0].GetDouble()
+                            + gravity[1].GetDouble() * gravity[1].GetDouble()
+                            + gravity[2].GetDouble() * gravity[2].GetDouble();
+                        matrixValid = (magnitudeSq > 1.0e-12) == (matrixGravity == 1);
+                    }
+                }
+                if (matrixValid)
+                {
+                    std::array<bool, 147> seen{};
+                    for (const auto& point : cloth["control_points"].GetArray())
+                    {
+                        if (!point.IsObject() || !point.HasMember("stable_id")
+                            || !point["stable_id"].IsUint() || !point.HasMember("anchor")
+                            || !point["anchor"].IsBool() || !point.HasMember("contact")
+                            || !point["contact"].IsBool())
+                        {
+                            matrixValid = false;
+                            break;
+                        }
+                        const unsigned id = point["stable_id"].GetUint();
+                        if (id >= seen.size() || seen[id])
+                        {
+                            matrixValid = false;
+                            break;
+                        }
+                        seen[id] = true;
+                        matrixAnchors += point["anchor"].GetBool() ? 1 : 0;
+                        matrixContacts += point["contact"].GetBool() ? 1 : 0;
+                    }
+                    matrixValid = matrixValid && matrixAnchors == (matrixScenario == 3 ? 7 : 14)
+                        && matrixContacts == 147;
+                }
+            }
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|OXC-009.CPP_STRUCTURE|%s|ANCHORS=%d|CONTACTS=%d\\n",
+                matrixValid ? "PASS" : "FAIL", matrixAnchors, matrixContacts);
+            return {};
+        }
         int vertexCount = -1;
         int triangleCount = -1;
         int cpCount = -1;
