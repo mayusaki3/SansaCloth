@@ -1244,6 +1244,83 @@ namespace SansaClothBackendProbeValidation
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-003.CPP_RESULT|%s\n", bodyValid ? "PASS" : "FAIL");
         valid = valid && bodyValid;
+        // OXC-004: validate each control point's stable identity, strip
+        // position and surface reference against the committed SR-001 layout.
+        bool cpValid = valid;
+        int checkedCp = 0;
+        if (cpValid)
+        {
+            const auto& points = doc["cloth"]["control_points"];
+            const auto& bodyVertices = doc["body_surface"]["vertices"];
+            auto near = [](double a, double b) -> bool
+            {
+                return std::isfinite(a) && std::isfinite(b)
+                    && std::abs(a - b) <= 1.0e-6;
+            };
+            std::array<bool, 147> seenIds{};
+            std::array<bool, 147> seenStripOrders{};
+            for (const auto& point : points.GetArray())
+            {
+                if (!point.IsObject() || !point.HasMember("stable_id")
+                    || !point.HasMember("strip_id") || !point.HasMember("strip_order")
+                    || !point.HasMember("position_m") || !point.HasMember("surface_reference")
+                    || !point["stable_id"].IsUint() || !point["strip_id"].IsUint()
+                    || !point["strip_order"].IsUint())
+                {
+                    cpValid = false;
+                    break;
+                }
+                const unsigned int id = point["stable_id"].GetUint();
+                const unsigned int strip = point["strip_id"].GetUint();
+                const unsigned int order = point["strip_order"].GetUint();
+                if (id >= 147 || strip >= 7 || order >= 21 || seenIds[id]
+                    || seenStripOrders[strip * 21 + order])
+                {
+                    cpValid = false;
+                    break;
+                }
+                seenIds[id] = true;
+                seenStripOrders[strip * 21 + order] = true;
+                const auto& p = point["position_m"];
+                const auto& ref = point["surface_reference"];
+                const auto& bodyPos = bodyVertices[id]["position_m"];
+                if (!p.IsArray() || p.Size() != 3 || !ref.IsObject()
+                    || !ref.HasMember("domain_id") || !ref["domain_id"].IsUint()
+                    || !ref.HasMember("u") || !ref.HasMember("v")
+                    || !ref["u"].IsNumber() || !ref["v"].IsNumber())
+                {
+                    cpValid = false;
+                    break;
+                }
+                cpValid = id == strip * 21 + order
+                    && ref["domain_id"].GetUint() == 1
+                    && near(ref["u"].GetDouble(), static_cast<double>(order) / 20.0)
+                    && near(ref["v"].GetDouble(), static_cast<double>(strip) / 6.0);
+                for (rapidjson::SizeType axis = 0; axis < 3 && cpValid; ++axis)
+                {
+                    cpValid = p[axis].IsNumber() && bodyPos[axis].IsNumber()
+                        && near(p[axis].GetDouble(), bodyPos[axis].GetDouble());
+                }
+                if (!cpValid)
+                {
+                    break;
+                }
+                ++checkedCp;
+            }
+            for (bool seen : seenIds)
+            {
+                cpValid = cpValid && seen;
+            }
+            for (bool seen : seenStripOrders)
+            {
+                cpValid = cpValid && seen;
+            }
+        }
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-004.CPP_CHECKED_CP_COUNT|%d\\n", checkedCp);
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-004.CPP_RESULT|%s\\n", cpValid ? "PASS" : "FAIL");
+        valid = valid && cpValid;
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|%d\n", vertexCount);
         AZ_Printf("SansaClothBackendProbe",
