@@ -911,3 +911,24 @@ Windowsのリポジトリルートで`git pull --ff-only`後、`python -m unitte
 - この段階のC++実装はSR-001 baseline限定。重力非ゼロ、Conformity非ゼロ、SR-002～005は未実装。入力の一般的なFixture妥当性検査は既存ACKほど網羅していないため、実験用APIとしてのみ使用する。
 
 **ビルド・Editor実行・数値一致の実測は未実施。OSR-004はOPEN。** Windows実機で`BuildProbeAssets.ps1`実行後、O3DE Project ManagerでGemを再ビルドし、Editor Pythonから`sansacloth_osr001_probe.py`を実行する。コンパイルエラー・Runtime差分があればログを採取して修正する。
+
+### 16.11 OSR-004 Editor Runtime実績：SR-001-C0-G0（2026-10-09）
+
+ユーザー提供のO3DE Editor Python Consoleログから、`sansacloth_osr001_probe.py`による独立C++ Solver対Rust Reference比較が成功したことを確認。
+
+- `OSR-004.CASE_ID|SR-001-C0-G0`
+- `OSR-004.FIXTURE_SHA256|d63de3a9851bf72bf05c41e61f86955178669e198b7c569dc2b54bf70c2d1833`
+- `OSR-004.REFERENCE_SHA256|e7075328500979e0d82616b16cf01d18fed4667808e33beb61f1123bb0dbdec5`
+- `OSR-004.TOLERANCE|1e-09`
+- `OSR-004.MAX_ERROR.bridge_position_m|0`
+- `OSR-004.MAX_ERROR.gravity_position_m|0`
+- `OSR-004.MAX_ERROR.conformity_position_m|0`
+- `OSR-004.MAX_ERROR.collision_position_m|0`
+- `OSR-004.MAX_ERROR.final_position_m|0`
+- `OSR-004.MAX_ERROR.surface_position_m|3.4694469519536142e-18`
+- `OSR-004.MAX_ERROR.surface_normal|1.1102230246251565e-16`
+- `OSR-004.MAX_ERROR.separation_m|0`
+- `OSR-004.CONTROL_POINT_COUNT|147`
+- `OSR-004.RESULT|PASS`
+
+**判定：OSR-004 SR-001-C0-G0限定 Runtime PASS。** Support/Contact・集計値・Profile・StableIdも比較器で検証済み。C0/G0専用のC++実装であり、重力・Conformityが非ゼロの条件および残り29ケースへの一般化は未検証。OSR-006/008はOPENのまま。OSR-002はSolver APIの存在・実機呼出しを確認済み（SR-001-C0-G0限定）。
