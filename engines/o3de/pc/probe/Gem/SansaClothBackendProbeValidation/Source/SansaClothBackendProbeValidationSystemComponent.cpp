@@ -1876,7 +1876,7 @@ namespace SansaClothBackendProbeValidation
         d.Parse(payload.c_str());
         if (d.HasParseError() || !d.IsObject() || !d.HasMember("case_id")
             || !d["case_id"].IsString()
-            || AZStd::string(d["case_id"].GetString()).find("SR-001-") != 0
+            || AZStd::string(d["case_id"].GetString()).find("SR-00") != 0
             || !d.HasMember("format") || !d["format"].IsString()
             || AZStd::string(d["format"].GetString()) != "sansacloth.validation.fixture-exchange/0"
             || !d.HasMember("body_surface") || !d["body_surface"].IsObject()
@@ -1970,7 +1970,8 @@ namespace SansaClothBackendProbeValidation
         w.Key("characteristic_length_m");w.Double(0.1);
         w.Key("quasi_static_gravity_scale");w.Double(0.1);
         w.Key("conformity_reach_m");w.Double(0.02);
-        w.Key("support_layout");w.String("BothEdges");
+        const bool oneEdge = AZStd::string(d["case_id"].GetString()).find("SR-003-") == 0;
+        w.Key("support_layout");w.String(oneEdge ? "OneEdge" : "BothEdges");
         w.EndObject();
         w.Key("control_points");w.StartArray();
         int supports=0,contacts=0;
@@ -1979,10 +1980,11 @@ namespace SansaClothBackendProbeValidation
             // Both-edge strip bridge: anchor endpoints at strip orders 0 and 20.
             if (p.strip>=7 || p.order>=21 || p.id!=p.strip*21+p.order) return {};
             const CP& left=points[p.strip*21], &right=points[p.strip*21+20];
-            if (!left.anchor || !right.anchor) return {};
-            V bridge=p.anchor ? p.pos : left.pos*(1.0-p.order/20.0)+right.pos*(p.order/20.0);
+            if (!left.anchor || (!oneEdge && !right.anchor)) return {};
+            V bridge = (left.anchor && right.anchor && !p.anchor)
+                ? left.pos*(1.0-p.order/20.0)+right.pos*(p.order/20.0) : p.pos;
             const double t = p.order / 20.0;
-            const double weight = 4.0*t*(1.0-t);
+            const double weight = oneEdge ? t : 4.0*t*(1.0-t);
             V gravity = p.anchor ? bridge : bridge + gravityDirection*(0.1*0.1*weight);
             Q afterGravity{};
             if (!query(p,gravity,afterGravity)) return {};
