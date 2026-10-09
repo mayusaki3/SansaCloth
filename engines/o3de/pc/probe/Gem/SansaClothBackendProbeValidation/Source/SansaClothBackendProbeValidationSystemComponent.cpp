@@ -1279,6 +1279,22 @@ namespace SansaClothBackendProbeValidation
                         && std::abs(pos[0].GetDouble() - expectedX) < 1.0e-6
                         && std::abs(pos[1].GetDouble() - expectedY) < 1.0e-6
                         && std::abs(pos[2].GetDouble() - longitudinal) < 1.0e-6;
+                    // Analytic normal of the cosine displacement. The
+                    // derivative is zero outside the active columns.
+                    const double slope = (col >= 6 && col <= 14)
+                        ? -amplitude * (3.14159265358979323846 / 0.1)
+                            * 0.5 * std::sin(3.14159265358979323846
+                                * (static_cast<double>(col) - 10.0) / 5.0)
+                        : 0.0;
+                    const double invNormalLength = 1.0 / std::sqrt(1.0 + slope * slope);
+                    const double expectedNx = matrixScenario == 3
+                        ? invNormalLength : -slope * invNormalLength;
+                    const double expectedNy = matrixScenario == 3
+                        ? -slope * invNormalLength : invNormalLength;
+                    numericValid = numericValid
+                        && std::abs(normal[0].GetDouble() - expectedNx) < 1.0e-5
+                        && std::abs(normal[1].GetDouble() - expectedNy) < 1.0e-5
+                        && std::abs(normal[2].GetDouble()) < 1.0e-6;
                     numericValid = numericValid && std::abs(lengthSq - 1.0) < 1.0e-5
                         && std::abs(uv[0].GetDouble() - static_cast<double>(i % 21) / 20.0) < 1.0e-6
                         && std::abs(uv[1].GetDouble() - static_cast<double>(i / 21) / 6.0) < 1.0e-6;
