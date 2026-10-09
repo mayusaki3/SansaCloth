@@ -60,7 +60,7 @@ The Project Manager Gem configuration UI may be used instead. This is a code Gem
 In O3DE Editor open:
 
 ~~~text
-Tools > Other > Python Scripts
+Tools > Python Scripts
 ~~~
 
 Run:
@@ -122,7 +122,7 @@ This validates the coordinate/semantic boundary, not a complete SansaCloth produ
 After deploying and rebuilding the validation Gem, in O3DE Editor open:
 
 ~~~text
-Tools > Other > Python Scripts
+Tools > Python Scripts
 ~~~
 
 Run:
@@ -164,7 +164,7 @@ BF-003 was confirmed PASS in O3DE Editor on 2026-10-08 for the validation-only f
 ## Run BF-004 SurfaceQuery Feasibility
 
 After deploying and rebuilding the C++ validation Gem, run this script in
-O3DE Editor using Tools > Other > Python Scripts:
+O3DE Editor using Tools > Python Scripts:
 
 ~~~text
 SansaCloth/sansacloth_surface_query_probe.py
@@ -209,7 +209,7 @@ scale, or a full cloth solver.
 ## Run BF-005 / BF-006 SR-001 Input/Output Semantics
 
 Deploy the current 9 Python scripts and C++ Validation Gem, rebuild the project,
-and run in O3DE Editor (Tools > Other > Python Scripts):
+and run in O3DE Editor (Tools > Python Scripts):
 
 ~~~text
 SansaCloth/sansacloth_sr001_boundary_probe.py
@@ -277,7 +277,7 @@ validation-only SR-001 Flat C=0/G=0 fixture.
 
 After closing O3DE Editor, deploy the current 7 Python scripts and validation Gem
 using `BuildProbeAssets.ps1`. Rebuild the O3DE project in Project Manager.
-In Editor > Tools > Other > Python Scripts, run:
+In Editor > Tools > Python Scripts, run:
 
 ~~~text
 SansaCloth/sansacloth_basic_fixture_probe.py
@@ -400,7 +400,7 @@ to `<O3DE project>/Editor/Scripts/SansaCloth/Fixtures/SR-001-C0-G0.json`.
 It compares the source and deployed SHA-256 and reports
 `SCRIPT_COUNT|7`, `FIXTURE_SHA256`, `RESULT|PASS`.
 
-Run in O3DE Editor > Tools > Other > Python Scripts:
+Run in O3DE Editor > Tools > Python Scripts:
 
 ~~~text
 SansaCloth/sansacloth_fixture_exchange_import_probe.py
@@ -448,7 +448,7 @@ Close Editor and run `BuildProbeAssets.ps1` from the repository root with the
 O3DE project path. The deploy verifies all 30 committed Reference JSON files
 and prints `MATRIX_CASE_COUNT|30` and `SCRIPT_COUNT|8`.
 
-In O3DE Editor > Tools > Other > Python Scripts, run:
+In O3DE Editor > Tools > Python Scripts, run:
 
 ~~~text
 SansaCloth/sansacloth_fixture_exchange_matrix_probe.py
@@ -508,7 +508,7 @@ OXC-001 was confirmed **RUNTIME PASS** in the 2026-10-09 O3DE Editor log. The in
 
 After updating the repository, close Editor, run `BuildProbeAssets.ps1`
 (expected `SCRIPT_COUNT|10`), rebuild the Validation Gem, and reopen Editor.
-In Tools > Other > Python Scripts, run:
+In Tools > Python Scripts, run:
 
 ~~~text
 SansaCloth/sansacloth_fixture_cpp_handoff_probe.py
@@ -535,6 +535,21 @@ SANSA_O3DE|OXC-002.RESULT|PASS
 ~~~
 
 The negative-input C++ `OXC-002.CPP_RESULT|FAIL` is intentional.
-OXC-002 remains **Runtime OPEN** until actual Editor evidence is reviewed.
-OXC-003+ require full geometry/identity/input validation; this probe only
-establishes a real-data handoff and checks initial counts.
+OXC-002 was confirmed **Runtime PASS** in the 2026-10-09 Editor log.
+OXC-003 body geometry validation is now included in the C++ boundary, but remains **Runtime OPEN** until the updated Editor log is reviewed. OXC-004+ identity/input validation is separate.
+
+## Run OXC-003 full Body geometry validation
+
+Close Editor, deploy current sources, rebuild `Editor`, then launch Editor.
+Choose **Tools > Python Scripts** and run
+`SansaCloth/sansacloth_fixture_cpp_handoff_probe.py`.
+The existing OXC-002 script now also triggers the C++ OXC-003 gate:
+all 147 body positions/normals/UVs and 240 triangles are checked after
+canonical→O3DE axis mapping and winding reversal. Expected log:
+
+~~~text
+SANSA_O3DE|OXC-003.CPP_RESULT|PASS
+SANSA_O3DE|OXC-002.RESULT|PASS
+~~~
+
+OXC-003 is not marked Runtime PASS until actual Editor evidence is provided.
