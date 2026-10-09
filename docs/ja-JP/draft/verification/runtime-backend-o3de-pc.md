@@ -932,3 +932,24 @@ Windowsのリポジトリルートで`git pull --ff-only`後、`python -m unitte
 - `OSR-004.RESULT|PASS`
 
 **判定：OSR-004 SR-001-C0-G0限定 Runtime PASS。** Support/Contact・集計値・Profile・StableIdも比較器で検証済み。C0/G0専用のC++実装であり、重力・Conformityが非ゼロの条件および残り29ケースへの一般化は未検証。OSR-006/008はOPENのまま。OSR-002はSolver APIの存在・実機呼出しを確認済み（SR-001-C0-G0限定）。
+
+### 16.12 OSR-004 SR-001 6条件 Editor Runtime PASS（2026-10-09）
+
+ユーザー提供のO3DE Editor Python Consoleログで、`sansacloth_osr001_probe.py`の6条件比較が全件PASS。
+
+| ケース | 結果 |
+|---|---|
+| SR-001-C0-G0 | PASS |
+| SR-001-C0-G1 | PASS |
+| SR-001-C05-G0 | PASS |
+| SR-001-C05-G1 | PASS |
+| SR-001-C1-G0 | PASS |
+| SR-001-C1-G1 | PASS |
+
+- `OSR-004.CASE_COUNT|6`
+- `OSR-004.RESULT|PASS`
+- 各ケース`CONTROL_POINT_COUNT|147`：合計882点。
+- 位置・Separationの最大絶対誤差は`3.4694469519536142e-18` m、Surface法線成分は`1.1102230246251565e-16`。比較許容差`1e-9`。
+- Bridge/Gravity/Conformity/Collision/Final/Surface/Normal/Separationの全比較項目、およびStableId/Support/Contact/Profile/集計の比較器検査が成功。
+
+**判定：OSR-004 SR-001 6/6 Runtime PASS。** Gravity・Conformity有効条件を含む。ただしSR-002～005の24条件、OneEdge support等の一般化、OSR-006/008は未検証・OPEN。
