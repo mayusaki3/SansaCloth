@@ -1317,9 +1317,9 @@ namespace SansaClothBackendProbeValidation
             }
         }
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-004.CPP_CHECKED_CP_COUNT|%d\\n", checkedCp);
+            "SANSA_O3DE|OXC-004.CPP_CHECKED_CP_COUNT|%d\n", checkedCp);
         AZ_Printf("SansaClothBackendProbe",
-            "SANSA_O3DE|OXC-004.CPP_RESULT|%s\\n", cpValid ? "PASS" : "FAIL");
+            "SANSA_O3DE|OXC-004.CPP_RESULT|%s\n", cpValid ? "PASS" : "FAIL");
         valid = valid && cpValid;
         AZ_Printf("SansaClothBackendProbe",
             "SANSA_O3DE|OXC-002.CPP_BODY_VERTEX_COUNT|%d\n", vertexCount);
