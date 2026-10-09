@@ -1222,6 +1222,96 @@ namespace SansaClothBackendProbeValidation
                         && matrixContacts == (matrixScenario >= 4 ? 84 : 147);
                 }
             }
+            // OXC-009 numeric gate: independently verify every vertex,
+            // normal, UV, triangle, CP position and surface reference.
+            bool numericValid = matrixValid;
+            if (numericValid)
+            {
+                const auto& vertices = doc["body_surface"]["vertices"];
+                const auto& triangles = doc["body_surface"]["triangles"];
+                const auto& points = doc["cloth"]["control_points"];
+                auto near = [](const rapidjson::Value& value, double expected)
+                {
+                    return value.IsNumber() && std::isfinite(value.GetDouble())
+                        && std::abs(value.GetDouble() - expected) <= 1.0e-6;
+                };
+                for (rapidjson::SizeType i = 0; i < vertices.Size() && numericValid; ++i)
+                {
+                    const auto& vertex = vertices[i];
+                    const int row = static_cast<int>(i) / 21;
+                    const int col = static_cast<int>(i) % 21;
+                    const double u = static_cast<double>(col) / 20.0;
+                    const double v = static_cast<double>(row) / 6.0;
+                    const double x = -0.1 + col * 0.01;
+                    const double z = -0.05 + row / 60.0;
+                    const double y = matrixScenario == 3 ? 0.1 - col * 0.01 : 0.0;
+                    const double expectedX = matrixScenario == 3 ? 0.0 : x;
+                    const double expectedY = y;
+                    if (!vertex.IsObject() || !vertex.HasMember("position_m")
+                        || !vertex.HasMember("normal") || !vertex.HasMember("uv"))
+                    {
+                        numericValid = false;
+                        break;
+                    }
+                    const auto& pos = vertex["position_m"];
+                    const auto& normal = vertex["normal"];
+                    const auto& uv = vertex["uv"];
+                    numericValid = pos.IsArray() && pos.Size() == 3
+                        && normal.IsArray() && normal.Size() == 3
+                        && uv.IsArray() && uv.Size() == 2;
+                    if (!numericValid) break;
+                    numericValid = near(pos[0], expectedX) && near(pos[1], expectedY)
+                        && near(pos[2], z)
+                        && near(normal[0], matrixScenario == 3 ? 1.0 : 0.0)
+                        && near(normal[1], matrixScenario == 3 ? 0.0 : 1.0)
+                        && near(normal[2], 0.0)
+                        && near(uv[0], u) && near(uv[1], v);
+                }
+                for (rapidjson::SizeType i = 0; i < triangles.Size() && numericValid; ++i)
+                {
+                    const auto& tri = triangles[i];
+                    const unsigned row = static_cast<unsigned>(i / 2) / 20;
+                    const unsigned col = static_cast<unsigned>(i / 2) % 20;
+                    const unsigned v00 = row * 21 + col;
+                    numericValid = tri.IsArray() && tri.Size() == 3
+                        && tri[0].IsUint() && tri[1].IsUint() && tri[2].IsUint();
+                    if (!numericValid) break;
+                    numericValid = tri[0].GetUint() == v00
+                        && tri[1].GetUint() == (i % 2 == 0 ? v00 + 21 : v00 + 22)
+                        && tri[2].GetUint() == (i % 2 == 0 ? v00 + 22 : v00 + 1);
+                }
+                for (const auto& point : points.GetArray())
+                {
+                    if (!numericValid) break;
+                    numericValid = point.HasMember("stable_id") && point["stable_id"].IsUint()
+                        && point.HasMember("strip_id") && point["strip_id"].IsUint()
+                        && point.HasMember("strip_order") && point["strip_order"].IsUint()
+                        && point.HasMember("position_m") && point["position_m"].IsArray()
+                        && point.HasMember("surface_reference") && point["surface_reference"].IsObject();
+                    if (!numericValid) break;
+                    const unsigned id = point["stable_id"].GetUint();
+                    const auto& pos = point["position_m"];
+                    const auto& ref = point["surface_reference"];
+                    numericValid = pos.Size() == 3 && id < vertices.Size()
+                        && point["strip_id"].GetUint() == id / 21
+                        && point["strip_order"].GetUint() == id % 21
+                        && ref.HasMember("domain_id") && ref["domain_id"].IsUint()
+                        && ref["domain_id"].GetUint() == 1
+                        && ref.HasMember("u") && ref.HasMember("v");
+                    if (!numericValid) break;
+                    const auto& bodyPos = vertices[id]["position_m"];
+                    for (rapidjson::SizeType axis = 0; axis < 3; ++axis)
+                    {
+                        numericValid = numericValid && bodyPos[axis].IsNumber()
+                            && near(pos[axis], bodyPos[axis].GetDouble());
+                    }
+                    numericValid = numericValid
+                        && near(ref["u"], static_cast<double>(id % 21) / 20.0)
+                        && near(ref["v"], static_cast<double>(id / 21) / 6.0);
+                }
+            }
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|OXC-009.CPP_NUMERIC|%s\\n", numericValid ? "PASS" : "FAIL");
             AZ_Printf("SansaClothBackendProbe",
                 "SANSA_O3DE|OXC-009.CPP_STRUCTURE|%s|ANCHORS=%d|CONTACTS=%d\n",
                 matrixValid ? "PASS" : "FAIL", matrixAnchors, matrixContacts);
