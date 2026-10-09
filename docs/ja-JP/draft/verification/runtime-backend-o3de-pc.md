@@ -878,3 +878,13 @@ Basic Profileは`characteristic_length_m=0.1`、`quasi_static_gravity_scale=0.1`
 **重要**：UV barycentric解決の三角形選択・頂点順序・法線向きもReferenceに合わせる。差分比較の閾値はO3DE実装精度を確認してから明示的に確定し、Gateに適用する。既存Fixture ACKはOSRの計算証跡ではない。
 
 **次の実装対象**：`ProbeSurfaceResponseJson`という独立C++ BehaviorContext API（validation-only）と、Reference JSONを読み込むPython比較プローブ。まずSR-001-C0-G0の7 strip/147点を実計算し、Referenceとの差を記録する。OSR-002～008のRuntime判定は引き続きOPEN。
+
+### 16.8 OSR比較器の初期実装（2026-10-09）
+
+- `engines/o3de/pc/probe/Editor/Scripts/SansaCloth/sansacloth_surface_response_compare.py`：Referenceと独立Solver出力の`surface-response-result/0`を`stable_id`で照合。147点、Support/Contact、7種類のvec3、Separation、集計数、profile一致を検査。各数値の最大絶対差を返し、欠落・重複・非有限値・差分超過は例外で拒否する。
+- `engines/o3de/pc/probe/tests/test_surface_response_compare.py`：同一結果、順序変更、数値不一致、Support不一致、欠落点、非有限値の6つの回帰テストを追加。
+- `BuildProbeAssets.ps1`：比較モジュールの配布を追加。これは実行用の独立Editor probeではなく、後続のSolver probeからimportするライブラリ。
+- 実行コマンド：`python -m unittest discover -s engines/o3de/pc/probe/tests`（ローカル実行結果は未取得）。
+- **閾値は比較器の引数**。未確定の既定閾値は設定しない。OSR-007の負例テストを用意したが、O3DE Solver未実装のためRuntime PASSにはしない。
+
+**注意：C++ Solver API `ProbeSurfaceResponseJson`はまだ未実装。OSR-002～008はOPEN。** 比較器単体のテストはSolver数値一致の証拠ではない。
