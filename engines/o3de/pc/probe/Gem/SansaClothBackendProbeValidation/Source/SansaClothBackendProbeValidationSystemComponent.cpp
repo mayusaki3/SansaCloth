@@ -1306,6 +1306,30 @@ namespace SansaClothBackendProbeValidation
                         && std::abs(ref["v"].GetDouble() - static_cast<double>(id / 21) / 6.0) < 1.0e-6;
                 }
             }
+            // OXC-009 semantic pattern gate: verify flags per StableId,
+            // not merely their aggregate counts.
+            bool patternValid = numericValid;
+            if (patternValid)
+            {
+                const auto& points = doc["cloth"]["control_points"];
+                for (const auto& point : points.GetArray())
+                {
+                    const unsigned id = point["stable_id"].GetUint();
+                    const unsigned col = id % 21;
+                    const bool expectedAnchor = matrixScenario == 3
+                        ? col == 0 : (col == 0 || col == 20);
+                    // SR-004/005 contact mask: seven rows of 12 points,
+                    // comprising the first/last six columns of each strip.
+                    const bool expectedContact = matrixScenario <= 3
+                        || col < 6 || col >= 15;
+                    patternValid = point["anchor"].GetBool() == expectedAnchor
+                        && point["contact"].GetBool() == expectedContact;
+                    if (!patternValid) break;
+                }
+            }
+            AZ_Printf("SansaClothBackendProbe",
+                "SANSA_O3DE|OXC-009.CPP_SEMANTIC_PATTERN|%s\\n",
+                patternValid ? "PASS" : "FAIL");
             AZ_Printf("SansaClothBackendProbe",
                 "SANSA_O3DE|OXC-009.CPP_NUMERIC_INTEGRITY|%s\\n", numericValid ? "PASS" : "FAIL");
             AZ_Printf("SansaClothBackendProbe",
