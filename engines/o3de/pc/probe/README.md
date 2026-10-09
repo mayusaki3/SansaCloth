@@ -502,7 +502,7 @@ SANSA_O3DE|OXC-001.RESULT|PASS
 The intentional `CPP_RESULT|FAIL` is from the negative input; the Python
 probe must report `INVALID_REJECTED|PASS`. If the Gem is unavailable,
 `OXC-001.RESULT|OPEN`; a failed conversion or unexpected response is FAIL.
-OXC-001 remains OPEN until the actual Editor log is reviewed.
+OXC-001 was confirmed **RUNTIME PASS** in the 2026-10-09 O3DE Editor log. The intentional invalid-input rejection was also observed. This does not validate the full JSON handoff.
 
 ## Run OXC-002 real Fixture Exchange JSON → C++ handoff
 
