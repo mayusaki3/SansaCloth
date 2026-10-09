@@ -1117,6 +1117,34 @@ namespace SansaClothBackendProbeValidation
                 && doc.HasMember("cloth") && doc["cloth"].IsObject()
                 && doc.HasMember("inputs") && doc["inputs"].IsObject();
         }
+        // OXC-009 phase 1: parse matrix identity; this does not grant ACK.
+        int matrixScenario = 0;
+        double matrixConformity = -1.0;
+        int matrixGravity = -1;
+        if (!doc.HasParseError() && doc.IsObject()
+            && doc.HasMember("case_id") && doc["case_id"].IsString())
+        {
+            const AZStd::string id(doc["case_id"].GetString());
+            for (int scenario = 1; scenario <= 5; ++scenario)
+            {
+                for (int conformity = 0; conformity <= 2; ++conformity)
+                {
+                    const char* cCode = conformity == 0 ? "0" : (conformity == 1 ? "05" : "1");
+                    for (int gravity = 0; gravity <= 1; ++gravity)
+                    {
+                        if (id == AZStd::string::format("SR-%03d-C%s-G%d", scenario, cCode, gravity))
+                        {
+                            matrixScenario = scenario;
+                            matrixConformity = conformity == 0 ? 0.0 : (conformity == 1 ? 0.5 : 1.0);
+                            matrixGravity = gravity;
+                        }
+                    }
+                }
+            }
+        }
+        AZ_Printf("SansaClothBackendProbe",
+            "SANSA_O3DE|OXC-009.CPP_MATRIX_ID|SCENARIO=%d|C=%.1f|G=%d\\n",
+            matrixScenario, matrixConformity, matrixGravity);
         int vertexCount = -1;
         int triangleCount = -1;
         int cpCount = -1;
