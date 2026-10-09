@@ -2,6 +2,8 @@
 
 #include <AzCore/Math/MathUtils.h>
 #include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 #include <AzCore/std/string/string.h>
 #include <AzCore/Math/Vector2.h>
 
@@ -583,6 +585,9 @@ namespace SansaClothBackendProbeValidation
 
         if (auto* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
+            behaviorContext->Method("ProbeSurfaceResponseJson", &SystemComponent::ProbeSurfaceResponseJson)
+                ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
+                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common);
             behaviorContext->Method("ProbeFixtureJson", &SystemComponent::ProbeFixtureJson)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common);
@@ -1838,6 +1843,176 @@ namespace SansaClothBackendProbeValidation
             "SANSA_O3DE|BF-008.CPP_MEASUREMENTS_RESULT|%s\n",
             valid ? "PASS" : "FAIL");
         return valid ? measurements : AZStd::string{};
+    }
+
+
+    // OSR validation-only: independently calculate the SR-001-C0-G0 reference
+    // stages in double precision. This is NOT an OXC fixture ACK.
+    AZStd::string SystemComponent::ProbeSurfaceResponseJson(const AZStd::string& payload)
+    {
+        struct V
+        {
+            double x, y, z;
+            V operator+(V b) const { return {x+b.x,y+b.y,z+b.z}; }
+            V operator-(V b) const { return {x-b.x,y-b.y,z-b.z}; }
+            V operator*(double s) const { return {x*s,y*s,z*s}; }
+            double dot(V b) const { return x*b.x+y*b.y+z*b.z; }
+            V cross(V b) const { return {y*b.z-z*b.y,z*b.x-x*b.z,x*b.y-y*b.x}; }
+            V normalized() const
+            {
+                const double n = std::sqrt(dot(*this));
+                return n > 0 && std::isfinite(n) ? (*this)*(1.0/n) : V{0,0,0};
+            }
+        };
+        auto vec = [](const rapidjson::Value& v) -> V {
+            return {v[0].GetDouble(),v[1].GetDouble(),v[2].GetDouble()};
+        };
+        auto validVec = [](const rapidjson::Value& v) {
+            return v.IsArray() && v.Size()==3 && v[0].IsNumber() && v[1].IsNumber()
+                && v[2].IsNumber() && std::isfinite(v[0].GetDouble())
+                && std::isfinite(v[1].GetDouble()) && std::isfinite(v[2].GetDouble());
+        };
+        rapidjson::Document d;
+        d.Parse(payload.c_str());
+        if (d.HasParseError() || !d.IsObject() || !d.HasMember("case_id")
+            || !d["case_id"].IsString()
+            || AZStd::string(d["case_id"].GetString()) != "SR-001-C0-G0"
+            || !d.HasMember("format") || !d["format"].IsString()
+            || AZStd::string(d["format"].GetString()) != "sansacloth.validation.fixture-exchange/0"
+            || !d.HasMember("body_surface") || !d["body_surface"].IsObject()
+            || !d.HasMember("cloth") || !d["cloth"].IsObject()
+            || !d.HasMember("inputs") || !d["inputs"].IsObject())
+            return {};
+        const auto& body = d["body_surface"];
+        const auto& cloth = d["cloth"];
+        const auto& inputs = d["inputs"];
+        if (!body.HasMember("domain_id") || !body["domain_id"].IsUint64()
+            || !body.HasMember("vertices") || !body["vertices"].IsArray()
+            || !body.HasMember("triangles") || !body["triangles"].IsArray()
+            || !cloth.HasMember("control_points") || !cloth["control_points"].IsArray()
+            || cloth["control_points"].Size()!=147
+            || !inputs.HasMember("world_gravity_m_per_s2")
+            || !validVec(inputs["world_gravity_m_per_s2"])
+            || !inputs.HasMember("conformity") || !inputs["conformity"].IsNumber()
+            || !inputs.HasMember("collision_tolerance_m") || !inputs["collision_tolerance_m"].IsNumber())
+            return {};
+        const double conformity = inputs["conformity"].GetDouble();
+        const double tolerance = inputs["collision_tolerance_m"].GetDouble();
+        if (conformity!=0 || tolerance!=0 || vec(inputs["world_gravity_m_per_s2"]).dot(vec(inputs["world_gravity_m_per_s2"]))!=0)
+            return {};
+        const auto& vertices = body["vertices"];
+        const auto& triangles = body["triangles"];
+        struct CP { unsigned id, strip, order; V pos; double u,v; bool anchor,contact; };
+        std::array<CP,147> points{};
+        std::array<bool,147> seen{};
+        for (const auto& item : cloth["control_points"].GetArray())
+        {
+            if (!item.IsObject() || !item.HasMember("stable_id") || !item["stable_id"].IsUint()
+                || !item.HasMember("strip_id") || !item["strip_id"].IsUint()
+                || !item.HasMember("strip_order") || !item["strip_order"].IsUint()
+                || !item.HasMember("position_m") || !validVec(item["position_m"])
+                || !item.HasMember("anchor") || !item["anchor"].IsBool()
+                || !item.HasMember("contact") || !item["contact"].IsBool()
+                || !item.HasMember("surface_reference") || !item["surface_reference"].IsObject())
+                return {};
+            const auto& ref = item["surface_reference"];
+            if (!ref.HasMember("domain_id") || !ref["domain_id"].IsUint64()
+                || ref["domain_id"].GetUint64()!=body["domain_id"].GetUint64()
+                || !ref.HasMember("u") || !ref["u"].IsNumber()
+                || !ref.HasMember("v") || !ref["v"].IsNumber()) return {};
+            unsigned id=item["stable_id"].GetUint();
+            if (id>=147 || seen[id]) return {};
+            seen[id]=true;
+            points[id]={id,item["strip_id"].GetUint(),item["strip_order"].GetUint(),
+                vec(item["position_m"]),ref["u"].GetDouble(),ref["v"].GetDouble(),
+                item["anchor"].GetBool(),item["contact"].GetBool()};
+        }
+        struct Q { V surface,normal; double separation; };
+        auto query = [&](const CP& point,V position,Q& out) -> bool {
+            for (const auto& tri : triangles.GetArray())
+            {
+                if (!tri.IsArray() || tri.Size()!=3) return false;
+                unsigned idx[3]; V xyz[3]; double uv[3][2];
+                for (int k=0;k<3;++k)
+                {
+                    if (!tri[k].IsUint() || (idx[k]=tri[k].GetUint())>=vertices.Size()) return false;
+                    const auto& v=vertices[idx[k]];
+                    if (!v.IsObject() || !v.HasMember("position_m") || !validVec(v["position_m"])
+                        || !v.HasMember("uv") || !v["uv"].IsArray() || v["uv"].Size()!=2
+                        || !v["uv"][0].IsNumber() || !v["uv"][1].IsNumber()) return false;
+                    xyz[k]=vec(v["position_m"]);
+                    uv[k][0]=v["uv"][0].GetDouble(); uv[k][1]=v["uv"][1].GetDouble();
+                }
+                double ax=uv[1][0]-uv[0][0],ay=uv[1][1]-uv[0][1];
+                double bx=uv[2][0]-uv[0][0],by=uv[2][1]-uv[0][1];
+                double px=point.u-uv[0][0],py=point.v-uv[0][1];
+                double denom=ax*by-ay*bx;
+                if (std::abs(denom)<=1e-15) continue;
+                double w1=(px*by-py*bx)/denom,w2=(ax*py-ay*px)/denom,w0=1-w1-w2;
+                if (w0 < -1e-12 || w1 < -1e-12 || w2 < -1e-12) continue;
+                V normal=(xyz[1]-xyz[0]).cross(xyz[2]-xyz[0]).normalized();
+                if (normal.dot(normal)==0) return false;
+                V surface=xyz[0]*w0+xyz[1]*w1+xyz[2]*w2;
+                out={surface,normal,(position-surface).dot(normal)};
+                return true;
+            }
+            return false;
+        };
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> w(buffer);
+        auto writeVec = [&](V v) { w.StartArray();w.Double(v.x);w.Double(v.y);w.Double(v.z);w.EndArray(); };
+        w.StartObject();
+        w.Key("format");w.String("sansacloth.validation.surface-response-result/0");
+        w.Key("case_id");w.String("SR-001-C0-G0");
+        w.Key("profile");w.StartObject();
+        w.Key("characteristic_length_m");w.Double(0.1);
+        w.Key("quasi_static_gravity_scale");w.Double(0.1);
+        w.Key("conformity_reach_m");w.Double(0.02);
+        w.Key("support_layout");w.String("BothEdges");
+        w.EndObject();
+        w.Key("control_points");w.StartArray();
+        int supports=0,contacts=0;
+        for (const auto& p : points)
+        {
+            // Both-edge strip bridge: anchor endpoints at strip orders 0 and 20.
+            if (p.strip>=7 || p.order>=21 || p.id!=p.strip*21+p.order) return {};
+            const CP& left=points[p.strip*21], &right=points[p.strip*21+20];
+            if (!left.anchor || !right.anchor) return {};
+            V bridge=p.anchor ? p.pos : left.pos*(1.0-p.order/20.0)+right.pos*(p.order/20.0);
+            V gravity=bridge; // G0: gravity zero, independently checked above.
+            Q afterGravity{};
+            if (!query(p,gravity,afterGravity)) return {};
+            V conform=gravity; // C0: no conformity.
+            Q afterConformity{};
+            if (!query(p,conform,afterConformity)) return {};
+            V collision=conform;
+            if (afterConformity.separation<tolerance)
+                collision=collision+afterConformity.normal*(tolerance-afterConformity.separation);
+            Q final{};
+            if (!query(p,collision,final)) return {};
+            bool contact=final.separation<=tolerance;
+            supports+=p.anchor;contacts+=contact;
+            w.StartObject();
+            w.Key("stable_id");w.Uint(p.id);
+            w.Key("support");w.String(p.anchor?"Anchor":"Unsupported");
+            w.Key("bridge_position_m");writeVec(bridge);
+            w.Key("gravity_position_m");writeVec(gravity);
+            w.Key("conformity_position_m");writeVec(conform);
+            w.Key("collision_position_m");writeVec(collision);
+            w.Key("final_position_m");writeVec(collision);
+            w.Key("surface_position_m");writeVec(final.surface);
+            w.Key("surface_normal");writeVec(final.normal);
+            w.Key("separation_m");w.Double(final.separation);
+            w.Key("contact");w.Bool(contact);
+            w.EndObject();
+        }
+        w.EndArray();
+        w.Key("aggregate");w.StartObject();
+        w.Key("control_point_count");w.Uint(147);
+        w.Key("support_count");w.Int(supports);
+        w.Key("contact_count");w.Int(contacts);
+        w.EndObject();w.EndObject();
+        return AZStd::string(buffer.GetString());
     }
 
 } // namespace SansaClothBackendProbeValidation
