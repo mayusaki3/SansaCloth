@@ -18,7 +18,7 @@ compare = _comparator.compare
 
 PREFIX = "SANSA_O3DE|OSR-004."
 root = Path(__file__).resolve().parent
-cases = [f"SR-001-C{c}-G{g}" for c in ("0", "05", "1") for g in ("0", "1")]
+cases = [f"SR-{scenario:03d}-C{c}-G{g}" for scenario in range(1, 6) for c in ("0", "05", "1") for g in ("0", "1")]
 try:
     method = getattr(probe, "ProbeSurfaceResponseJson", None)
     if not callable(method):
