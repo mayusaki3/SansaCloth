@@ -100,6 +100,75 @@ impl SurfaceQuery for ResolvedExchangeSurfaceQuery<'_> {
     }
 }
 
+#[derive(Serialize)]
+struct QueryDiagnostic {
+    stable_id: u64,
+    barycentric_weights: [f64; 3],
+    raw_normal: [f64; 3],
+    normal_length: f64,
+    delta_position_m: [f64; 3],
+    separation_dot_terms: [f64; 3],
+}
+
+fn diagnostic_query(
+    surface: &ExchangeBodySurface,
+    position: DVec3,
+    reference: SurfaceReference,
+    stable_id: u64,
+) -> QueryDiagnostic {
+    let uv = [reference.u, reference.v];
+    for triangle in &surface.triangles {
+        let v0 = &surface.vertices[triangle[0]];
+        let v1 = &surface.vertices[triangle[1]];
+        let v2 = &surface.vertices[triangle[2]];
+        if let Some(weights) = barycentric(uv, v0.uv, v1.uv, v2.uv) {
+            let p0 = vec3(v0.position_m);
+            let p1 = vec3(v1.position_m);
+            let p2 = vec3(v2.position_m);
+            let surface_position = p0 * weights[0] + p1 * weights[1] + p2 * weights[2];
+            let raw = (p1 - p0).cross(p2 - p0);
+            let normal = raw.normalize();
+            let delta = position - surface_position;
+            return QueryDiagnostic {
+                stable_id,
+                barycentric_weights: weights,
+                raw_normal: array3(raw),
+                normal_length: raw.length(),
+                delta_position_m: array3(delta),
+                separation_dot_terms: [delta.x * normal.x, delta.y * normal.y, delta.z * normal.z],
+            };
+        }
+    }
+    panic!("unresolved diagnostic surface reference for {stable_id}");
+}
+
+fn write_query_diagnostics(
+    output_dir: &Path,
+    exchange: &FixtureExchange,
+    result: &ValidationResult,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let by_id: BTreeMap<_, _> = exchange.cloth.control_points.iter()
+        .map(|p| (p.stable_id, p)).collect();
+    let mut diagnostics = Vec::with_capacity(result.control_points.len());
+    for point in &result.control_points {
+        let source = by_id[&point.stable_id];
+        let reference = SurfaceReference::new(
+            source.surface_reference.domain_id,
+            source.surface_reference.u,
+            source.surface_reference.v,
+        ).unwrap();
+        diagnostics.push(diagnostic_query(
+            &exchange.body_surface,
+            vec3(point.final_position_m),
+            reference,
+            point.stable_id,
+        ));
+    }
+    let path = output_dir.join(format!("{}.query-diagnostic.json", exchange.case_id));
+    fs::write(path, serde_json::to_vec_pretty(&diagnostics)?)?;
+    Ok(())
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output_dir = env::args_os().nth(1).map(PathBuf::from).unwrap_or_else(|| {
         PathBuf::from("validation")
@@ -117,10 +186,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .into());
     }
 
+    let diagnostic_dir = env::var_os("SANSA_SURFACE_QUERY_DIAGNOSTIC_DIR").map(PathBuf::from);
+    if let Some(dir) = &diagnostic_dir { fs::create_dir_all(dir)?; }
     let mut written = 0usize;
     for exchange in &exchanges {
         let result = solve_exchange(exchange);
         write_result(&output_dir, &result)?;
+        if let Some(dir) = &diagnostic_dir { write_query_diagnostics(dir, exchange, &result)?; }
         println!("SANSA_FXE|FXE-017A.CASE.{}|PASS", exchange.case_id);
         written += 1;
     }
