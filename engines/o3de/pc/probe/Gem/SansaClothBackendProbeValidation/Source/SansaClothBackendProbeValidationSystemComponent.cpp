@@ -1930,7 +1930,7 @@ namespace SansaClothBackendProbeValidation
                 vec(item["position_m"]),ref["u"].GetDouble(),ref["v"].GetDouble(),
                 item["anchor"].GetBool(),item["contact"].GetBool()};
         }
-        struct Q { V surface,normal; double separation; V rawNormal,delta; double normalLength,weights[3],dotTerms[3]; };
+        struct Q { V surface,normal; double separation; V rawNormal,delta; double normalLength,weights[3],dotTerms[3]; V trianglePositions[3],edge01,edge02; };
         auto query = [&](const CP& point,V position,Q& out) -> bool {
             for (const auto& tri : triangles.GetArray())
             {
@@ -1960,7 +1960,8 @@ namespace SansaClothBackendProbeValidation
                 V surface=xyz[0]*w0+xyz[1]*w1+xyz[2]*w2;
                 V delta=position-surface;
                 out={surface,normal,delta.dot(normal),rawNormal,delta,normalLength,
-                    {w0,w1,w2},{delta.x*normal.x,delta.y*normal.y,delta.z*normal.z}};
+                    {w0,w1,w2},{delta.x*normal.x,delta.y*normal.y,delta.z*normal.z},
+                    {xyz[0],xyz[1],xyz[2]},xyz[1]-xyz[0],xyz[2]-xyz[0]};
                 return true;
             }
             return false;
@@ -2023,6 +2024,11 @@ namespace SansaClothBackendProbeValidation
             w.Key("separation_m");w.Double(final.separation);
             w.Key("contact");w.Bool(contact);
             w.Key("diagnostic_query");w.StartObject();
+            w.Key("triangle_positions_m");w.StartArray();
+            for (V value : final.trianglePositions) writeVec(value);
+            w.EndArray();
+            w.Key("edge_01_m");writeVec(final.edge01);
+            w.Key("edge_02_m");writeVec(final.edge02);
             w.Key("barycentric_weights");w.StartArray();
             for (double value : final.weights) w.Double(value);
             w.EndArray();
