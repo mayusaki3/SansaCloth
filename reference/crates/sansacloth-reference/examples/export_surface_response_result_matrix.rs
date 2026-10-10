@@ -197,12 +197,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .into());
     }
 
+    // Optional comparison run: solve exactly the Fixture Exchange values after JSON roundtrip.
+    // Keep the canonical Reference outputs untouched.
+    let roundtrip_dir = env::var_os("SANSA_SURFACE_JSON_ROUNDTRIP_RESULT_DIR").map(PathBuf::from);
+    if let Some(dir) = &roundtrip_dir { fs::create_dir_all(dir)?; }
     let diagnostic_dir = env::var_os("SANSA_SURFACE_QUERY_DIAGNOSTIC_DIR").map(PathBuf::from);
     if let Some(dir) = &diagnostic_dir { fs::create_dir_all(dir)?; }
     let mut written = 0usize;
     for exchange in &exchanges {
         let result = solve_exchange(exchange);
         write_result(&output_dir, &result)?;
+        if let Some(dir) = &roundtrip_dir {
+            let serialized = serde_json::to_vec(exchange)?;
+            let decoded: FixtureExchange = serde_json::from_slice(&serialized)?;
+            let roundtrip_result = solve_exchange(&decoded);
+            write_result(dir, &roundtrip_result)?;
+            if let Some(diagnostic_dir) = &diagnostic_dir {
+                let roundtrip_diagnostic_dir = diagnostic_dir.join("json-roundtrip");
+                fs::create_dir_all(&roundtrip_diagnostic_dir)?;
+                write_query_diagnostics(&roundtrip_diagnostic_dir, &decoded, &roundtrip_result)?;
+            }
+        }
         if let Some(dir) = &diagnostic_dir { write_query_diagnostics(dir, exchange, &result)?; }
         println!("SANSA_FXE|FXE-017A.CASE.{}|PASS", exchange.case_id);
         written += 1;
