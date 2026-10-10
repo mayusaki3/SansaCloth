@@ -106,6 +106,7 @@ struct QueryDiagnostic {
     triangle_positions_m: [[f64; 3]; 3],
     edge_01_m: [f64; 3],
     edge_02_m: [f64; 3],
+    json_roundtrip_triangle_positions_m: [[f64; 3]; 3],
     barycentric_weights: [f64; 3],
     raw_normal: [f64; 3],
     normal_length: f64,
@@ -128,6 +129,9 @@ fn diagnostic_query(
             let p0 = vec3(v0.position_m);
             let p1 = vec3(v1.position_m);
             let p2 = vec3(v2.position_m);
+            // Mirror the JSON number serialization/parsing boundary used by O3DE.
+            let roundtrip = [v0.position_m, v1.position_m, v2.position_m]
+                .map(|v| v.map(|x| serde_json::from_str::<f64>(&serde_json::to_string(&x).unwrap()).unwrap()));
             let surface_position = p0 * weights[0] + p1 * weights[1] + p2 * weights[2];
             let raw = (p1 - p0).cross(p2 - p0);
             let normal = raw.normalize();
@@ -137,6 +141,7 @@ fn diagnostic_query(
                 triangle_positions_m: [array3(p0), array3(p1), array3(p2)],
                 edge_01_m: array3(p1 - p0),
                 edge_02_m: array3(p2 - p0),
+                json_roundtrip_triangle_positions_m: roundtrip,
                 barycentric_weights: weights,
                 raw_normal: array3(raw),
                 normal_length: raw.length(),
