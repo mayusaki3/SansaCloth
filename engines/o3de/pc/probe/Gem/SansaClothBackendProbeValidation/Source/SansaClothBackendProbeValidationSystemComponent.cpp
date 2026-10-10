@@ -2005,8 +2005,12 @@ namespace SansaClothBackendProbeValidation
             Q afterConformity{};
             if (!query(p,conform,afterConformity)) return {};
             V collision=conform;
-            if (afterConformity.separation<tolerance)
-                collision=collision+afterConformity.normal.normalized()*(tolerance-afterConformity.separation);
+            const bool collisionApplied = afterConformity.separation < tolerance;
+            const V collisionNormal = collisionApplied ? afterConformity.normal.normalized() : V{0,0,0};
+            const double collisionCorrection = collisionApplied ? tolerance-afterConformity.separation : 0.0;
+            const V collisionOffset = collisionNormal * collisionCorrection;
+            if (collisionApplied)
+                collision = collision + collisionOffset;
             Q final{};
             if (!query(p,collision,final)) return {};
             bool contact=final.separation<=tolerance;
@@ -2018,6 +2022,16 @@ namespace SansaClothBackendProbeValidation
             w.Key("gravity_position_m");writeVec(gravity);
             w.Key("conformity_position_m");writeVec(conform);
             w.Key("collision_position_m");writeVec(collision);
+            w.Key("collision_diagnostic");w.StartObject();
+            w.Key("applied");w.Bool(collisionApplied);
+            w.Key("input_position_m");writeVec(conform);
+            w.Key("surface_position_m");writeVec(afterConformity.surface);
+            w.Key("surface_normal");writeVec(afterConformity.normal);
+            w.Key("separation_m");w.Double(afterConformity.separation);
+            w.Key("normalized_normal");writeVec(collisionNormal);
+            w.Key("correction_m");w.Double(collisionCorrection);
+            w.Key("offset_m");writeVec(collisionOffset);
+            w.EndObject();
             w.Key("final_position_m");writeVec(collision);
             w.Key("surface_position_m");writeVec(final.surface);
             w.Key("surface_normal");writeVec(final.normal);
