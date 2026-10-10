@@ -28,7 +28,7 @@ def stage_differences(expected, got):
     else:
         for field, value in query.items():
             if isinstance(value, list):
-                encoded = ",".join(x.hex() for x in value)
+                encoded = ",".join(",".join(y.hex() for y in x) if isinstance(x, list) else x.hex() for x in value)
             else:
                 encoded = value.hex()
             print(f"{prefix}QUERY_INTERMEDIATE|{field}|{encoded}")
