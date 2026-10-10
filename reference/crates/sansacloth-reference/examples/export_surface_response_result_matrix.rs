@@ -103,6 +103,9 @@ impl SurfaceQuery for ResolvedExchangeSurfaceQuery<'_> {
 #[derive(Serialize)]
 struct QueryDiagnostic {
     stable_id: u64,
+    triangle_positions_m: [[f64; 3]; 3],
+    edge_01_m: [f64; 3],
+    edge_02_m: [f64; 3],
     barycentric_weights: [f64; 3],
     raw_normal: [f64; 3],
     normal_length: f64,
@@ -131,6 +134,9 @@ fn diagnostic_query(
             let delta = position - surface_position;
             return QueryDiagnostic {
                 stable_id,
+                triangle_positions_m: [array3(p0), array3(p1), array3(p2)],
+                edge_01_m: array3(p1 - p0),
+                edge_02_m: array3(p2 - p0),
                 barycentric_weights: weights,
                 raw_normal: array3(raw),
                 normal_length: raw.length(),
