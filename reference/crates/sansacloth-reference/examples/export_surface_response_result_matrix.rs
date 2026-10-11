@@ -101,8 +101,21 @@ impl SurfaceQuery for ResolvedExchangeSurfaceQuery<'_> {
 }
 
 #[derive(Serialize)]
+struct CollisionDiagnostic {
+    applied: bool,
+    input_position_m: [f64; 3],
+    surface_position_m: [f64; 3],
+    surface_normal: [f64; 3],
+    separation_m: f64,
+    normalized_normal: [f64; 3],
+    correction_m: f64,
+    offset_m: [f64; 3],
+}
+
+#[derive(Serialize)]
 struct QueryDiagnostic {
     stable_id: u64,
+    collision_diagnostic: CollisionDiagnostic,
     triangle_positions_m: [[f64; 3]; 3],
     edge_01_m: [f64; 3],
     edge_02_m: [f64; 3],
@@ -119,6 +132,7 @@ fn diagnostic_query(
     position: DVec3,
     reference: SurfaceReference,
     stable_id: u64,
+    collision_diagnostic: CollisionDiagnostic,
 ) -> QueryDiagnostic {
     let uv = [reference.u, reference.v];
     for triangle in &surface.triangles {
@@ -138,6 +152,7 @@ fn diagnostic_query(
             let delta = position - surface_position;
             return QueryDiagnostic {
                 stable_id,
+                collision_diagnostic,
                 triangle_positions_m: [array3(p0), array3(p1), array3(p2)],
                 edge_01_m: array3(p1 - p0),
                 edge_02_m: array3(p2 - p0),
@@ -168,11 +183,36 @@ fn write_query_diagnostics(
             source.surface_reference.u,
             source.surface_reference.v,
         ).unwrap();
+        let conformity_position = vec3(point.conformity_position_m);
+        let collision_query = ResolvedExchangeSurfaceQuery {
+            surface: &exchange.body_surface,
+        }.query(conformity_position, reference);
+        let tolerance = exchange.inputs.collision_tolerance_m;
+        let applied = collision_query.separation_m < tolerance;
+        let normalized_normal = if applied {
+            collision_query.surface_normal.try_normalize()
+                .expect("collision correction requires a finite non-zero surface normal")
+        } else {
+            DVec3::ZERO
+        };
+        let correction_m = if applied { tolerance - collision_query.separation_m } else { 0.0 };
+        let offset = normalized_normal * correction_m;
+        let collision_diagnostic = CollisionDiagnostic {
+            applied,
+            input_position_m: point.conformity_position_m,
+            surface_position_m: array3(collision_query.surface_position_m),
+            surface_normal: array3(collision_query.surface_normal),
+            separation_m: collision_query.separation_m,
+            normalized_normal: array3(normalized_normal),
+            correction_m,
+            offset_m: array3(offset),
+        };
         diagnostics.push(diagnostic_query(
             &exchange.body_surface,
             vec3(point.final_position_m),
             reference,
             point.stable_id,
+            collision_diagnostic,
         ));
     }
     let path = output_dir.join(format!("{}.query-diagnostic.json", exchange.case_id));
