@@ -4,7 +4,13 @@ import struct
 from pathlib import Path
 import azlmbr.sansacloth_probe as probe
 
-root = Path(__file__).resolve().parent
+script_dir = Path(__file__).resolve().parent
+repo_root = script_dir.parents[5]
+fixture_dir = repo_root / "reference" / "validation" / "fixture-exchange" / "basic-v1"
+result_dir = repo_root / "validation" / "surface-response-json-roundtrip"
+for directory in (fixture_dir, result_dir):
+    if not directory.is_dir():
+        raise FileNotFoundError(f"OSR-006 diagnostic directory not found: {directory}")
 prefix = "SANSA_O3DE|OSR-006."
 def ulp_distance(a, b):
     """IEEE-754 binary64 ordered distance, for diagnosis only."""
@@ -32,6 +38,18 @@ def stage_differences(expected, got):
             else:
                 encoded = value.hex()
             print(f"{prefix}QUERY_INTERMEDIATE|{field}|{encoded}")
+    collision = got.get("collision_diagnostic")
+    if collision is not None:
+        for field, value in collision.items():
+            if isinstance(value, list):
+                encoded = ",".join(x.hex() for x in value)
+            elif isinstance(value, bool):
+                encoded = str(value)
+            else:
+                encoded = value.hex()
+            print(f"{prefix}COLLISION_INTERMEDIATE|{field}|{encoded}")
+    else:
+        print(f"{prefix}COLLISION_INTERMEDIATES|UNAVAILABLE|REBUILD_O3DE_GEM")
     a, b = expected["separation_m"], got["separation_m"]
     print(f"{prefix}SEPARATION_HEX|REF={a.hex()}|ACT={b.hex()}|ULP={ulp_distance(a, b)}")
 
@@ -42,8 +60,8 @@ for scenario in range(1, 6):
     for conformity in ("0", "05", "1"):
         for gravity in ("0", "1"):
             case = f"SR-{scenario:03d}-C{conformity}-G{gravity}"
-            fixture = (root / "Fixtures" / f"{case}.json").read_text(encoding="utf-8")
-            reference = json.loads((root / "SurfaceResponseResults" / f"{case}.json").read_text(encoding="utf-8"))
+            fixture = (fixture_dir / f"{case}.json").read_text(encoding="utf-8")
+            reference = json.loads((result_dir / f"{case}.json").read_text(encoding="utf-8"))
             output = probe.ProbeSurfaceResponseJson(fixture)
             if not output:
                 print(f"{prefix}CASE|{case}|NO_OUTPUT")
