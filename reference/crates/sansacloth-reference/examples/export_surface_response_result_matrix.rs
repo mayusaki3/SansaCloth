@@ -123,6 +123,9 @@ struct QueryDiagnostic {
     barycentric_weights: [f64; 3],
     raw_normal: [f64; 3],
     normal_length: f64,
+    normal_glam: [f64; 3],
+    normal_direct_division: [f64; 3],
+    normal_reciprocal_multiply: [f64; 3],
     delta_position_m: [f64; 3],
     separation_dot_terms: [f64; 3],
 }
@@ -149,6 +152,10 @@ fn diagnostic_query(
             let surface_position = p0 * weights[0] + p1 * weights[1] + p2 * weights[2];
             let raw = (p1 - p0).cross(p2 - p0);
             let normal = raw.normalize();
+            let normal_length = raw.length();
+            // Diagnostic alternatives only: do not alter the solver's normal.
+            let normal_direct_division = raw / normal_length;
+            let normal_reciprocal_multiply = raw * (1.0 / normal_length);
             let delta = position - surface_position;
             return QueryDiagnostic {
                 stable_id,
@@ -159,7 +166,10 @@ fn diagnostic_query(
                 json_roundtrip_triangle_positions_m: roundtrip,
                 barycentric_weights: weights,
                 raw_normal: array3(raw),
-                normal_length: raw.length(),
+                normal_length,
+                normal_glam: array3(normal),
+                normal_direct_division: array3(normal_direct_division),
+                normal_reciprocal_multiply: array3(normal_reciprocal_multiply),
                 delta_position_m: array3(delta),
                 separation_dot_terms: [delta.x * normal.x, delta.y * normal.y, delta.z * normal.z],
             };
