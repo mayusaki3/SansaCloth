@@ -1048,3 +1048,19 @@ Git `develop` の `validation/osr008-evidence/osr008-evidence.json`（ユーザ�
 4. `fixture_version`/`reference_version` は証跡スクリプトが付与した形式ラベル。各JSONのformatフィールドの独立照合や実行バイナリのversion検証は別途必要。
 
 **製品実装への適用範囲：** O3DE実Mesh API、Skinned/deformed mesh、非一様scale、topology変更、production Runtime Backendの挙動は本Gateで検証していない。これらをPASSへ昇格させない。
+
+
+### 16.18 OSR-008 原本照合・OSR-001 Reference再生成 実測PASS（2026-10-12）
+
+Windows PowerShellで `git pull --ff-only` により `a130b29` を取り込み、監査スクリプト `engines/o3de/pc/probe/tests/audit_osr008_evidence.py` を実行したユーザー提供ログを確認した。
+
+- `python engines/o3de/pc/probe/tests/audit_osr008_evidence.py`：`TRACKED_ORIGINAL_HASHES|PASS`、`ERROR_COUNT|0`、`RESULT|PASS`。
+- `python engines/o3de/pc/probe/tests/audit_osr008_evidence.py --regenerate`：`TRACKED_ORIGINAL_HASHES|PASS`、`REFERENCE_REGENERATION|PASS`、`ERROR_COUNT|0`、`RESULT|PASS`。
+- Backend C++ソースおよびPython比較器はGit blobのLFをWindows checkoutのCRLFへ変換したバイト列で記録済みSHA-256・サイズと一致（`MATCH|...|checkout-crlf`）。
+- Fixture全30件について、監査スクリプトのGit履歴原本照合が成功。
+- `validation/surface-response-json-roundtrip` 以下のReference生成物30件はGit追跡対象外（`GENERATED_REFERENCE|...|NOT_TRACKED`）。これは欠落エラーではなく、`--regenerate` により生成された各Reference JSONのSHA-256・サイズ・case_id・formatを証跡と照合して成功した。
+- 再生成には実行時点の作業ツリーのRustソースを使用。証跡基準リビジョン `9a788c39eace0506a01f1f1376af1d93be62f62a` のソースとの完全な同一性を独立に検査したわけではない。
+
+**判定：OSR-001 Reference再生成 PASS（現行ソース）、OSR-008 Git原本SHA-256照合・Reference生成物再現性 PASS。** 16.17節の「再生成未検証」は当時の履歴記録として残し、本節を最新判定とする。
+
+**総合状態：OSR-001～008のvalidation-only SurfaceResponse検証・負例検証・証跡監査はすべてPASS（上記の範囲）。** ただし、ロードされたO3DE Gemのビルド済みバイナリハッシュ・ビルド環境と証跡の紐付け、production Mesh/Skinned Mesh/変形メッシュ、本番Runtime Backendは未検証である。
