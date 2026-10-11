@@ -953,3 +953,22 @@ Windowsのリポジトリルートで`git pull --ff-only`後、`python -m unitte
 - Bridge/Gravity/Conformity/Collision/Final/Surface/Normal/Separationの全比較項目、およびStableId/Support/Contact/Profile/集計の比較器検査が成功。
 
 **判定：OSR-004 SR-001 6/6 Runtime PASS。** Gravity・Conformity有効条件を含む。ただしSR-002～005の24条件、OneEdge support等の一般化、OSR-006/008は未検証・OPEN。
+
+
+### 16.13 OSR-006 Scenario extension Editor Runtime PASS（2026-10-11）
+
+O3DE Editor実機で `sansacloth_osr006_full_compare.py` を実行し、Rust ReferenceのJSON-roundtrip結果と独立C++ `ProbeSurfaceResponseJson` 実計算結果を全30ケースで照合した。
+
+- 対象：SR-001～005 × Conformity=0/0.5/1 × Gravity=0/1、計30ケース。
+- 各ケース147 CP、合計4,410 CP。StableIdで対応付け、Support、Contact、Profile、case_id、集計値を既存比較器で検査。
+- Bridge/Gravity/Conformity/Collision/Final/Surfaceの各位置、Surface Normal、Separationの**全8フィールドの最大絶対差は0**。
+- `OSR-006.FULL_CHECKED|30`、`OSR-006.FULL_FAILED|0`、`OSR-006.FULL_RESULT|PASS_DIAGNOSTIC`。
+- 直前のContact専用診断も30ケースすべて不一致0。Host Python単体テスト9/9 PASS。
+- 以前のContact不一致（18ケース、210点）は、C++の法線正規化を除算から逆数乗算に変更して解消。
+- 実行スクリプトは暫定比較許容差 `1e-12`（位置・Separation [m]、法線成分）を使用したが、観測最大差は0であり閾値依存のPASSではない。
+
+**判定：OSR-006 Scenario extension Runtime PASS（30/30）。**
+16.2節のOSR-006条件（全30ケースで両実計算結果を照合、未対応ケースをOPEN扱い）を満たす。
+スクリプト内の `PASS_DIAGNOSTIC` / `PENDING_CRITERIA_REVIEW` は正式判定を自動発行しない設計上のマーカーであり、本節は実測結果と既定条件の照合による検証記録である。
+
+**範囲の制約：** validation-onlyの解析FixtureおよびO3DE C++ Solverについての結果であり、製品用O3DE Mesh API・変形メッシュ・本番布Solverの保証ではない。OSR-007（負例検証）とOSR-008（ケース別証跡、version、SHA-256の集約）は別ゲートであり、本結果だけでPASSとしない。OSR-001～005の個別判定も本節によって一括変更しない。
