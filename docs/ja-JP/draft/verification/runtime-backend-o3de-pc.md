@@ -1003,3 +1003,18 @@ O3DE Editor Python Consoleで `sansacloth_osr008_evidence.py` を実行したロ
 
 **判定：OSR-008 Editor Runtime集計 PASS（30/30）。**
 ただし、証跡JSONのファイル内容そのものはまだレビューしていない。ケース別ハッシュ・誤差値の独立確認および証跡のリポジトリ保存は未完了であり、OSR-008の正式な証跡レビュー完了とは区別する。現状の検証範囲はvalidation-onlyの解析Fixtureと独立C++ Solverである。
+
+
+### 16.16 OSR-008 証跡JSONレビュー（2026-10-11）
+
+ユーザーから提出された `osr008-evidence.json` を読み込み、全レコードを検査した。
+
+- 証跡JSON SHA-256：`136074896a595eeabd41022b0d71be27863646f9dc1dae0921b3c458fc6c262e`（30,556 bytes）。
+- 30ケースのID集合はSR-001～005 × C=0/0.5/1 × G=0/1と完全一致。重複・不足・余剰なし。
+- ケース別 `status=PASS` 30件、`error=null` 30件。集計 `PASS=30, FAIL=0, OPEN=0` と一致。
+- 8数値フィールドの `max_abs_error` は全30ケースですべて0。
+- 各ケースのFixture、Reference、Backend出力のSHA-256は64桁の16進数として記録され、パス・サイズ・version・許容差・Gitリビジョンも存在。
+- `repository_revision=9a788c39eace0506a01f1f1376af1d93be62f62a`、`tracked_worktree_status=CLEAN`、Backend C++ソースSHA-256 `31b015e671541e53c54b37084502b1dabb5d3c5b2beaac045686c7536a8a1bf6`。
+
+**判定：OSR-008 証跡JSON内部整合性レビュー PASS。**
+本レビューは提出された証跡の形式・網羅性・記録値の整合性を確認したもの。SHA-256の原本照合は未実施であり、原本一致を検証済みとは記載しない。証跡JSONはユーザーの実行環境で生成されたファイルであり、リポジトリへの保存は別途実施する。
