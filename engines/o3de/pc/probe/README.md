@@ -684,3 +684,45 @@ SANSA_O3DE|OXC-002.RESULT|PASS
 ~~~
 
 **Runtime acceptance remains OPEN** until the new Editor log is reviewed.
+
+
+## OSR-006 Rust Reference / O3DE SurfaceResponseResult parity (2026-10-11)
+
+The O3DE Editor runtime log supplied on 2026-10-11 confirms that the
+validation-only C++ `ProbeSurfaceResponseJson` and Rust Reference
+JSON-roundtrip results agree across **30/30** SR-001..SR-005 matrix cases
+(5 scenarios × 3 conformity values × 2 gravity values; 147 CP per case,
+4,410 point comparisons in total).
+
+The `sansacloth_osr006_full_compare.py` runner calls the independent C++
+solver and the existing `sansacloth_surface_response_compare.py` comparator.
+Observed markers:
+
+~~~text
+SANSA_O3DE|OSR-006.FULL_CHECKED|30
+SANSA_O3DE|OSR-006.FULL_FAILED|0
+SANSA_O3DE|OSR-006.FULL_RESULT|PASS_DIAGNOSTIC
+SANSA_O3DE|OSR-006.FORMAL_RESULT|PENDING_CRITERIA_REVIEW
+~~~
+
+The reported maximum difference is **0** for each of:
+`bridge_position_m`, `gravity_position_m`,
+`conformity_position_m`, `collision_position_m`,
+`final_position_m`, `surface_position_m`,
+`surface_normal`, and `separation_m`.
+The comparator also checks case ID, profile, stable IDs, support/contact,
+and aggregate counts. The preceding contact-only diagnostic reported
+0 mismatches in all 30 cases. Host Python unittest discovery passed 9/9.
+
+The original contact mismatch (210 CP across 18 cases) was resolved by
+changing the validation-only C++ normalizer from component-wise division
+by length to multiplication by reciprocal length, matching the Rust
+`glam` normalization rounding for the observed cases.
+
+**Status:** Runtime parity evidence PASS; **formal OSR-006 acceptance
+PENDING** review against the normative acceptance criteria and retention
+of the full Editor log as evidence. `PASS_DIAGNOSTIC` is not a formal
+OSR-006 PASS marker. The comparator runner's `1e-12` thresholds are
+diagnostic defaults, not an approved acceptance-tolerance change.
+This validates the analytic fixture / validation-only backend, not the
+production O3DE Mesh API or a production cloth solver.
