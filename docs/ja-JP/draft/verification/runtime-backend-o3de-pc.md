@@ -988,3 +988,18 @@ O3DE Editor Python Consoleで `sansacloth_osr007_negative_probe.py` を実行し
 16.2節の負例・ACK拒否条件を満たす。数値改変は診断用閾値 `1e-12` より十分大きい `0.001` を使用。Host Python単体テストの新規追加分については、この実測ログに含まれないため実行確認待ち。これはvalidation-onlyのC++ SolverとPython比較器を対象とし、本番O3DE Backendの保証ではない。
 
 次のOSR-008はケース別証跡とFixture/Reference/Backendのversion・SHA-256を記録する独立Gateであり、OSR-007のPASSから自動的にPASSとはしない。
+
+
+### 16.15 OSR-008 Aggregate/evidence Editor Runtime集計 PASS（2026-10-11）
+
+O3DE Editor Python Consoleで `sansacloth_osr008_evidence.py` を実行したログを確認。
+
+- `OSR-008.CASE_COUNT|30`、`OSR-008.PASS_COUNT|30`、`OSR-008.FAIL_COUNT|0`、`OSR-008.OPEN_COUNT|0`。
+- `OSR-008.REPOSITORY_REVISION|9a788c39eace0506a01f1f1376af1d93be62f62a`。
+- `OSR-008.TRACKED_WORKTREE|CLEAN`。
+- `OSR-008.BACKEND_SHA256|31b015e671541e53c54b37084502b1dabb5d3c5b2beaac045686c7536a8a1bf6`。
+- `OSR-008.RESULT|PASS`。
+- ケース別Fixture/Reference SHA-256、Backend出力SHA-256、最大絶対誤差、比較許容差、比較器SHA-256等を含む証跡JSONがローカル `validation/osr008-evidence/osr008-evidence.json` に生成されたと報告。
+
+**判定：OSR-008 Editor Runtime集計 PASS（30/30）。**
+ただし、証跡JSONのファイル内容そのものはまだレビューしていない。ケース別ハッシュ・誤差値の独立確認および証跡のリポジトリ保存は未完了であり、OSR-008の正式な証跡レビュー完了とは区別する。現状の検証範囲はvalidation-onlyの解析Fixtureと独立C++ Solverである。
