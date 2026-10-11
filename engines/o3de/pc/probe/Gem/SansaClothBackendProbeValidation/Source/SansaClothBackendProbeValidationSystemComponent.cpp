@@ -1862,7 +1862,7 @@ namespace SansaClothBackendProbeValidation
             V normalized() const
             {
                 const double n = std::sqrt(dot(*this));
-                return n > 0 && std::isfinite(n) ? (*this)/n : V{0,0,0};
+                return n > 0 && std::isfinite(n) ? (*this) * (1.0 / n) : V{0,0,0};
             }
         };
         auto vec = [](const rapidjson::Value& v) -> V {
