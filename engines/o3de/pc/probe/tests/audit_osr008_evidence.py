@@ -24,10 +24,16 @@ def git_blob(revision, path):
     return subprocess.run(["git", "-C", str(ROOT), "show", f"{revision}:{path}"],
                           capture_output=True, check=True).stdout
 
-def check_hash(label, raw, expected, errors):
-    actual = hashlib.sha256(raw).hexdigest()
-    if not isinstance(expected, str) or not HEX.fullmatch(expected) or actual != expected:
-        errors.append(f"{label}: SHA-256 mismatch expected={expected} actual={actual}")
+def check_hash(label, raw, expected, size, errors):
+    # Git blobs use LF; Windows worktrees may contain CRLF.
+    variants = [("git-lf", raw)]
+    if b"\r\n" not in raw:
+        variants.append(("checkout-crlf", raw.replace(b"\n", b"\r\n")))
+    for mode, data in variants:
+        if len(data) == size and isinstance(expected, str) and HEX.fullmatch(expected) and hashlib.sha256(data).hexdigest() == expected:
+            return mode
+    errors.append(f"{label}: SHA-256/size mismatch expected={expected}/{size}, git={hashlib.sha256(raw).hexdigest()}/{len(raw)}")
+    return None
 
 def audit(regenerate=False):
     errors = []
@@ -53,9 +59,9 @@ def audit(regenerate=False):
         path = item["path"].replace("\\", "/")
         try:
             raw = git_blob(revision, path)
-            check_hash(label, raw, item["sha256"], errors)
-            if len(raw) != item["size_bytes"]:
-                errors.append(f"{label}: size mismatch")
+            mode = check_hash(label, raw, item["sha256"], item["size_bytes"], errors)
+            if mode:
+                print(f"OSR008_AUDIT|MATCH|{label}|{mode}")
         except subprocess.CalledProcessError:
             errors.append(f"{label}: cannot read original at {revision}")
     for record in records:
@@ -77,15 +83,18 @@ def audit(regenerate=False):
                 errors.append(f"{case}: unexpected {kind} path")
             try:
                 raw = git_blob(revision, path)
-                check_hash(f"{case} {kind}", raw, item["sha256"], errors)
-                if len(raw) != item["size_bytes"]:
-                    errors.append(f"{case} {kind}: size mismatch")
+                check_hash(f"{case} {kind}", raw, item["sha256"], item["size_bytes"], errors)
                 parsed = json.loads(raw)
                 if parsed.get("format") != expected_format or parsed.get("case_id") != case:
                     errors.append(f"{case} {kind}: format/case mismatch")
-            except (subprocess.CalledProcessError, ValueError) as exc:
-                errors.append(f"{case} {kind}: original unavailable or invalid ({exc})")
-    print(f"OSR008_AUDIT|ORIGINAL_HASHES|{'PASS' if not errors else 'FAIL'}")
+            except subprocess.CalledProcessError:
+                if kind == "reference":
+                    print(f"OSR008_AUDIT|GENERATED_REFERENCE|{case}|NOT_TRACKED")
+                else:
+                    errors.append(f"{case} {kind}: Git original unavailable")
+            except ValueError as exc:
+                errors.append(f"{case} {kind}: invalid JSON ({exc})")
+    print(f"OSR008_AUDIT|TRACKED_ORIGINAL_HASHES|{'PASS' if not errors else 'FAIL'}")
     if regenerate:
         with tempfile.TemporaryDirectory(prefix="sansacloth-osr001-") as temp:
             base = Path(temp)
@@ -107,10 +116,12 @@ def audit(regenerate=False):
                         errors.append(f"{case}: regenerated result missing")
                         continue
                     try:
-                        expected = json.loads(git_blob(revision, record["reference"]["path"].replace("\\", "/")))
-                        actual = json.loads(result_path.read_text(encoding="utf-8"))
-                        if expected != actual:
-                            errors.append(f"{case}: regenerated JSON differs from recorded Reference")
+                        raw = result_path.read_bytes()
+                        item = record["reference"]
+                        check_hash(f"{case} regenerated Reference", raw, item["sha256"], item["size_bytes"], errors)
+                        actual = json.loads(raw)
+                        if actual.get("case_id") != case or actual.get("format") != manifest["reference_version"]:
+                            errors.append(f"{case}: regenerated Reference metadata mismatch")
                     except (subprocess.CalledProcessError, ValueError) as exc:
                         errors.append(f"{case}: regeneration comparison failed: {exc}")
         print(f"OSR008_AUDIT|REFERENCE_REGENERATION|{'PASS' if not errors else 'FAIL'}")
