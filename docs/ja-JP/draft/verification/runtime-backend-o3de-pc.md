@@ -1018,3 +1018,33 @@ O3DE Editor Python Consoleで `sansacloth_osr008_evidence.py` を実行したロ
 
 **判定：OSR-008 証跡JSON内部整合性レビュー PASS。**
 本レビューは提出された証跡の形式・網羅性・記録値の整合性を確認したもの。SHA-256の原本照合は未実施であり、原本一致を検証済みとは記載しない。証跡JSONはユーザーの実行環境で生成されたファイルであり、リポジトリへの保存は別途実施する。
+
+
+### 16.17 OSR-001～008 総合監査（2026-10-12）
+
+Git `develop` の `validation/osr008-evidence/osr008-evidence.json`（ユーザー保存コミット `35f71a1`）を取得して監査した。これは16.4～16.10節の各時点のOPEN記録を遡及的に書き換えるものではなく、最新の集約判定である。
+
+| Gate | 最新判定 | 根拠・範囲 |
+|---|---|---|
+| OSR-001 | DISCOVERED / 再生成未検証 | Rust Referenceの実装・30件の出力・再生成コマンドを特定（16.5）。Reference再生成コマンドの実行結果は未受領 |
+| OSR-002 | PASS（validation-only） | O3DE C++ `ProbeSurfaceResponseJson` をEditorで実呼出し。ACKとは独立した実計算（16.11～16.14） |
+| OSR-003 | PASS（解析Fixture範囲） | canonical座標・単位・法線・StableId・Support/Contact・Profileを30件の比較器で照合（16.13）。実メッシュ変換は範囲外 |
+| OSR-004 | PASS | SR-001-C0-G0およびSR-001全6条件のEditor比較実測（16.11、16.12） |
+| OSR-005 | PASS（解析Fixture範囲） | 30件のSupport/Contact一致、OSR-007負例で独立改変を拒否（16.13、16.14） |
+| OSR-006 | PASS | 30ケース・4,410 CP、全8数値項目最大差0（16.13） |
+| OSR-007 | PASS | 正常系1件、負例12/12拒否、ACKのみの応答も拒否（16.14） |
+| OSR-008 | PASS（実測・記録保存） | Editor 30/30、証跡JSONの内部整合性レビュー、Git保存（16.15、16.16、`35f71a1`） |
+
+保存されたOSR-008証跡について、30件のcase_id集合・重複・PASS/FAIL/OPEN集計・`error=null`・8項目の最大差0・SHA-256文字列形式を再検査し、矛盾なし。
+
+証跡の基準リビジョン：`9a788c39eace0506a01f1f1376af1d93be62f62a`。Backend C++ソースSHA-256：`31b015e671541e53c54b37084502b1dabb5d3c5b2beaac045686c7536a8a1bf6`。Fixture format：`sansacloth.validation.fixture-exchange/0`、Reference result format：`sansacloth.validation.surface-response-result/0`。許容差は位置/距離[m]および法線成分それぞれ`1e-12`（実測差0）。
+
+**総合判定：O3DE PC validation-only SurfaceResponse Solverの比較・負例・証跡保存はPASS。** ただし、OSR-001のReference再生成は未実行確認であり、OSR-001～008すべてが完全な再現性監査まで終了したとは宣言しない。
+
+**残存する再現性チェック：**
+1. 証跡の30組のFixture/Reference SHA-256と、証跡生成時のリビジョンにあるGit原本を再照合する。
+2. Reference再生成コマンドを実行し、生成結果の同一性または差分を記録する（OSR-001の残件）。
+3. 証跡のBackend SHA-256はC++**ソースファイル**のハッシュであり、実際にロードされたGemのビルド済みバイナリのハッシュではない。バイナリとビルド環境の同一性は未証明。
+4. `fixture_version`/`reference_version` は証跡スクリプトが付与した形式ラベル。各JSONのformatフィールドの独立照合や実行バイナリのversion検証は別途必要。
+
+**製品実装への適用範囲：** O3DE実Mesh API、Skinned/deformed mesh、非一様scale、topology変更、production Runtime Backendの挙動は本Gateで検証していない。これらをPASSへ昇格させない。
