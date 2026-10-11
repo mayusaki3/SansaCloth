@@ -972,3 +972,19 @@ O3DE Editor実機で `sansacloth_osr006_full_compare.py` を実行し、Rust Ref
 スクリプト内の `PASS_DIAGNOSTIC` / `PENDING_CRITERIA_REVIEW` は正式判定を自動発行しない設計上のマーカーであり、本節は実測結果と既定条件の照合による検証記録である。
 
 **範囲の制約：** validation-onlyの解析FixtureおよびO3DE C++ Solverについての結果であり、製品用O3DE Mesh API・変形メッシュ・本番布Solverの保証ではない。OSR-007（負例検証）とOSR-008（ケース別証跡、version、SHA-256の集約）は別ゲートであり、本結果だけでPASSとしない。OSR-001～005の個別判定も本節によって一括変更しない。
+
+
+### 16.14 OSR-007 Negative/mismatch detection Editor Runtime PASS（2026-10-11）
+
+O3DE Editor Python Consoleで `sansacloth_osr007_negative_probe.py` を実行した実測ログを確認した。
+
+- `OSR-007.BASELINE|PASS`：独立C++ `ProbeSurfaceResponseJson` の実計算結果をRust Referenceと比較して成功。
+- 数値8項目（Bridge/Gravity/Conformity/Collision/Final/Surfaceの位置、Surface Normal、Separation）を各1点で改変し、すべて比較Gateが拒否。
+- Contact、Support（整合するAggregateも更新）、Profileの改変をすべて拒否。
+- Solver出力形式ではないACK専用応答を `unsupported SurfaceResponse format` として拒否。
+- `OSR-007.NEGATIVE_COUNT|12`、`OSR-007.REJECTED_COUNT|12`、`OSR-007.RESULT|PASS`。
+
+**判定：OSR-007 Runtime PASS（正常系1件＋負例12/12拒否）。**
+16.2節の負例・ACK拒否条件を満たす。数値改変は診断用閾値 `1e-12` より十分大きい `0.001` を使用。Host Python単体テストの新規追加分については、この実測ログに含まれないため実行確認待ち。これはvalidation-onlyのC++ SolverとPython比較器を対象とし、本番O3DE Backendの保証ではない。
+
+次のOSR-008はケース別証跡とFixture/Reference/Backendのversion・SHA-256を記録する独立Gateであり、OSR-007のPASSから自動的にPASSとはしない。
