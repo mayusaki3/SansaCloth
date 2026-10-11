@@ -5,7 +5,7 @@ from pathlib import Path
 import azlmbr.sansacloth_probe as probe
 
 script_dir = Path(__file__).resolve().parent
-repo_root = script_dir.parents[5]
+repo_root = script_dir.parents[6]
 fixture_dir = repo_root / "reference" / "validation" / "fixture-exchange" / "basic-v1"
 result_dir = repo_root / "validation" / "surface-response-json-roundtrip"
 for directory in (fixture_dir, result_dir):
