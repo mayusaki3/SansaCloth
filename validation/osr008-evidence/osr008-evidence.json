@@ -1,0 +1,810 @@
+{
+  "backend_api": "azlmbr.sansacloth_probe.ProbeSurfaceResponseJson",
+  "backend_source": {
+    "path": "engines\\o3de\\pc\\probe\\Gem\\SansaClothBackendProbeValidation\\Source\\SansaClothBackendProbeValidationSystemComponent.cpp",
+    "sha256": "31b015e671541e53c54b37084502b1dabb5d3c5b2beaac045686c7536a8a1bf6",
+    "size_bytes": 105033
+  },
+  "cases": [
+    {
+      "backend_output_sha256": "6d02e329428d1a297486438bf3e05a958434e249f2700f85d90a9f29ed2a2df8",
+      "case_id": "SR-001-C0-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-001-C0-G0.json",
+        "sha256": "515e181cae82b770ae3a59f4d458135dfa98e2bcdff8f0d8860be904b8b9cb72",
+        "size_bytes": 109556
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-001-C0-G0.json",
+        "sha256": "9127ee5af91b8ab2a0ca9b5a95bad8c56910bd763d94e0d690e4db555d316e9e",
+        "size_bytes": 115822
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "f7662d3754ef484874d4fdf530173c9d3aaa4dd391009318b64f92c04c3f19d7",
+      "case_id": "SR-001-C0-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-001-C0-G1.json",
+        "sha256": "1d7851fb95061e9b4c92398820e00d2992584d271451e5c006ea7d025fcb07b5",
+        "size_bytes": 109561
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-001-C0-G1.json",
+        "sha256": "78c9306c0213acb60b10e3d39d51ba37deb5453695d127161979d1e06216c1ce",
+        "size_bytes": 119882
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "a6d277d5a99f5af175008a9e8d482a61cdff6884c6f5921f1e89328c2cdc92b2",
+      "case_id": "SR-001-C05-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-001-C05-G0.json",
+        "sha256": "6b391798d84670529bdf584ca8157193784ce787cea46fcf76af9510d30ed669",
+        "size_bytes": 109557
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-001-C05-G0.json",
+        "sha256": "9c833f134ef44a5df7846df9bfbbe49e7b365b6616c2eb1c0be59e712f4da565",
+        "size_bytes": 114422
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "8ffe62924a32c47179df0a444351bae144ea79b44d8de18cc88659d5403143a8",
+      "case_id": "SR-001-C05-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-001-C05-G1.json",
+        "sha256": "9b3d8ca3bae423ba5e771f4946143979655ac0d84a85d92c2f07455cac220488",
+        "size_bytes": 109562
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-001-C05-G1.json",
+        "sha256": "dcdf665041cd803e7135e270d9166c19a4f6f2494a99601ab95eea4d4911972a",
+        "size_bytes": 119883
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "8633ba1b54982e242fda1499d365508e95e4de2db871c5b36fb95aa3e92ba802",
+      "case_id": "SR-001-C1-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-001-C1-G0.json",
+        "sha256": "74659d03e0ed3ae87aeafc1435fdb3d9cc99cc0901071215b03a1d88a7e3801c",
+        "size_bytes": 109556
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-001-C1-G0.json",
+        "sha256": "614a7fcfda5b00d8ff817ee4ef6efdf804faa67c51a53c829ecd895f7b1efc1a",
+        "size_bytes": 115639
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "16e1fabd9c34cdecd16a63adb92ce7fd40bc0e20527b4fd726f46ffd21c0ce28",
+      "case_id": "SR-001-C1-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-001-C1-G1.json",
+        "sha256": "b847b6c72eab246e7f57a8e628eca2718b89be9fcb00fde4972149e6642b6ec8",
+        "size_bytes": 109561
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-001-C1-G1.json",
+        "sha256": "6fdf56125e0d1b5795a535ae81c8aaa55435d038851a9004094fc14e5cf1421e",
+        "size_bytes": 119882
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "8b5441a5fbfbaeee2402bfa290fde685acf72cd784c63625c9b2f845914d813d",
+      "case_id": "SR-002-C0-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-002-C0-G0.json",
+        "sha256": "c7a8a673a3483b26745bdaa2c02cd6eb1290b6d7a09f8f69c9f9b281a5ff05bd",
+        "size_bytes": 112489
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-002-C0-G0.json",
+        "sha256": "942397337095b935bd3cefa11e4187c2fe0443931a8424cd84899aebe8126418",
+        "size_bytes": 122421
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "3bbe7e910faf5f5a01d12e912b6862e0d51464a1a97c75201df76e4e341ccaa8",
+      "case_id": "SR-002-C0-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-002-C0-G1.json",
+        "sha256": "259b40489301abc1875da4963016ef49b3449441c0b6c1cbadc06bcfe4caae04",
+        "size_bytes": 112494
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-002-C0-G1.json",
+        "sha256": "011b84c3c9230c44ce0b44bfb42f5e5fe3aee191af3ad7e544690245c07f5ebf",
+        "size_bytes": 126555
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "bbbfa6c8a4be2975a83f8679e698c8147f0a51f54cd15df74bed41768b4fc97b",
+      "case_id": "SR-002-C05-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-002-C05-G0.json",
+        "sha256": "c32f0fcfd056841bd8d7fa35a8d55a0dcbd774001132ee107f378b4fa4b7b8ac",
+        "size_bytes": 112490
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-002-C05-G0.json",
+        "sha256": "4e5e408c8734d2aa2b66325347ad4c5531c08cc01b92c6e3cb8930092153bb27",
+        "size_bytes": 121587
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "58f891c4edcd7acf6501801c4be06d4a6fe78b7e1fa40d065d3f05a7e57ac1c6",
+      "case_id": "SR-002-C05-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-002-C05-G1.json",
+        "sha256": "8a9c2b2aab5643242d143ea2dda1996c2f9ad60b50822984c0a4fae05fccf2d3",
+        "size_bytes": 112495
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-002-C05-G1.json",
+        "sha256": "65f6f82fcedd8c561a22dee9d658c62446f56c23aac977aa547cfce936640b4c",
+        "size_bytes": 126556
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "69ef72c1acce6d8964918186313c3c70c97a94b78ddafc59e0a40a80cd5876c8",
+      "case_id": "SR-002-C1-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-002-C1-G0.json",
+        "sha256": "ee602b166981a39229b4e5ef8c24b87d7563c29384f50054737468288723c437",
+        "size_bytes": 112489
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-002-C1-G0.json",
+        "sha256": "8369aa29cbceed5ec31aba2224d4df5e11694f8474f1d4e0a2ff655df2841e36",
+        "size_bytes": 122195
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "67c1dd9b6c422b313995b26fdcca4e0473e9119403621436f6ce43d50943c916",
+      "case_id": "SR-002-C1-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-002-C1-G1.json",
+        "sha256": "ff02b988138e42d71c22d61501aa09411a037e383deacfee292aedd383c685de",
+        "size_bytes": 112494
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-002-C1-G1.json",
+        "sha256": "e26db39edcf550de4234f939d33c723be9f6e0e66609e3e748a95ac78d42c199",
+        "size_bytes": 126555
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "f12e00fe653e2aaa89df10127beffd184dd94e577754ef8b2445abf1e09d590c",
+      "case_id": "SR-003-C0-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-003-C0-G0.json",
+        "sha256": "a9b27552a2acfa1e4ce048f395513de9ab1d529b1b3f7a34459cf534befb17fe",
+        "size_bytes": 113679
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-003-C0-G0.json",
+        "sha256": "9d7955528e14cf6418eb6a767878284a3844375f95b582ffa41ebba0cb7e5c4d",
+        "size_bytes": 126335
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "f4cc27ef0e4e3b89ba677e8d5992cc4940bd2e1387b404e7cadd0b8e1c70cc8c",
+      "case_id": "SR-003-C0-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-003-C0-G1.json",
+        "sha256": "2011c0ebe192ab4853201b1ba96ca2b4d9db85dbaaea9b4d4b9c636884d66b81",
+        "size_bytes": 113684
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-003-C0-G1.json",
+        "sha256": "8cc95db93d988d8d0bf6f96c0b4d139a23494fd0ef51c7ddd78ec5dd55d081be",
+        "size_bytes": 126792
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "0eae863e52e909a9249c8c93dffef12907a6f99678ff339e9837078ddd2992b4",
+      "case_id": "SR-003-C05-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-003-C05-G0.json",
+        "sha256": "56944954c2f0d51257faa658a096d7c75a18fc670df3b5acdb927f7b1b843416",
+        "size_bytes": 113680
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-003-C05-G0.json",
+        "sha256": "160cfbb803deabdd39c9ba1c0df6e0d59e485ea09e2281b5b3b12a0b12bef19c",
+        "size_bytes": 126336
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "e371426737ea19cc381cc5465905659ab60d64513226a3d31d926d7db5441836",
+      "case_id": "SR-003-C05-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-003-C05-G1.json",
+        "sha256": "4c10632a16d5e69e26b3573c17dd5cea32cb41652c597fcee9660bf650ede345",
+        "size_bytes": 113685
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-003-C05-G1.json",
+        "sha256": "548382b9b32620d6768578b9e27b1912b882f599779285c2630a97c0191e1abb",
+        "size_bytes": 127767
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "5e4e2d814b6575234347b0f4f1b8f16fe584df88b859a928ab66bd4e5e969beb",
+      "case_id": "SR-003-C1-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-003-C1-G0.json",
+        "sha256": "90d69e5a1384e34e30a14302a1d49037ef8f5d019ccf495afc3a0d0fa37d3694",
+        "size_bytes": 113679
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-003-C1-G0.json",
+        "sha256": "f5283bfb0cb265bf27e76720b3da7ee493137173617a1be9c5026e1f615e4c7d",
+        "size_bytes": 126335
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "399bd8c23cff020b83fd07a473d44700455fcb84fb0004281b00fe2e978c69f9",
+      "case_id": "SR-003-C1-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-003-C1-G1.json",
+        "sha256": "0fefe5bb72302f7cd85a3dfef8e9c26e09f222e68f854ca7773c46ba37f8d51f",
+        "size_bytes": 113684
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-003-C1-G1.json",
+        "sha256": "2e57b1b161ce3a2d7639f3646718695e4382334699beb458208a3d442978b3e6",
+        "size_bytes": 127381
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "ac8b2d7257fc2cd70c570f8fee0c56b08bd7a1412815f9c950f8d6b3f704c240",
+      "case_id": "SR-004-C0-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-004-C0-G0.json",
+        "sha256": "9b91cf5e6772955426c19c4c4ed58ea3a59b8994fdcc1ef65ec61b602a0c3ada",
+        "size_bytes": 112622
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-004-C0-G0.json",
+        "sha256": "2af8aede38820cd77627a609753b67ce0caa330dc759dc2ab488609bef54b465",
+        "size_bytes": 120518
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "e585aba83a751553c72c5900943e63a754bcf60a7a4cef70baaa1379ca3d3272",
+      "case_id": "SR-004-C0-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-004-C0-G1.json",
+        "sha256": "145ef6238d20cc3a28ddd74a809f110bd41aab3993443b873f44d1a57f2d206f",
+        "size_bytes": 112627
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-004-C0-G1.json",
+        "sha256": "cdebca9016fde4d67963fba6ebf69b8c1e2977daab274e549a301d3766ebe1cf",
+        "size_bytes": 126750
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "13cda156b4326a02c7129e22b9c4df9ac2e3d1ee271b28445ebe2ada2b9f1351",
+      "case_id": "SR-004-C05-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-004-C05-G0.json",
+        "sha256": "212c092ab324367dfd886c70117a10e75a00a00ab9b8f5c2c163a77a14a0bc59",
+        "size_bytes": 112623
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-004-C05-G0.json",
+        "sha256": "4d130b1c07fb25942070be5e27d5cec285ba91f006dce87f82743cbfa17b20b5",
+        "size_bytes": 123498
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "2f1e006b1c443b409fcb496f574f66484bbe0e4d3c1e36d65fe29288d459a17b",
+      "case_id": "SR-004-C05-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-004-C05-G1.json",
+        "sha256": "c4f88f356cfe1c29703f9d9bfdeab3171638d0a8a2cf2784c24e1a8f472d95f8",
+        "size_bytes": 112628
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-004-C05-G1.json",
+        "sha256": "c922042916bdc13a74a52f160748645f6c9afe328cdc7e7e06dad86d02df5669",
+        "size_bytes": 126405
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "5d413b53cf9bb9b83f3121f97fd7f5cf0ae74e9efc11abe2c23cf244f7acab25",
+      "case_id": "SR-004-C1-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-004-C1-G0.json",
+        "sha256": "d4756b5f9f125c41f250c389ae10b41cfdb2ea34bdaad973a862f13a8cf22076",
+        "size_bytes": 112622
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-004-C1-G0.json",
+        "sha256": "c536cf48e02650ddcceda66383e2418ea354fef4fb44781f574c668784de8620",
+        "size_bytes": 124265
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "eba264258d7f291eb4f393fa6d5c736f05e2d7557f635ea0b5257649d1baa7d0",
+      "case_id": "SR-004-C1-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-004-C1-G1.json",
+        "sha256": "dc69e1d2a83df2da9f2226a2501aa791058c2208a30f8f7202506d68ac9afe98",
+        "size_bytes": 112627
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-004-C1-G1.json",
+        "sha256": "41d81a9a7323164c98b257717071bec722c7af1f551f73521a69519eebc176c7",
+        "size_bytes": 126786
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "c9e45042cd3c304edd32c98928b83c0f4cd40fd3ba42982c5accf7260f9f83a0",
+      "case_id": "SR-005-C0-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-005-C0-G0.json",
+        "sha256": "72af09fd6b735083ff04e52e15a264462a73729d65d2e3e6f290fa66e7581b97",
+        "size_bytes": 112538
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-005-C0-G0.json",
+        "sha256": "5896d49f6f07a663146c6b084af9ac91fbbadef7722fd262992e2a05461e84b0",
+        "size_bytes": 120492
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "d66366fdcb53112e9a626572e67caec62c1b4eadb03750007ec3fe156726c93e",
+      "case_id": "SR-005-C0-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-005-C0-G1.json",
+        "sha256": "d6fd75b39be24696eca53c69c4a74428740e1c048e953bf165849425e5f40790",
+        "size_bytes": 112543
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-005-C0-G1.json",
+        "sha256": "38c3960255b08714212802f68a17a10fe1aadfdd4d41ab4fee01a03c170833bc",
+        "size_bytes": 126430
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "67b297e38865e8364cbb4e9ab178ba2b122e8892287ad57fe97f0da0a1772908",
+      "case_id": "SR-005-C05-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-005-C05-G0.json",
+        "sha256": "f1f374a1ba850a0f491fa4d2dfa94428d95e5700b250a0d4cda6e51384331abb",
+        "size_bytes": 112539
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-005-C05-G0.json",
+        "sha256": "ee514757d85dd200326e35630db69bf90f1724a8edaca76a608dc1925ed0bc8b",
+        "size_bytes": 121992
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "a69744402adb758ff911d06ead8e07c5738a5fda443e1dbe55bdf8681ff9afb5",
+      "case_id": "SR-005-C05-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-005-C05-G1.json",
+        "sha256": "2806b166c3f48603a37080bda05cbc5a863a552b1c322068fb63c06cfb634786",
+        "size_bytes": 112544
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-005-C05-G1.json",
+        "sha256": "c5d00c27dcfb82684a0723da3c9770c4fe867abae953f89f8082a906521d9a1e",
+        "size_bytes": 126991
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "3d8c31c0f76999d4db6618b6d0c3388fdc6139a46319fe9821ef16c4d8c196ab",
+      "case_id": "SR-005-C1-G0",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-005-C1-G0.json",
+        "sha256": "55b4307c1f6c8b42a94b578a551b03e58d94a20e4cebba36b2455fb31248de75",
+        "size_bytes": 112538
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-005-C1-G0.json",
+        "sha256": "714720f73dfa1e029347ea5a8530654e6922afc998daf572f9dbf3f1840c4821",
+        "size_bytes": 122530
+      },
+      "status": "PASS"
+    },
+    {
+      "backend_output_sha256": "92ecdd71d3295099ed32c005561fcd6b0380ee6584a6eed8d71232adad82fc52",
+      "case_id": "SR-005-C1-G1",
+      "error": null,
+      "fixture": {
+        "path": "reference\\validation\\fixture-exchange\\basic-v1\\SR-005-C1-G1.json",
+        "sha256": "2f5846728635a2528df9434b40e9306f67b6ee0f2d8e2112e9325d3317d06194",
+        "size_bytes": 112543
+      },
+      "max_abs_error": {
+        "bridge_position_m": 0.0,
+        "collision_position_m": 0.0,
+        "conformity_position_m": 0.0,
+        "final_position_m": 0.0,
+        "gravity_position_m": 0.0,
+        "separation_m": 0.0,
+        "surface_normal": 0.0,
+        "surface_position_m": 0.0
+      },
+      "reference": {
+        "path": "validation\\surface-response-json-roundtrip\\SR-005-C1-G1.json",
+        "sha256": "ec2524da7721411ef05bbfe218b8b1ca386081b0b42e99d673922a3fd70fbdac",
+        "size_bytes": 127003
+      },
+      "status": "PASS"
+    }
+  ],
+  "comparator": {
+    "path": "engines\\o3de\\pc\\probe\\Editor\\Scripts\\SansaCloth\\sansacloth_surface_response_compare.py",
+    "sha256": "23b5f7bb9fda1255b938391ab7f6a39d8c73d2d3f2e73665a854b066cfc13e5c",
+    "size_bytes": 4802
+  },
+  "counts": {
+    "FAIL": 0,
+    "OPEN": 0,
+    "PASS": 30
+  },
+  "fixture_version": "sansacloth.validation.fixture-exchange/0",
+  "gate": "OSR-008",
+  "generated_at_utc": "2026-10-11T14:34:27.784793+00:00",
+  "normal_tolerance": 1e-12,
+  "position_tolerance_m": 1e-12,
+  "reference_version": "sansacloth.validation.surface-response-result/0",
+  "repository_revision": "9a788c39eace0506a01f1f1376af1d93be62f62a",
+  "result": "PASS",
+  "scope": "O3DE validation-only analytic fixture C++ solver versus Rust Reference",
+  "tracked_worktree_status": "CLEAN"
+}
