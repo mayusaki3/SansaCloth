@@ -11,6 +11,8 @@ ly_add_target(
     BUILD_DEPENDENCIES
         PRIVATE
             AZ::AzCore
+            Gem::Atom_RPI.Public
+            Gem::AtomLyIntegration_CommonFeatures.Static
 )
 
 ly_add_source_properties(
