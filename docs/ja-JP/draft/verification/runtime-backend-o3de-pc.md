@@ -1064,3 +1064,58 @@ Windows PowerShellで `git pull --ff-only` により `a130b29` を取り込み�
 **判定：OSR-001 Reference再生成 PASS（現行ソース）、OSR-008 Git原本SHA-256照合・Reference生成物再現性 PASS。** 16.17節の「再生成未検証」は当時の履歴記録として残し、本節を最新判定とする。
 
 **総合状態：OSR-001～008のvalidation-only SurfaceResponse検証・負例検証・証跡監査はすべてPASS（上記の範囲）。** ただし、ロードされたO3DE Gemのビルド済みバイナリハッシュ・ビルド環境と証跡の紐付け、production Mesh/Skinned Mesh/変形メッシュ、本番Runtime Backendは未検証である。
+
+
+## 17. 製品用O3DE PC Backend移行設計（2026-10-12、ドラフト）
+
+### 17.1 境界と方針
+
+OSR-001～008で実測PASSとなったのは、**validation-onlyの解析Fixtureから独立C++ SurfaceResponse Solverを実行し、Rust Referenceと照合する経路**である。本章は製品用O3DE Mesh/Skinned Meshへの接続設計であり、未実装・未検証の項目をPASSとしない。
+
+- Rust ReferenceのSurfaceResponse意味論、StableId、DomainId、Contact/Support、Bridge→Gravity→Conformity→Collisionの順序を変更しない。
+- Canonical空間は+X右、+Y上、+Z前、長さm。O3DE境界では既存OBF-002～005の軸・winding・normal変換を一度だけ適用する。
+- SolverとSurfaceQueryの境界を分ける。Solverはメッシュ取得APIに直接依存せず、SurfaceQueryから位置・法線・signed separationを受け取る。
+- Validation Gemの既存API `ProbeFixtureJson` と `ProbeSurfaceResponseJson` は回帰基準として維持する。製品用コンポーネントへの単純な名称変更はしない。
+- 外部World Gravityは明示入力とし、Body rotationから暗黙生成しない。O3DE Physics/PhysX依存は必須としない。
+
+### 17.2 推奨する責務分割（候補）
+
+| 層 | 責務 | O3DE依存 |
+|---|---|---|
+| Core Solver | CP列・Support・Gravity・Conformity・Collisionを計算しSurfaceQueryを呼ぶ | なし（可能な限り） |
+| SurfaceQuery Adapter | SurfaceReferenceから変形後surface position/normal/separationを解決 | 抽象インターフェース |
+| Mesh Snapshot Provider | 現在フレームの頂点、三角形、変換、メッシュ識別・更新世代を取得 | O3DE固有 |
+| Coordinate Adapter | O3DE空間↔canonical空間、winding/normalの一貫した変換 | O3DE固有 |
+| Runtime Integration | Entity/Componentライフサイクル、更新順序、出力適用、診断 | O3DE固有 |
+
+`SurfaceReference=(DomainId,U,V)`を論理参照として保持し、triangle indexを永続IDとして保存しない。ただしUV seam・overlap・複数domain・topology変更での安定解決規則は未確定。これらを黙って「先に見つかったtriangle」で処理しない。
+
+### 17.3 Phase OPM-01：Rigid実Mesh読取の実現性確認
+
+**目的：** O3DE実Meshのデータ取得方法と利用可能なruntime APIを、O3DE 26.05の実環境で確認する。API名や使用可能なコンポーネントは実機のSDKヘッダー・Gem依存・Editorで確定するまで未確定とする。
+
+| ID | テストケース（実装前定義） | PASS条件 |
+|---|---|---|
+| OPM-001 | Mesh discovery | 指定Entityから実Meshへのアクセス経路・所有権・利用可能な頂点/三角形取得APIを特定。取得不可ならOPEN |
+| OPM-002 | Rigid identity | 既知の平面実Meshを読み、頂点数・三角形数・座標・面法線を独立期待値と比較 |
+| OPM-003 | Rigid transform | 平行移動と非自明な回転を与え、world↔canonicalの位置・normal・windingを照合 |
+| OPM-004 | Reference resolve | DomainId/UVからsurfaceを解決し、triangle配列順序の変更でも同一結果。UV曖昧性は拒否またはOPEN |
+| OPM-005 | Separation sign | 表面法線の正負両側でsigned separationを測り、±0.01mと一致 |
+| OPM-006 | Runtime update | EntityのTransform変更を次回Queryに反映。Snapshot世代と更新タイミングを記録 |
+| OPM-007 | Failure handling | Mesh未準備・無効Domain・解決不能UV・縮退triangle・非有限入力をfail-closedで拒否 |
+| OPM-008 | Evidence | O3DEバージョン、Gem/API経路、ケース別結果、mesh資産識別子、ソース/実行物のSHA-256を記録 |
+
+初期Fixtureは既存BF-003/004と同じ0.20m×0.10m、4頂点・2三角形のrigid flat planeを基準とする。最初は**実Mesh読取だけ**を行い、Solver統合はOPM-001～007の確認後に実施する。
+
+### 17.4 Phase OPM-02：Skinned/Deformed Mesh（OPM-01後）
+
+- 変形後頂点のCPU取得可否、GPU専用データのreadback要否、frame同期、負荷を別途検証する。
+- Skinning前のUV/Domainと変形後の頂点位置・法線を結び付ける規則を定義する。
+- 骨変形・非一様scale・topology変更・UV seam/overlap・複数domainを独立した負例/境界ケースとして扱う。
+- CPU/GPUの利用可能性はPC実機で検証する。O3DEが特定のMesh APIを提供すると推測で断言しない。
+
+### 17.5 Phase OPM-03：Solver統合と回帰
+
+OPM-01/02で成立したSurfaceQuery Adapterを既存SurfaceResponse Solverへ接続する。まずRigid MeshでSR-001 baselineを比較し、次にSR-001～005の30条件へ拡張する。OSR-008の証跡は固定回帰基準とし、新Backendは別のversion・SHA-256・実行証跡を記録する。
+
+**現在判定：OPM-001～008すべてOPEN。** 本章は設計・テストケース定義のみで、実Mesh APIの調査・実装・Editor実測は未実施。
