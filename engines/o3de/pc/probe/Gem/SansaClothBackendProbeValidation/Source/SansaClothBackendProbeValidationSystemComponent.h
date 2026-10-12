@@ -18,6 +18,7 @@ namespace SansaClothBackendProbeValidation
         void Activate() override {}
         void Deactivate() override {}
 
+        static AZStd::string ProbeMeshDiscovery(const AZStd::string& entityIdText);
         static bool RunObf006();
         static bool RunBf003();
         static bool RunBf004();
