@@ -1153,3 +1153,19 @@ O3DE 26.05公開API資料から、EntityのAtom Mesh ComponentとRPI Modelへ到
 **判定：OPM-001のローカルSDK入口・LOD/Buffer API定義調査は完了。ただしOPM-001 Gate全体はOPEN。** API宣言の存在はCPU上の頂点・index実データ取得成功、Mesh Componentからの呼出し成功、コンパイル成功を保証しない。
 
 次はヘッダーの前後文脈を読み、`MeshComponentRequestBus`に`GetModel`が実際に存在するかを再確認する。今回の検出ログでは`GetModel`は現れず、`OnModelReady`からModel/ModelAssetを受け取る経路を第一候補とする。続いて既存Validation Gemとは独立した最小のMesh discovery probeをビルド・Editor実行し、vertex/index取得の可否を確定する。
+
+
+### 17.8 OPM-001 ローカル26.05 API詳細ログ（2026-10-12）
+
+ユーザー提供の `--context 5` 実行ログで、以下の実ヘッダー宣言・実装を確認。
+
+- `MeshComponentBus.h:28`：`GetModelAsset() const`、`:41`：`Data::Instance<RPI::Model> GetModel() const`。前回の単純な正規表現で `GetModel` が検出されなかったのはスクリプトの探索式の不足であり、API欠落ではない。
+- `MeshComponentBus.h:116`：`OnModelReady(modelAsset, model)`、`:142-147`：接続時に `GetModel` を取得し、モデルとAssetがReadyなら即時通知。
+- `ModelAsset.h:65`：`GetLodAssets()`、`ModelLodAsset.h:154`：`GetMeshes()`。
+- `ModelLodAsset.h:103,108`：`GetIndexBufferAssetView()`、`GetIndexBufferTyped<T>()`。
+- `ModelLodAsset.h:115-122`：POSITIONセマンティクスを指定した `GetSemanticBufferAssetView(AZ::Name("POSITION"))` と型指定によるbuffer取得。
+- `ModelLodAsset.h:211-221`：`GetBufferTyped<T>()` が `BufferAsset::GetBuffer()` のraw bytesを参照し、BufferViewDescriptorのoffset・size・countを用いてspanを形成する実装を確認。
+
+**設計判断：** 初期probeは `MeshComponentRequestBus::GetModelAsset()` と `GetModel()` で現在状態を読み、必要に応じて `MeshComponentNotificationBus::OnModelReady` を使用する。LOD 0の各Meshを列挙し、POSITIONとindex bufferのdescriptor・型・個数を検証してから読み取る。BufferAssetが空、型不一致、非対応format、未準備の場合は成功扱いしない。
+
+**OPM-001判定：OPEN（SDK上のCPU bufferアクセス経路は確認。実Meshからの取得・コンパイル・Editor実測は未実施）。**
