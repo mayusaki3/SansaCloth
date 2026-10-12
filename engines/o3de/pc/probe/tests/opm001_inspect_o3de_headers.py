@@ -25,6 +25,7 @@ SYMBOLS = re.compile(
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--engine-root", type=Path, required=True)
+    parser.add_argument("--context", type=int, default=0, help="Print N surrounding lines for each matched symbol (0: matches only)")
     args = parser.parse_args()
     root = args.engine_root.expanduser().resolve()
     if not root.is_dir():
@@ -39,9 +40,15 @@ def main():
         found += 1
         print(f"OPM001|HEADER|FOUND|{label}|{rel}")
         lines = path.read_text(encoding="utf-8-sig", errors="replace").splitlines()
-        for index, line in enumerate(lines, 1):
-            if SYMBOLS.search(line):
-                print(f"OPM001|SYMBOL|{label}|{index}|{line.strip()[:220]}")
+        matches = [i for i, line in enumerate(lines) if SYMBOLS.search(line)]
+        if args.context < 0 or args.context > 30:
+            parser.error("--context must be between 0 and 30")
+        selected = set()
+        for i in matches:
+            selected.update(range(max(0, i - args.context), min(len(lines), i + args.context + 1)))
+        for i in sorted(selected):
+            kind = "SYMBOL" if i in matches else "CONTEXT"
+            print(f"OPM001|{kind}|{label}|{i + 1}|{lines[i].strip()[:240]}")
     print(f"OPM001|HEADER_COUNT|{found}/{len(TARGETS)}")
     print("OPM001|RESULT|DISCOVERY_ONLY")
     return 0 if found else 1
