@@ -1119,3 +1119,22 @@ OSR-001～008で実測PASSとなったのは、**validation-onlyの解析Fixture
 OPM-01/02で成立したSurfaceQuery Adapterを既存SurfaceResponse Solverへ接続する。まずRigid MeshでSR-001 baselineを比較し、次にSR-001～005の30条件へ拡張する。OSR-008の証跡は固定回帰基準とし、新Backendは別のversion・SHA-256・実行証跡を記録する。
 
 **現在判定：OPM-001～008すべてOPEN。** 本章は設計・テストケース定義のみで、実Mesh APIの調査・実装・Editor実測は未実施。
+
+
+### 17.6 OPM-001 API机上調査（2026-10-12）
+
+O3DE 26.05公開API資料から、EntityのAtom Mesh ComponentとRPI Modelへ到達する候補を確認した。**API資料の存在確認であり、SansaCloth Gemへの組込み・コンパイル・Editor実行は未実施。**
+
+| 候補 | 公開API上の確認事項 | 制約 |
+|---|---|---|
+| `AZ::Render::MeshComponentRequestBus` | `GetModelAssetId`、`GetModelAssetPath`（scriptable）、`GetModel`（C++、not scriptable） | Model取得後のCPU頂点・index読取は別途確認 |
+| `AZ::Render::MeshComponentNotificationBus` | `OnModelReady`、`OnModelPreDestroy` | 非同期読込・破棄に追従する必要あり |
+| `AZ::Render::MeshFeatureProcessorInterface` | `GetModel(MeshHandle)`、`GetModelAsset(MeshHandle)`、`GetNonUniformScale(MeshHandle)` | 既存Mesh ComponentのMeshHandle所有境界を確認するまで直接使用しない |
+
+根拠：O3DE 26.05 Atom Gem API `https://docs.o3de.org/docs/api/gems/atom/class_a_z_1_1_render_1_1_mesh_feature_processor_interface`、AtomLyIntegration `https://www.docs.o3de.org/docs/api/gems/atomlyintegration/class_a_z_1_1_render_1_1_mesh_component_notifications`、Mesh Component user guide `https://o3deorg.netlify.app/docs/user-guide/components/reference/atom/mesh/`。
+
+**優先経路：** `MeshComponentRequestBus` → `AZ::RPI::Model` → LOD/mesh asset/CPU streamを調査する。最初はasset ID/pathとModel ready状態だけを検査し、頂点・三角形データがCPUから安全に参照できるかは実SDKヘッダーとEditor実測で確定する。
+
+**実機確認手順（ソース調査）：** O3DEエンジンの `Gems/AtomLyIntegration/CommonFeatures/Code/Include/AtomLyIntegration/CommonFeatures/Mesh/MeshComponentBus.h`、`Gems/Atom/RPI/Code/Include/Atom/RPI.Public/Model/Model.h`、`Gems/Atom/RPI/Code/Include/Atom/RPI.Reflect/Model/ModelAsset.h`、関連 `ModelLodAsset` / `ModelAssetHelpers` の実在・関数シグネチャ・依存Gemを調べる。これらは候補パスであり、ローカル26.05 SDKでの実在確認前には確定扱いしない。
+
+**OPM-001判定：OPEN（API入口候補を机上確認、CPU vertex/index取得と実機ビルド未確認）。** 次のGateはローカルヘッダー照合→最小C++ Mesh discovery probeのビルド→Editor実測の順とする。
