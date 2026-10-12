@@ -1138,3 +1138,18 @@ O3DE 26.05公開API資料から、EntityのAtom Mesh ComponentとRPI Modelへ到
 **実機確認手順（ソース調査）：** O3DEエンジンの `Gems/AtomLyIntegration/CommonFeatures/Code/Include/AtomLyIntegration/CommonFeatures/Mesh/MeshComponentBus.h`、`Gems/Atom/RPI/Code/Include/Atom/RPI.Public/Model/Model.h`、`Gems/Atom/RPI/Code/Include/Atom/RPI.Reflect/Model/ModelAsset.h`、関連 `ModelLodAsset` / `ModelAssetHelpers` の実在・関数シグネチャ・依存Gemを調べる。これらは候補パスであり、ローカル26.05 SDKでの実在確認前には確定扱いしない。
 
 **OPM-001判定：OPEN（API入口候補を机上確認、CPU vertex/index取得と実機ビルド未確認）。** 次のGateはローカルヘッダー照合→最小C++ Mesh discovery probeのビルド→Editor実測の順とする。
+
+
+### 17.7 OPM-001 ローカルO3DE 26.05 SDKヘッダー調査（2026-10-12）
+
+ユーザーのWindows環境 `C:\O3DE\26.05\` で `opm001_inspect_o3de_headers.py` を実行したログを確認。対象5ヘッダーすべて `FOUND`、`HEADER_COUNT|5/5`、`RESULT|DISCOVERY_ONLY`。
+
+- `MeshComponentBus.h`：`GetModelAssetId` (33行)、`GetModelAssetPath` (38行)、`OnModelReady(const Data::Asset<RPI::ModelAsset>&, const Data::Instance<RPI::Model>&)` (116行)、`OnModelPreDestroy` (118行)。
+- `Model.h`：`GetLodCount` (52行)。
+- `ModelAsset.h`：`GetLodCount` (63行)、`GetLodAssets` (65行)。
+- `ModelLodAsset.h`：`GetVertexCount` (87行)、`GetIndexCount` (90行)、`GetIndexBufferAssetView` (103行)、`GetSemanticBufferAssetView` (117、162行)、`GetMeshes` (154行)、`GetBufferTyped<T>` の呼出し (200行)、`GetBufferAsset` (213行)、`GetBufferViewDescriptor` (218行)。
+- `ModelAssetHelpers.h`：ファイルの存在を確認。
+
+**判定：OPM-001のローカルSDK入口・LOD/Buffer API定義調査は完了。ただしOPM-001 Gate全体はOPEN。** API宣言の存在はCPU上の頂点・index実データ取得成功、Mesh Componentからの呼出し成功、コンパイル成功を保証しない。
+
+次はヘッダーの前後文脈を読み、`MeshComponentRequestBus`に`GetModel`が実際に存在するかを再確認する。今回の検出ログでは`GetModel`は現れず、`OnModelReady`からModel/ModelAssetを受け取る経路を第一候補とする。続いて既存Validation Gemとは独立した最小のMesh discovery probeをビルド・Editor実行し、vertex/index取得の可否を確定する。
