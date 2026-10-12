@@ -1,4 +1,8 @@
 #include "SansaClothBackendProbeValidationSystemComponent.h"
+#include <AtomLyIntegration/CommonFeatures/Mesh/MeshComponentBus.h>
+#include <Atom/RPI.Reflect/Model/ModelAsset.h>
+#include <Atom/RPI.Reflect/Model/ModelLodAsset.h>
+#include <AzCore/Component/EntityId.h>
 
 #include <AzCore/Math/MathUtils.h>
 #include <rapidjson/document.h>
@@ -575,6 +579,58 @@ namespace SansaClothBackendProbeValidation
         }
     } // namespace
 
+    // OPM-001: discovery only. Never interpret a buffer without validating its format.
+    AZStd::string SystemComponent::ProbeMeshDiscovery(const AZStd::string& entityIdText)
+    {
+        AZ::u64 rawId = 0;
+        if (entityIdText.empty())
+        {
+            return "OPM001|RESULT|INVALID_ENTITY_ID";
+        }
+        for (char c : entityIdText)
+        {
+            if (c < '0' || c > '9' || rawId > (UINT64_MAX - static_cast<AZ::u64>(c - '0')) / 10)
+            {
+                return "OPM001|RESULT|INVALID_ENTITY_ID";
+            }
+            rawId = rawId * 10 + static_cast<AZ::u64>(c - '0');
+        }
+        if (rawId == 0)
+        {
+            return "OPM001|RESULT|INVALID_ENTITY_ID";
+        }
+        const AZ::EntityId entityId(rawId);
+        AZ::Data::Asset<const AZ::RPI::ModelAsset> asset;
+        AZ::Render::MeshComponentRequestBus::EventResult(
+            asset, entityId, &AZ::Render::MeshComponentRequests::GetModelAsset);
+        if (!asset.IsReady())
+        {
+            return "OPM001|RESULT|MODEL_NOT_READY";
+        }
+        const auto lods = asset->GetLodAssets();
+        AZStd::string report = AZStd::string::format("OPM001|LOD_COUNT|%zu", lods.size());
+        for (size_t lodIndex = 0; lodIndex < lods.size(); ++lodIndex)
+        {
+            if (!lods[lodIndex].IsReady())
+            {
+                report += AZStd::string::format("\\nOPM001|LOD|%zu|NOT_READY", lodIndex);
+                continue;
+            }
+            const auto meshes = lods[lodIndex]->GetMeshes();
+            report += AZStd::string::format("\\nOPM001|LOD|%zu|MESH_COUNT|%zu", lodIndex, meshes.size());
+            for (size_t meshIndex = 0; meshIndex < meshes.size(); ++meshIndex)
+            {
+                const auto& mesh = meshes[meshIndex];
+                report += AZStd::string::format(
+                    "\\nOPM001|MESH|%zu|%zu|VERTICES|%u|INDICES|%u|POSITION_VIEW|%s",
+                    lodIndex, meshIndex, mesh.GetVertexCount(), mesh.GetIndexCount(),
+                    mesh.GetSemanticBufferAssetView(AZ::Name("POSITION")) ? "YES" : "NO");
+            }
+        }
+        report += "\\nOPM001|RESULT|DISCOVERY_ONLY";
+        return report;
+    }
+
     void SystemComponent::Reflect(AZ::ReflectContext* context)
     {
         if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
@@ -585,6 +641,9 @@ namespace SansaClothBackendProbeValidation
 
         if (auto* behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
+            behaviorContext->Method("ProbeMeshDiscovery", &SystemComponent::ProbeMeshDiscovery)
+                ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
+                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common);
             behaviorContext->Method("ProbeSurfaceResponseJson", &SystemComponent::ProbeSurfaceResponseJson)
                 ->Attribute(AZ::Script::Attributes::Module, "sansacloth_probe")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common);
