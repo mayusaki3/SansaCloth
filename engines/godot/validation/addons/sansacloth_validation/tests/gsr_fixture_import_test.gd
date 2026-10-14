@@ -65,9 +65,19 @@ func _initialize() -> void:
                 _fail("TRIANGLE_INDEX")
                 return
     var inputs: Dictionary = doc.get("inputs", {})
-    if inputs.get("conformity") != 0 or inputs.get("collision_tolerance_m") != 0 or inputs.get("world_gravity_m_per_s2") != [0, 0, 0]:
-        _fail("INPUTS")
+    var gravity = inputs.get("world_gravity_m_per_s2")
+    if not (gravity is Array) or gravity.size() != 3:
+        _fail("GRAVITY_SCHEMA")
         return
+    for component in gravity:
+        if not (component is float or component is int) or absf(float(component)) > 0.000000001:
+            _fail("GRAVITY_VALUE")
+            return
+    for key in ["conformity", "collision_tolerance_m"]:
+        var value = inputs.get(key)
+        if not (value is float or value is int) or absf(float(value)) > 0.000000001:
+            _fail("INPUT_" + key.to_upper())
+            return
     print("SANSA_GODOT|GSR-007A|VERTEX_COUNT|", vertices.size())
     print("SANSA_GODOT|GSR-007A|TRIANGLE_COUNT|", triangles.size())
     print("SANSA_GODOT|GSR-007A|CP_COUNT|", points.size())
