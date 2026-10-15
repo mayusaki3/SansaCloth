@@ -21,6 +21,7 @@ fn gsr_007d_sr004_committed_normals_match_current_rust_reference() {
         .as_array().expect("body surface vertices");
     assert_eq!(vertices.len(), points.len());
     let mut fixture_mismatches = Vec::new();
+    let mut surface_position_mismatches = Vec::new();
 
     let query = AnalyticFixtureSurfaceQuery {
         fixture: AnalyticFixture::concave_shallow(),
@@ -33,7 +34,18 @@ fn gsr_007d_sr004_committed_normals_match_current_rust_reference() {
         let u = (index % 21) as f64 / 20.0;
         let v = (index / 21) as f64 / 6.0;
         let surface_reference = SurfaceReference::new(1, u, v).unwrap();
-        let actual = query.query(DVec3::ZERO, surface_reference).surface_normal;
+        let query_result = query.query(DVec3::ZERO, surface_reference);
+        let actual = query_result.surface_normal;
+        let saved_position = point["surface_position_m"].as_array().expect("saved surface position");
+        let expected_position = DVec3::new(
+            saved_position[0].as_f64().unwrap(),
+            saved_position[1].as_f64().unwrap(),
+            saved_position[2].as_f64().unwrap(),
+        );
+        let position_error = query_result.surface_position_m.distance(expected_position);
+        if position_error > 1.0e-6 {
+            surface_position_mismatches.push((stable_id, position_error));
+        }
         let saved = point["surface_normal"].as_array().expect("saved normal");
         let expected = DVec3::new(
             saved[0].as_f64().unwrap(),
@@ -56,6 +68,12 @@ fn gsr_007d_sr004_committed_normals_match_current_rust_reference() {
             mismatches.push((stable_id, error));
         }
     }
+    assert!(
+        surface_position_mismatches.is_empty(),
+        "committed SR-004 surface positions differ from current analytic Rust query: {:?}; total: {}",
+        &surface_position_mismatches[..surface_position_mismatches.len().min(5)],
+        surface_position_mismatches.len()
+    );
     assert!(
         fixture_mismatches.is_empty(),
         "committed fixture-exchange normals differ from current analytic Rust query: {:?}; total: {}",
