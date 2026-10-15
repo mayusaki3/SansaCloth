@@ -15,6 +15,13 @@ fn gsr_007d_sr004_committed_normals_match_current_rust_reference() {
     let points = document["control_points"].as_array().expect("control points");
     assert_eq!(points.len(), 147);
 
+    let fixture_json = include_str!("../../../validation/fixture-exchange/basic-v1/SR-004-C1-G0.json");
+    let fixture_document: Value = serde_json::from_str(fixture_json).expect("valid fixture exchange");
+    let vertices = fixture_document["body_surface"]["vertices"]
+        .as_array().expect("body surface vertices");
+    assert_eq!(vertices.len(), points.len());
+    let mut fixture_mismatches = Vec::new();
+
     let query = AnalyticFixtureSurfaceQuery {
         fixture: AnalyticFixture::concave_shallow(),
     };
@@ -33,11 +40,28 @@ fn gsr_007d_sr004_committed_normals_match_current_rust_reference() {
             saved[1].as_f64().unwrap(),
             saved[2].as_f64().unwrap(),
         );
+        let vertex = &vertices[index];
+        let fixture_normal = &vertex["normal"];
+        let fixture_value = DVec3::new(
+            fixture_normal[0].as_f64().unwrap(),
+            fixture_normal[1].as_f64().unwrap(),
+            fixture_normal[2].as_f64().unwrap(),
+        );
+        let fixture_error = actual.distance(fixture_value);
+        if fixture_error > 1.0e-6 {
+            fixture_mismatches.push((stable_id, fixture_error));
+        }
         let error = actual.distance(expected);
         if error > 1.0e-6 {
             mismatches.push((stable_id, error));
         }
     }
+    assert!(
+        fixture_mismatches.is_empty(),
+        "committed fixture-exchange normals differ from current analytic Rust query: {:?}; total: {}",
+        &fixture_mismatches[..fixture_mismatches.len().min(5)],
+        fixture_mismatches.len()
+    );
     assert!(
         mismatches.is_empty(),
         "committed SR-004 normals differ from current analytic Rust query; first mismatches: {:?}; total: {}",
