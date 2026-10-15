@@ -73,7 +73,32 @@ func _initialize() -> void:
             _fail("SURFACE_UV_NOT_FOUND")
             return
         var surface := _vec(vertex["position_m"])
+        # Compute a geometric normal from neighboring surface positions.
+        var left: Dictionary = {}
+        var right: Dictionary = {}
+        var left_gap := INF
+        var right_gap := INF
+        for candidate in vertices:
+            var candidate_uv: Array = candidate.get("uv", [])
+            if candidate_uv.size() != 2 or absf(float(candidate_uv[1]) - v) > EPS:
+                continue
+            var du := float(candidate_uv[0]) - u
+            if du < -EPS and -du < left_gap:
+                left_gap = -du
+                left = candidate
+            elif du > EPS and du < right_gap:
+                right_gap = du
+                right = candidate
         var normal := _vec(vertex["normal"]).normalized()
+        if not left.is_empty() and not right.is_empty():
+            var tangent := (_vec(right["position_m"]) - _vec(left["position_m"])).normalized()
+            normal = Vector3(-tangent.y, tangent.x, 0.0).normalized()
+        elif not right.is_empty():
+            var tangent := (_vec(right["position_m"]) - surface).normalized()
+            normal = Vector3(-tangent.y, tangent.x, 0.0).normalized()
+        elif not left.is_empty():
+            var tangent := (surface - _vec(left["position_m"])).normalized()
+            normal = Vector3(-tangent.y, tangent.x, 0.0).normalized()
         var surface_error := surface.distance_to(_vec(ref["surface_position_m"]))
         var normal_error := normal.distance_to(_vec(ref["surface_normal"]))
         max_surface_error = maxf(max_surface_error, surface_error)
