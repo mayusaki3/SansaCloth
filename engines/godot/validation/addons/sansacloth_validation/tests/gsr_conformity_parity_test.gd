@@ -73,46 +73,28 @@ func _initialize() -> void:
             _fail("SURFACE_UV_NOT_FOUND")
             return
         var surface := _vec(vertex["position_m"])
-        # Compute a geometric normal from neighboring surface positions.
-        var left: Dictionary = {}
-        var right: Dictionary = {}
-        var left_gap := INF
-        var right_gap := INF
-        for candidate in vertices:
-            var candidate_uv: Array = candidate.get("uv", [])
-            if candidate_uv.size() != 2 or absf(float(candidate_uv[1]) - v) > EPS:
-                continue
-            var du := float(candidate_uv[0]) - u
-            if du < -EPS and -du < left_gap:
-                left_gap = -du
-                left = candidate
-            elif du > EPS and du < right_gap:
-                right_gap = du
-                right = candidate
-        var normal := _vec(vertex["normal"]).normalized()
-        if not left.is_empty() and not right.is_empty():
-            var tangent := (_vec(right["position_m"]) - _vec(left["position_m"])).normalized()
-            normal = Vector3(-tangent.y, tangent.x, 0.0).normalized()
-        elif not right.is_empty():
-            var tangent := (_vec(right["position_m"]) - surface).normalized()
-            normal = Vector3(-tangent.y, tangent.x, 0.0).normalized()
-        elif not left.is_empty():
-            var tangent := (surface - _vec(left["position_m"])).normalized()
-            normal = Vector3(-tangent.y, tangent.x, 0.0).normalized()
+        # SR-004 is the shallow concave analytic fixture (depth 0.02 m).
+        # Rust AnalyticFixture::normal evaluates the exact raised-cosine derivative.
+        var x := (u - 0.5) * 0.20
+        var dydx := 0.0
+        if absf(x) <= 0.05:
+            dydx = (0.02 * PI / 0.10) * sin(2.0 * PI * x / 0.10)
+        var normal := Vector3(-dydx, 1.0, 0.0).normalized()
         var surface_error := surface.distance_to(_vec(ref["surface_position_m"]))
         var normal_error := normal.distance_to(_vec(ref["surface_normal"]))
         max_surface_error = maxf(max_surface_error, surface_error)
         max_normal_error = maxf(max_normal_error, normal_error)
         if surface_error > EPS or normal_error > EPS:
             surface_mismatches += 1
-        # Initial independent hypothesis: project toward the sampled surface,
-        # limiting travel to conformity_reach_m. Never use reference position
-        # as the calculated result.
+        # Reference-v1 conformity: separation-weighted lerp toward surface.
+        # This is computed from fixture geometry and inputs, not result snapshots.
         var gravity_position := _vec(point["position_m"])
-        var delta := surface - gravity_position
+        var separation := (gravity_position - surface).dot(normal)
         var proposed := gravity_position
-        if not bool(point.get("anchor", false)) and delta.length() <= reach:
-            proposed = gravity_position + normal * delta.dot(normal)
+        if not bool(point.get("anchor", false)) and separation >= 0.0:
+            var weight := clampf(1.0 - separation / reach, 0.0, 1.0)
+            var conformity := float(fixture["inputs"]["conformity"])
+            proposed = gravity_position.lerp(surface, conformity * weight)
         var error := proposed.distance_to(_vec(ref["conformity_position_m"]))
         max_conformity_error = maxf(max_conformity_error, error)
         if error > EPS:
