@@ -128,3 +128,42 @@ fn gsr_007d_identify_saved_normal_derivation() {
     assert_eq!(chord_matches, 140, "saved normals are not uniformly backward-chord normals");
     assert_eq!(analytic_mismatches, 70, "unexpected analytic mismatch count");
 }
+
+
+/// Check whether the saved separation and contact fields are self-consistent
+/// with the saved (mesh-derived) normal, rather than the analytic normal.
+/// This is a diagnostic, not an endorsement of the snapshot's query contract.
+#[test]
+fn gsr_007d_diagnose_saved_separation_contract() {
+    let json = include_str!("../../../validation/surface-response-result/basic-v1/SR-004-C1-G0.json");
+    let document: Value = serde_json::from_str(json).expect("valid result snapshot");
+    let points = document["control_points"].as_array().expect("control points");
+    let fixture = AnalyticFixture::concave_shallow();
+    let mut saved_normal_matches = 0usize;
+    let mut analytic_normal_matches = 0usize;
+    let mut saved_contact_matches = 0usize;
+    for (index, point) in points.iter().enumerate() {
+        let vec = |name: &str| {
+            let a = point[name].as_array().expect("vector");
+            DVec3::new(a[0].as_f64().unwrap(), a[1].as_f64().unwrap(), a[2].as_f64().unwrap())
+        };
+        let displacement = vec("final_position_m") - vec("surface_position_m");
+        let saved_separation = point["separation_m"].as_f64().expect("separation");
+        let saved_normal = vec("surface_normal");
+        let u = (index % 21) as f64 / 20.0;
+        if (displacement.dot(saved_normal) - saved_separation).abs() <= 1.0e-6 {
+            saved_normal_matches += 1;
+        }
+        if (displacement.dot(fixture.normal(u)) - saved_separation).abs() <= 1.0e-6 {
+            analytic_normal_matches += 1;
+        }
+        if point["contact"].as_bool().expect("contact") == (saved_separation <= 0.0) {
+            saved_contact_matches += 1;
+        }
+    }
+    println!(
+        "GSR-007D separation diagnostic: saved_normal_matches={saved_normal_matches}/147 analytic_normal_matches={analytic_normal_matches}/147 contact_matches={saved_contact_matches}/147"
+    );
+    assert_eq!(saved_normal_matches, 147, "saved separation does not follow saved normals");
+    assert_eq!(saved_contact_matches, 147, "saved contact does not follow saved separation");
+}
