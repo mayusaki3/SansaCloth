@@ -1,8 +1,7 @@
 extends SceneTree
 
 # GSR-007D: independent comparison against committed SR-004 reference snapshot.
-# Snapshot geometry uses incoming-edge normals; current Rust analytic normals
-# differ, and generator consistency must be investigated separately.
+# Use the fixture-exchange analytic vertex normals, matching Rust SurfaceQuery.
 const FIXTURE := "res://addons/sansacloth_validation/fixtures/SR-004-C1-G0.json"
 const RESULT := "res://addons/sansacloth_validation/reference-results/SR-004-C1-G0.json"
 const EPS := 0.000001
@@ -73,23 +72,7 @@ func _initialize() -> void:
             _fail("SURFACE_UV_NOT_FOUND")
             return
         var surface := _vec(vertex["position_m"])
-        # The committed SR-004 reference snapshot uses the incoming U-edge
-        # slope, rather than the analytic derivative in the current Rust source.
-        # Keep this snapshot-specific rule explicit until generator parity is resolved.
-        var left: Dictionary = {}
-        var nearest_gap := INF
-        for candidate in vertices:
-            var candidate_uv: Array = candidate.get("uv", [])
-            if candidate_uv.size() != 2 or absf(float(candidate_uv[1]) - v) > EPS:
-                continue
-            var du := u - float(candidate_uv[0])
-            if du > EPS and du < nearest_gap:
-                nearest_gap = du
-                left = candidate
-        var normal := Vector3.UP
-        if not left.is_empty():
-            var tangent := (surface - _vec(left["position_m"])).normalized()
-            normal = Vector3(-tangent.y, tangent.x, 0.0).normalized()
+        var normal := _vec(vertex["normal"]).normalized()
         var surface_error := surface.distance_to(_vec(ref["surface_position_m"]))
         var normal_error := normal.distance_to(_vec(ref["surface_normal"]))
         max_surface_error = maxf(max_surface_error, surface_error)
