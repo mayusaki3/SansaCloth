@@ -1,5 +1,5 @@
 //! Replays SR-004-C1-G0 through the actual Rust solver using fixture-exchange inputs.
-//! The committed snapshot is a legacy comparison baseline, not the solver's oracle.
+//! The committed snapshot is regenerated from the current solver and is a parity oracle.
 use glam::DVec3;
 use sansacloth_core::SurfaceReference;
 use sansacloth_fixture::AnalyticFixture;
@@ -20,25 +20,25 @@ fn gsr_007d_replay_fixture_through_current_rust_solver() {
     let fixture: Value = serde_json::from_str(include_str!(
         "../../../validation/fixture-exchange/basic-v1/SR-004-C1-G0.json"
     )).unwrap();
-    let legacy: Value = serde_json::from_str(include_str!(
+    let snapshot: Value = serde_json::from_str(include_str!(
         "../../../validation/surface-response-result/basic-v1/SR-004-C1-G0.json"
     )).unwrap();
-    assert_eq!(fixture["case_id"], legacy["case_id"]);
+    assert_eq!(fixture["case_id"], snapshot["case_id"]);
     let input_points = fixture["cloth"]["control_points"].as_array().unwrap();
-    let saved_points = legacy["control_points"].as_array().unwrap();
+    let saved_points = snapshot["control_points"].as_array().unwrap();
     assert_eq!(input_points.len(), 147);
     assert_eq!(saved_points.len(), input_points.len());
 
     let query = AnalyticFixtureSurfaceQuery { fixture: AnalyticFixture::concave_shallow() };
     let settings = ReferenceSolverSettings {
-        quasi_static_gravity_scale: legacy["profile"]["quasi_static_gravity_scale"].as_f64().unwrap(),
-        conformity_reach_m: legacy["profile"]["conformity_reach_m"].as_f64().unwrap(),
+        quasi_static_gravity_scale: snapshot["profile"]["quasi_static_gravity_scale"].as_f64().unwrap(),
+        conformity_reach_m: snapshot["profile"]["conformity_reach_m"].as_f64().unwrap(),
         collision_tolerance_m: fixture["inputs"]["collision_tolerance_m"].as_f64().unwrap(),
     };
     let gravity = vector(&fixture["inputs"]["world_gravity_m_per_s2"]);
     let conformity = fixture["inputs"]["conformity"].as_f64().unwrap();
-    let characteristic_length_m = legacy["profile"]["characteristic_length_m"].as_f64().unwrap();
-    assert_eq!(legacy["profile"]["support_layout"].as_str(), Some("BothEdges"));
+    let characteristic_length_m = snapshot["profile"]["characteristic_length_m"].as_f64().unwrap();
+    assert_eq!(snapshot["profile"]["support_layout"].as_str(), Some("BothEdges"));
     let mut mismatches = [0usize; 9];
     let mut max_errors = [0.0f64; 9];
     let fields = [
@@ -108,8 +108,7 @@ fn gsr_007d_replay_fixture_through_current_rust_solver() {
     for (i, field) in fields.iter().enumerate() {
         println!("GSR-007D solver replay | {field} | mismatches={}/147 | max_error={:.12}", mismatches[i], max_errors[i]);
     }
-    // A baseline difference is expected while the old snapshot uses chord normals.
-    assert!(mismatches[6] > 0, "legacy normal mismatch unexpectedly disappeared");
+    assert!(mismatches.iter().all(|&count| count == 0), "regenerated solver snapshot mismatch: {mismatches:?}");
 }
 
 
