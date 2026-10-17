@@ -1,6 +1,6 @@
 //! Regression guard: committed SurfaceResponse snapshots must agree with the
 //! current analytic Reference surface query, not only with a Godot snapshot reader.
-//! This is intentionally a RED test until the snapshot generation path is reconciled.
+//! Regenerated snapshots must preserve this analytic-query contract.
 use glam::DVec3;
 use sansacloth_core::SurfaceReference;
 use sansacloth_fixture::AnalyticFixture;
@@ -89,52 +89,10 @@ fn gsr_007d_sr004_committed_normals_match_current_rust_reference() {
 }
 
 
-/// Diagnostic only: identify whether the committed result normals were
-/// generated from a backward finite difference of sampled surface positions.
-/// This does not make those normals the Reference solver contract.
+/// Regression guard: saved separation and contact must agree with the
+/// analytic query normal and the final cloth position.
 #[test]
-fn gsr_007d_identify_saved_normal_derivation() {
-    let json = include_str!("../../../validation/surface-response-result/basic-v1/SR-004-C1-G0.json");
-    let document: Value = serde_json::from_str(json).expect("valid result snapshot");
-    let points = document["control_points"].as_array().expect("control points");
-    let mut chord_matches = 0usize;
-    let mut analytic_mismatches = 0usize;
-    let fixture = AnalyticFixture::concave_shallow();
-    for index in 0..points.len() {
-        let u_index = index % 21;
-        if u_index == 0 { continue; }
-        let current = &points[index]["surface_position_m"];
-        let previous = &points[index - 1]["surface_position_m"];
-        let dx = current[0].as_f64().unwrap() - previous[0].as_f64().unwrap();
-        let dy = current[1].as_f64().unwrap() - previous[1].as_f64().unwrap();
-        let chord = DVec3::new(-dy, dx, 0.0).normalize();
-        let saved = &points[index]["surface_normal"];
-        let saved_normal = DVec3::new(
-            saved[0].as_f64().unwrap(),
-            saved[1].as_f64().unwrap(),
-            saved[2].as_f64().unwrap(),
-        );
-        let u = u_index as f64 / 20.0;
-        if saved_normal.distance(chord) < 1.0e-6 {
-            chord_matches += 1;
-        }
-        if saved_normal.distance(fixture.normal(u)) > 1.0e-6 {
-            analytic_mismatches += 1;
-        }
-    }
-    println!(
-        "GSR-007D diagnostic: backward_chord_matches={chord_matches}/140 analytic_mismatches={analytic_mismatches}/140"
-    );
-    assert_eq!(chord_matches, 140, "saved normals are not uniformly backward-chord normals");
-    assert_eq!(analytic_mismatches, 70, "unexpected analytic mismatch count");
-}
-
-
-/// Check whether the saved separation and contact fields are self-consistent
-/// with the saved (mesh-derived) normal, rather than the analytic normal.
-/// This is a diagnostic, not an endorsement of the snapshot's query contract.
-#[test]
-fn gsr_007d_diagnose_saved_separation_contract() {
+fn gsr_007d_saved_separation_and_contact_match_analytic_query() {
     let json = include_str!("../../../validation/surface-response-result/basic-v1/SR-004-C1-G0.json");
     let document: Value = serde_json::from_str(json).expect("valid result snapshot");
     let points = document["control_points"].as_array().expect("control points");
@@ -165,5 +123,6 @@ fn gsr_007d_diagnose_saved_separation_contract() {
         "GSR-007D separation diagnostic: saved_normal_matches={saved_normal_matches}/147 analytic_normal_matches={analytic_normal_matches}/147 contact_matches={saved_contact_matches}/147"
     );
     assert_eq!(saved_normal_matches, 147, "saved separation does not follow saved normals");
+    assert_eq!(analytic_normal_matches, 147, "saved separation does not follow analytic normals");
     assert_eq!(saved_contact_matches, 147, "saved contact does not follow saved separation");
 }
