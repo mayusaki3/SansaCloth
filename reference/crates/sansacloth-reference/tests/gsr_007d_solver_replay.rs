@@ -55,7 +55,7 @@ fn gsr_007d_replay_fixture_through_current_rust_solver() {
                 surface_references: input.iter().map(|p| {
                     let sr = &p["surface_reference"];
                     SurfaceReference::new(
-                        sr["domain_id"].as_u64().unwrap() as u32,
+                        sr["domain_id"].as_u64().unwrap(),
                         sr["u"].as_f64().unwrap(),
                         sr["v"].as_f64().unwrap(),
                     ).unwrap()
