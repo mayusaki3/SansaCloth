@@ -16,6 +16,7 @@ fn vector(value: &Value) -> DVec3 {
 }
 
 #[test]
+#[ignore = "explicitly writes GSR-007G snapshot; run with --ignored"]
 fn gsr_007g_generate_collision_snapshot() {
 
     let fixture: Value = serde_json::from_str(include_str!(
