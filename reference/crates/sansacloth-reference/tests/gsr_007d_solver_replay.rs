@@ -191,7 +191,7 @@ fn gsr_007d_regenerate_sr004() {
     let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../validation/surface-response-result/basic-v1/SR-004-C1-G0.json");
     let mut content = serde_json::to_string_pretty(&document).unwrap();
-    content.push('\\n');
+    content.push('\n');
     std::fs::write(&path, content).expect("write regenerated snapshot");
     println!("GSR-007D regenerated: {}", path.display());
 }
