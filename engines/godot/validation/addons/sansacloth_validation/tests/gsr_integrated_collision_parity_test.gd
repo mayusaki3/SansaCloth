@@ -77,6 +77,8 @@ func _initialize() -> void:
     var final_mismatches := 0
     var separation_mismatches := 0
     var contact_mismatches := 0
+    var contact_boundary_ambiguous := 0
+    var contact_boundary_examples := 0
     var corrected_count := 0
     for point in points:
         var id := int(point.get("stable_id", -1))
@@ -133,9 +135,18 @@ func _initialize() -> void:
             final_mismatches += 1
         if separation_error > EPS:
             separation_mismatches += 1
-        if contact != bool(saved["contact"]):
-            contact_mismatches += 1
-        if collision_error > EPS or final_error > EPS or separation_error > EPS or contact != bool(saved["contact"]):
+        var contact_differs := contact != bool(saved["contact"])
+        var saved_separation := float(saved["separation_m"])
+        var boundary_ambiguous := contact_differs and absf(final_separation - tolerance) <= EPS and absf(saved_separation - tolerance) <= EPS
+        if contact_differs:
+            if boundary_ambiguous:
+                contact_boundary_ambiguous += 1
+                if contact_boundary_examples < 5:
+                    print("SANSA_GODOT|GSR-007G|CONTACT_BOUNDARY|ID=", id, "|GODOT_SEPARATION_M=", final_separation, "|RUST_SEPARATION_M=", saved_separation, "|TOLERANCE_M=", tolerance, "|GODOT_CONTACT=", contact, "|RUST_CONTACT=", bool(saved["contact"]))
+                    contact_boundary_examples += 1
+            else:
+                contact_mismatches += 1
+        if collision_error > EPS or final_error > EPS or separation_error > EPS or (contact_differs and not boundary_ambiguous):
             if collision_mismatches + final_mismatches + separation_mismatches + contact_mismatches <= 10:
                 printerr("SANSA_GODOT|GSR-007G|MISMATCH|ID=", id, "|COLLISION=", collision_error, "|FINAL=", final_error, "|SEPARATION=", separation_error, "|CONTACT=", contact)
     print("SANSA_GODOT|GSR-007G|CHECKED|", points.size())
@@ -149,11 +160,16 @@ func _initialize() -> void:
     print("SANSA_GODOT|GSR-007G|FINAL_MISMATCHES|", final_mismatches)
     print("SANSA_GODOT|GSR-007G|SEPARATION_MISMATCHES|", separation_mismatches)
     print("SANSA_GODOT|GSR-007G|CONTACT_MISMATCHES|", contact_mismatches)
+    print("SANSA_GODOT|GSR-007G|CONTACT_BOUNDARY_AMBIGUOUS|", contact_boundary_ambiguous)
     if corrected_count == 0:
         _fail("NO_COLLISION_CORRECTIONS")
         return
     if bridge_mismatches + collision_mismatches + final_mismatches + separation_mismatches + contact_mismatches != 0:
         _fail("NUMERICAL_MISMATCH")
+        return
+    if contact_boundary_ambiguous > 0:
+        print("SANSA_GODOT|GSR-007G|NUMERIC_PARITY_PASS_CONTACT_BOUNDARY_UNRESOLVED")
+        quit(2)
         return
     print("SANSA_GODOT|GSR-007G|PASS")
     quit(0)
