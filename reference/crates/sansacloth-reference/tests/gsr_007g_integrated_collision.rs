@@ -5,7 +5,7 @@ use sansacloth_core::SurfaceReference;
 use sansacloth_fixture::AnalyticFixture;
 use sansacloth_reference::{
     AnalyticFixtureSurfaceQuery, GravitySupportLayout, ReferenceSolverSettings,
-    ReferenceSurfaceSolver, ReferenceSurfaceSolverInput, SurfaceQuery,
+    ReferenceSurfaceSolver, ReferenceSurfaceSolverInput,
 };
 use serde_json::Value;
 
