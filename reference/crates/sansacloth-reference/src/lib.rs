@@ -1002,12 +1002,10 @@ mod tests {
             assert!(result.positions_m.iter().all(|value| value.is_finite()));
             assert!(result.surface_normals.iter().all(|value| value.is_finite()));
             assert!(result.separation_m.iter().all(|value| value.is_finite()));
-            assert!(
-                result
-                    .separation_m
-                    .iter()
-                    .all(|value| *value >= -f64::EPSILON)
-            );
+            assert!(result
+                .separation_m
+                .iter()
+                .all(|value| *value >= -f64::EPSILON));
         }
     }
 
@@ -1016,15 +1014,13 @@ mod tests {
         let results = run_basic_surface(BasicSurface::Flat);
         assert_basic_results(&results);
         for result in &results {
-            assert!(
-                result
-                    .positions_m
-                    .iter()
-                    .zip(FlatClothFixture.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES))
-                    .all(|(actual, expected)| {
-                        (*actual - expected.position_m).length() <= f64::EPSILON
-                    },)
-            );
+            assert!(result
+                .positions_m
+                .iter()
+                .zip(FlatClothFixture.control_points(BASIC_U_SAMPLES, BASIC_V_SAMPLES))
+                .all(|(actual, expected)| {
+                    (*actual - expected.position_m).length() <= f64::EPSILON
+                },));
         }
     }
 
@@ -1239,19 +1235,15 @@ mod tests {
             fixture: AnalyticFixture::flat(),
         };
         let result = ReferenceSurfaceSolver::solve(&input, &query, gravity_settings());
-        assert!(
-            result
-                .positions_m
-                .iter()
-                .zip(&input.positions_m)
-                .all(|(actual, expected)| (*actual - *expected).length() <= f64::EPSILON)
-        );
-        assert!(
-            result
-                .separation_m
-                .iter()
-                .all(|value| value.abs() <= f64::EPSILON)
-        );
+        assert!(result
+            .positions_m
+            .iter()
+            .zip(&input.positions_m)
+            .all(|(actual, expected)| (*actual - *expected).length() <= f64::EPSILON));
+        assert!(result
+            .separation_m
+            .iter()
+            .all(|value| value.abs() <= f64::EPSILON));
     }
 
     #[test]
