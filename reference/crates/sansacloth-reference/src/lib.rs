@@ -581,9 +581,29 @@ pub fn apply_collision_response(
         .collect()
 }
 
+/// Cross-engine contact classification boundary band (metres).
+/// Collision correction continues to use the exact configured tolerance.
+pub const CONTACT_EPSILON_M: f64 = 1.0e-6;
+
+pub fn is_surface_contact(separation_m: f64, collision_tolerance_m: f64) -> bool {
+    assert!(separation_m.is_finite());
+    assert!(collision_tolerance_m.is_finite() && collision_tolerance_m >= 0.0);
+    separation_m <= collision_tolerance_m + CONTACT_EPSILON_M
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn contact_classification_boundary_band() {
+        let t = 0.005;
+        assert!(is_surface_contact(t - 1.0e-5, t));
+        assert!(is_surface_contact(t, t));
+        assert!(is_surface_contact(t + 1.0e-8, t));
+        assert!(is_surface_contact(t + CONTACT_EPSILON_M, t));
+        assert!(!is_surface_contact(t + CONTACT_EPSILON_M + 1.0e-8, t));
+    }
+
     use sansacloth_fixture::{AnchorProfile, FlatClothFixture};
 
     #[test]
