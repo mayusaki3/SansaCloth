@@ -68,6 +68,8 @@ func _initialize() -> void:
             _fail("DUPLICATE_UV")
             return
         by_uv[key] = vertex
+    var max_bridge_error := 0.0
+    var bridge_mismatches := 0
     var max_collision_error := 0.0
     var max_final_error := 0.0
     var max_separation_error := 0.0
@@ -89,10 +91,18 @@ func _initialize() -> void:
         var vertex: Dictionary = by_uv[key]
         var surface := _vec(vertex["position_m"])
         var normal := _vec(vertex["normal"]).normalized()
-        var gravity_position := _vec(point["position_m"])
+        var row := id / 21
         var column := id % 21
+        var first: Dictionary = points[row * 21]
+        var last: Dictionary = points[row * 21 + 20]
+        var gravity_position := _vec(point["position_m"])
         if column >= 5 and column <= 15:
             gravity_position.y -= 0.03
+        # Rust Reference v1 Bridge: both strip endpoints are anchors.
+        # Interior initial positions (including the deliberate 30 mm offsets)
+        # are replaced by endpoint interpolation before conformity/collision.
+        if bool(first.get("anchor", false)) and bool(last.get("anchor", false)) and column > 0 and column < 20:
+            gravity_position = _vec(first["position_m"]).lerp(_vec(last["position_m"]), float(column) / 20.0)
         var initial_separation := (gravity_position - surface).dot(normal)
         var proposed := gravity_position
         if not bool(point.get("anchor", false)) and initial_separation >= 0.0:
@@ -107,6 +117,10 @@ func _initialize() -> void:
         var final_separation := (final_position - surface).dot(normal)
         var contact := final_separation <= tolerance
         var saved: Dictionary = by_id[id]
+        var bridge_error := gravity_position.distance_to(_vec(saved["bridge_position_m"]))
+        max_bridge_error = maxf(max_bridge_error, bridge_error)
+        if bridge_error > EPS:
+            bridge_mismatches += 1
         var collision_error := collision.distance_to(_vec(saved["collision_position_m"]))
         var final_error := final_position.distance_to(_vec(saved["final_position_m"]))
         var separation_error := absf(final_separation - float(saved["separation_m"]))
@@ -125,6 +139,8 @@ func _initialize() -> void:
             if collision_mismatches + final_mismatches + separation_mismatches + contact_mismatches <= 10:
                 printerr("SANSA_GODOT|GSR-007G|MISMATCH|ID=", id, "|COLLISION=", collision_error, "|FINAL=", final_error, "|SEPARATION=", separation_error, "|CONTACT=", contact)
     print("SANSA_GODOT|GSR-007G|CHECKED|", points.size())
+    print("SANSA_GODOT|GSR-007G|MAX_BRIDGE_ERROR_M|", max_bridge_error)
+    print("SANSA_GODOT|GSR-007G|BRIDGE_MISMATCHES|", bridge_mismatches)
     print("SANSA_GODOT|GSR-007G|CORRECTED|", corrected_count)
     print("SANSA_GODOT|GSR-007G|MAX_COLLISION_ERROR_M|", max_collision_error)
     print("SANSA_GODOT|GSR-007G|MAX_FINAL_ERROR_M|", max_final_error)
@@ -136,7 +152,7 @@ func _initialize() -> void:
     if corrected_count == 0:
         _fail("NO_COLLISION_CORRECTIONS")
         return
-    if collision_mismatches + final_mismatches + separation_mismatches + contact_mismatches != 0:
+    if bridge_mismatches + collision_mismatches + final_mismatches + separation_mismatches + contact_mismatches != 0:
         _fail("NUMERICAL_MISMATCH")
         return
     print("SANSA_GODOT|GSR-007G|PASS")
