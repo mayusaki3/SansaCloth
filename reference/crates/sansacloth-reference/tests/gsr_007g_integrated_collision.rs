@@ -5,7 +5,7 @@ use sansacloth_core::SurfaceReference;
 use sansacloth_fixture::AnalyticFixture;
 use sansacloth_reference::{
     AnalyticFixtureSurfaceQuery, GravitySupportLayout, ReferenceSolverSettings,
-    ReferenceSurfaceSolver, ReferenceSurfaceSolverInput,
+    ReferenceSurfaceSolver, ReferenceSurfaceSolverInput, is_surface_contact,
 };
 use serde_json::Value;
 
@@ -79,7 +79,7 @@ fn gsr_007g_generate_collision_snapshot() {
             p["surface_normal"] = vec_json(debug.final_result.surface_normals[col]);
             p["separation_m"] = serde_json::json!(debug.final_result.separation_m[col]);
             p["contact"] = serde_json::json!(
-                debug.final_result.separation_m[col] <= settings.collision_tolerance_m
+                is_surface_contact(debug.final_result.separation_m[col], settings.collision_tolerance_m)
             );
             p["support"] = serde_json::json!(match debug.final_result.support[col] {
                 sansacloth_reference::SupportKind::Anchor => "Anchor",
