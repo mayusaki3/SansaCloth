@@ -1,0 +1,591 @@
+{
+  "cases": [
+    {
+      "case_id": "GSR-007H-C1",
+      "points": [
+        {
+          "anchor": true,
+          "bridge_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 0,
+          "support": "Anchor",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            -0.1,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "anchor": false,
+          "bridge_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "collision_position_m": [
+            0.0,
+            0.004999999999999999,
+            0.0
+          ],
+          "conformity_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "contact": true,
+          "final_position_m": [
+            0.0,
+            0.004999999999999999,
+            0.0
+          ],
+          "gravity_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "initial_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "separation_m": 0.004999999999999999,
+          "stable_id": 1,
+          "support": "Unsupported",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "anchor": false,
+          "bridge_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 2,
+          "support": "Unsupported",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            0.1,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "GSR-007H-C2",
+      "points": [
+        {
+          "anchor": true,
+          "bridge_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 0,
+          "support": "Anchor",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            -0.1,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "anchor": false,
+          "bridge_position_m": [
+            0.0,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            0.0,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            0.0,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            0.0,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            0.0,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 1,
+          "support": "Unsupported",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "anchor": true,
+          "bridge_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 2,
+          "support": "Anchor",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            0.1,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "GSR-007H-C3",
+      "points": [
+        {
+          "anchor": true,
+          "bridge_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 0,
+          "support": "Anchor",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            -0.1,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "anchor": false,
+          "bridge_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "collision_position_m": [
+            0.0,
+            0.004999999999999999,
+            0.0
+          ],
+          "conformity_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "contact": true,
+          "final_position_m": [
+            0.0,
+            0.004999999999999999,
+            0.0
+          ],
+          "gravity_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "initial_position_m": [
+            0.0,
+            -0.01,
+            0.0
+          ],
+          "separation_m": 0.004999999999999999,
+          "stable_id": 1,
+          "support": "Unsupported",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "anchor": false,
+          "bridge_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 2,
+          "support": "Unsupported",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            0.1,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "GSR-007H-C4",
+      "points": [
+        {
+          "anchor": true,
+          "bridge_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            -0.1,
+            0.02,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 0,
+          "support": "Anchor",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            -0.1,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "anchor": false,
+          "bridge_position_m": [
+            0.0,
+            0.0050005,
+            0.0
+          ],
+          "collision_position_m": [
+            0.0,
+            0.0050005,
+            0.0
+          ],
+          "conformity_position_m": [
+            0.0,
+            0.0050005,
+            0.0
+          ],
+          "contact": true,
+          "final_position_m": [
+            0.0,
+            0.0050005,
+            0.0
+          ],
+          "gravity_position_m": [
+            0.0,
+            0.0050005,
+            0.0
+          ],
+          "initial_position_m": [
+            0.0,
+            0.0050005,
+            0.0
+          ],
+          "separation_m": 0.0050005,
+          "stable_id": 1,
+          "support": "Unsupported",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "anchor": false,
+          "bridge_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "collision_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "conformity_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "contact": false,
+          "final_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "gravity_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "initial_position_m": [
+            0.1,
+            0.02,
+            0.0
+          ],
+          "separation_m": 0.02,
+          "stable_id": 2,
+          "support": "Unsupported",
+          "surface_normal": [
+            -0.0,
+            1.0,
+            0.0
+          ],
+          "surface_position_m": [
+            0.1,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    }
+  ],
+  "collision_tolerance_m": 0.005,
+  "contact_epsilon_m": 1e-6,
+  "schema": "GSR-007H-parity-v1"
+}
