@@ -1,6 +1,6 @@
 # GSR-007H — Bridge input propagation and collision validation
 
-Status: Test specification / implementation pending
+Status: GSR-007H C1–C4 Rust and Godot parity PASS (2026-10-19); extended variants and coverage gaps noted below
 Target: SansaCloth Rust Reference v1 and Godot validation
 Predecessor: GSR-007G-C1 (147 points, Rust–Godot parity PASS)
 Units: metres; X right, Y up, Z forward.
@@ -89,3 +89,33 @@ For end-to-end cross-engine cases, Rust generates a committed result snapshot; G
 - Do not remove unrelated untracked diagnostic outputs.
 - This test establishes Reference v1 behavior; it does not claim dynamic cloth simulation or physical time integration.
 - HLDocS v0.6.1 detailed schema/document-type conformity requires checking the canonical HLDocS templates separately before labeling this document formally compliant.
+
+## Execution record — 2026-10-19
+
+- Rust isolated tests: C1–C4, 4 passed, 0 failed.
+- Godot independent isolated replay: 4 cases, 0 mismatches, exit code 0.
+- Rust snapshot generator: 1 explicitly invoked ignored test passed; 4 cases / 12 points.
+- Godot snapshot parity: 4 cases / 12 points, 0 mismatches, exit code 0.
+- Two committed snapshot copies had matching SHA-256: `34F24146BF7EE4610B1C76CD07A2814945E9FE63A962B59B0C1B8808055829BD`.
+- Snapshot commit: `b762b13` on `develop`; working tree clean after push.
+- Numerical maximum error was **not emitted by the test**, so no measured maximum is claimed. The parity assertion threshold was 1e-6 m.
+
+### Verified artifacts
+
+- `reference/crates/sansacloth-reference/tests/gsr_007h_bridge_collision.rs`
+- `reference/crates/sansacloth-reference/tests/gsr_007h_snapshot.rs`
+- `reference/validation/surface-response-result/basic-v1/GSR-007H-parity.json`
+- `engines/godot/validation/addons/sansacloth_validation/tests/gsr_007h_bridge_collision_test.gd`
+- `engines/godot/validation/addons/sansacloth_validation/tests/gsr_007h_snapshot_parity_test.gd`
+- `engines/godot/validation/addons/sansacloth_validation/reference-results/GSR-007H-parity.json`
+
+### Coverage limits / follow-up
+
+- Godot snapshot parity consumes the Rust snapshot's surface position and normal. It does not independently compute or compare the analytic surface query; surface-query parity remains separate.
+- The snapshot contains a `contact` field but not a separate collision-corrected boolean; correction can be inferred from conformity versus collision positions, but the explicit flag acceptance criterion remains unimplemented.
+- The standalone C4 boundary probes include tolerance, half epsilon and twice epsilon, but Godot omits the exact `tolerance + epsilon` probe because of f32 rounding ambiguity. The full boundary representability criterion is not yet demonstrated across both engines.
+- The optional C3 extended nonzero-gravity/conformity variant is not implemented.
+- Current Godot parity computes the flat-fixture three-point stages independently using snapshot surface data; it does not invoke a full production Godot solver pipeline.
+- The Godot parity test checks stable IDs by index but does not explicitly detect duplicate case IDs.
+- The test prints mismatch counts, not observed maximum positional/separation errors.
+- Therefore **PASS applies to the executed C1–C4 isolated flat-fixture stage parity**, not to every extended acceptance criterion above or to general dynamic cloth simulation.
