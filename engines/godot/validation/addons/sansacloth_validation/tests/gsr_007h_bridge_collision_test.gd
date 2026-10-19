@@ -23,18 +23,22 @@ func _contact(separation: float) -> bool:
 func _solve(two_edges: bool, middle_y: float) -> Dictionary:
     # AnalyticFixture::flat() has surface y=0 and normal +Y.
     # x/z do not influence signed separation on this fixture.
-    var positions := [
+    var positions: Array[Vector3] = [
         Vector3(0.0, 0.020, 0.0),
         Vector3(0.5, middle_y, 0.0),
         Vector3(1.0, 0.020, 0.0)
     ]
-    var bridge: Array[Vector3] = positions.duplicate()
+    var bridge: Array[Vector3] = []
+    bridge.assign(positions)
     if two_edges:
         bridge[1] = positions[0].lerp(positions[2], 0.5)
     # Gravity vector is zero and conformity is zero in the isolated Rust cases.
-    var gravity: Array[Vector3] = bridge.duplicate()
-    var conformity: Array[Vector3] = gravity.duplicate()
-    var collision: Array[Vector3] = conformity.duplicate()
+    var gravity: Array[Vector3] = []
+    gravity.assign(bridge)
+    var conformity: Array[Vector3] = []
+    conformity.assign(gravity)
+    var collision: Array[Vector3] = []
+    collision.assign(conformity)
     var before_separation := conformity[1].y
     for i in range(3):
         var separation := conformity[i].y
