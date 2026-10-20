@@ -1,6 +1,6 @@
 # GSR-007K — Curved analytic Surface Query → Collision parity
 
-Status: Implementation committed; execution pending
+Status: Analytic curved Surface Query → Collision parity PASS (2026-10-20); full solver integration pending
 Predecessors: GSR-007I independent Surface Query PASS; GSR-007J flat integrated parity PASS.
 
 ## Objective
@@ -23,4 +23,4 @@ This is Surface Query → Collision integration, not a full Bridge/Gravity/Confo
 
 ## Execution record
 
-Pending local Rust snapshot generation and Godot headless execution. PASS must not be asserted before measured results.
+Rust snapshot generation: 81 probes, PASS. Godot 4.7.2 headless: 81 probes, 0 mismatches, exit code 0. Maximum position error: 0.00000000093132 m; maximum normal error: 0; maximum separation error: 0.00000000208616 m. PASS scope: analytic curved Surface Query → Collision, not Bridge/Gravity/Conformity or production mesh query. Snapshot files are pending commit from the local validation environment.
