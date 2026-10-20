@@ -1,0 +1,3870 @@
+{
+  "probes": [
+    {
+      "current_position_m": [
+        -0.1,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 0,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 1,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 2,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 3,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 4,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 5,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 6,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 7,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 8,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 9,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 10,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 11,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 12,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 13,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 14,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 15,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 16,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 17,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 18,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.0,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 19,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.0,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 20,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.0,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 21,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.0,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 22,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.0,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 23,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.0,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 24,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.0,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 25,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.0,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 26,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.0,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 27,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.0,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 28,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.0,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 29,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.0,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 30,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 31,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 32,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 33,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 34,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 35,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 36,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 37,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 38,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 39,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 40,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "flat",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 41,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 42,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 43,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 44,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 45,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 46,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 47,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 48,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 49,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 50,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 51,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 52,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 53,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 54,
+      "surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 55,
+      "surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 56,
+      "surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 57,
+      "surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 58,
+      "surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 59,
+      "surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.01814133288053761,
+        0.007722728166104727,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.009999999999999998,
+      "stable_id": 60,
+      "surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.015,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        0.015,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 61,
+      "surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.015,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.03871733423892479,
+        0.029554543667790544,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.020000000000000004,
+      "stable_id": 62,
+      "surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.015,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.01814133288053761,
+        0.007722728166104727,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.009999999999999998,
+      "stable_id": 63,
+      "surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.015,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        0.015,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 64,
+      "surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.015,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.03871733423892479,
+        0.029554543667790544,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.020000000000000004,
+      "stable_id": 65,
+      "surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        0.015,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.019999999999999997,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.010000000000000002,
+      "stable_id": 66,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.03,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.03,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 67,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.03,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.05,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.020000000000000004,
+      "stable_id": 68,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.03,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.019999999999999997,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.010000000000000002,
+      "stable_id": 69,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.03,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.03,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 70,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.03,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.05,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.020000000000000004,
+      "stable_id": 71,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        0.03,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 72,
+      "surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 73,
+      "surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 74,
+      "surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 75,
+      "surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 76,
+      "surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 77,
+      "surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 78,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 79,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 80,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 81,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 82,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "convex",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 83,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 84,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 85,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 86,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 87,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 88,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 89,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 90,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 91,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 92,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 93,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 94,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 95,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 96,
+      "surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 97,
+      "surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 98,
+      "surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 99,
+      "surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 100,
+      "surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 101,
+      "surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.030320180445014083,
+        -0.018467330159648306,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.010000000000000002,
+      "stable_id": 102,
+      "surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.01,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 103,
+      "surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.01,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.014359639109971841,
+        0.006934660319296607,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.019999999999999997,
+      "stable_id": 104,
+      "surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.01,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.030320180445014083,
+        -0.018467330159648306,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.010000000000000002,
+      "stable_id": 105,
+      "surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.01,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 106,
+      "surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.01,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.014359639109971841,
+        0.006934660319296607,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.019999999999999997,
+      "stable_id": 107,
+      "surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.01,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.03,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.009999999999999998,
+      "stable_id": 108,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.02,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 109,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.02,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 110,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.02,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.03,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.009999999999999998,
+      "stable_id": 111,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.02,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 112,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.02,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 113,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.02,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 114,
+      "surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 115,
+      "surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 116,
+      "surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 117,
+      "surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 118,
+      "surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 119,
+      "surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 120,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 121,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 122,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 123,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 124,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_shallow",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 125,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 126,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 127,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 128,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 129,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 130,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.1,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 131,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 0.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 132,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 133,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 134,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.2,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 135,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 136,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.06,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 137,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.06,
+        -0.0,
+        0.025
+      ],
+      "u": 0.2,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 138,
+      "surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 139,
+      "surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.049999999999999996,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 140,
+      "surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.25,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 141,
+      "surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.05,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 142,
+      "surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.049999999999999996,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 143,
+      "surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.25,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.03343563608068769,
+        -0.030370292721463153,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.010000000000000004,
+      "stable_id": 144,
+      "surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.025,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        -0.025,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 145,
+      "surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.025,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.008128727838624627,
+        -0.0142594145570737,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.020000000000000004,
+      "stable_id": 146,
+      "surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.025,
+        -0.025
+      ],
+      "u": 0.375,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        -0.03343563608068769,
+        -0.030370292721463153,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.010000000000000004,
+      "stable_id": 147,
+      "surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.025,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.025,
+        -0.025,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 148,
+      "surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.025,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        -0.008128727838624627,
+        -0.0142594145570737,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.020000000000000004,
+      "stable_id": 149,
+      "surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "surface_position_m": [
+        -0.025,
+        -0.025,
+        0.025
+      ],
+      "u": 0.375,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.060000000000000005,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.010000000000000002,
+      "stable_id": 150,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.05,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.05,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 151,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.05,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.030000000000000002,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 152,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.05,
+        -0.025
+      ],
+      "u": 0.5,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.060000000000000005,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.010000000000000002,
+      "stable_id": 153,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.05,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.05,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 154,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.05,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.0,
+        -0.030000000000000002,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 155,
+      "surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.0,
+        -0.05,
+        0.025
+      ],
+      "u": 0.5,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 156,
+      "surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 157,
+      "surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.049999999999999996,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 158,
+      "surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        -0.025
+      ],
+      "u": 0.75,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.05,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 159,
+      "surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.05,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 160,
+      "surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.049999999999999996,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 161,
+      "surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.05,
+        -0.0,
+        0.025
+      ],
+      "u": 0.75,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        -0.01,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 162,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.0,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 163,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.02,
+        -0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 164,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        -0.025
+      ],
+      "u": 1.0,
+      "v": 0.25
+    },
+    {
+      "current_position_m": [
+        0.1,
+        -0.01,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": -0.01,
+      "separation_m": -0.01,
+      "stable_id": 165,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.0,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.0,
+      "separation_m": 0.0,
+      "stable_id": 166,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    },
+    {
+      "current_position_m": [
+        0.1,
+        0.02,
+        0.025
+      ],
+      "fixture_kind": "concave_deep",
+      "offset_m": 0.02,
+      "separation_m": 0.02,
+      "stable_id": 167,
+      "surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "surface_position_m": [
+        0.1,
+        -0.0,
+        0.025
+      ],
+      "u": 1.0,
+      "v": 0.75
+    }
+  ],
+  "schema": "GSR-007I-surface-query-v1",
+  "tolerance": 1e-6
+}
