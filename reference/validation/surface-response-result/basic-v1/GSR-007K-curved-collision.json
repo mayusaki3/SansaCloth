@@ -1,0 +1,3248 @@
+{
+  "collision_tolerance_m": 0.005,
+  "comparison_epsilon": 1e-6,
+  "contact_epsilon_m": 1e-6,
+  "probes": [
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.1,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 0,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.1,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 1,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.1,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 2,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.06,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 3,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.06,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 4,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.06,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 5,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.05,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.05,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 6,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.05,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.05,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 7,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.05,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.05,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 8,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000003,
+      "after_surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        0.015,
+        0.0
+      ],
+      "before_separation_m": -0.009999999999999998,
+      "before_surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        0.015,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.0284293335597312,
+        0.018638635916947636,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.01814133288053761,
+        0.007722728166104727,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 9,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        0.015,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        0.015,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.028429333559731196,
+        0.018638635916947636,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.028429333559731196,
+        0.018638635916947636,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 10,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.020000000000000004,
+      "after_surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        0.015,
+        0.0
+      ],
+      "before_separation_m": 0.020000000000000004,
+      "before_surface_normal": [
+        -0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        0.015,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.03871733423892479,
+        0.029554543667790544,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        -0.03871733423892479,
+        0.029554543667790544,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 11,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.0050000000000000044,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        0.03,
+        0.0
+      ],
+      "before_separation_m": -0.010000000000000002,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        0.03,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        0.035,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.0,
+        0.019999999999999997,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 12,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.0049999999999999975,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        0.03,
+        0.0
+      ],
+      "before_separation_m": 0.0049999999999999975,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        0.03,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        0.034999999999999996,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.0,
+        0.034999999999999996,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 13,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.020000000000000004,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        0.03,
+        0.0
+      ],
+      "before_separation_m": 0.020000000000000004,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        0.03,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        0.05,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.0,
+        0.05,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 14,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000003,
+      "after_surface_normal": [
+        0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        0.015,
+        0.0
+      ],
+      "before_separation_m": -0.009999999999999998,
+      "before_surface_normal": [
+        0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        0.015,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0284293335597312,
+        0.018638635916947636,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.01814133288053761,
+        0.007722728166104727,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 15,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        0.015,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        0.015,
+        0.0
+      ],
+      "collision_position_m": [
+        0.028429333559731196,
+        0.018638635916947636,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.028429333559731196,
+        0.018638635916947636,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 16,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.020000000000000004,
+      "after_surface_normal": [
+        0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        0.015,
+        0.0
+      ],
+      "before_separation_m": 0.020000000000000004,
+      "before_surface_normal": [
+        0.6858667119462392,
+        0.7277271833895272,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        0.015,
+        0.0
+      ],
+      "collision_position_m": [
+        0.03871733423892479,
+        0.029554543667790544,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.03871733423892479,
+        0.029554543667790544,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 17,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.05,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.05,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 18,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.05,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.05,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 19,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        1.1542024162330739e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.05,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.05,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 20,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.06000000000000001,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 21,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.06000000000000001,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 22,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.06000000000000001,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 23,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.1,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 24,
+      "u": 1.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.1,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 25,
+      "u": 1.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "convex",
+      "initial_position_m": [
+        0.1,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 26,
+      "u": 1.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.1,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 27,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.1,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 28,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.1,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 29,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.06,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 30,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.06,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 31,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.06,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 32,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.05,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.05,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 33,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.05,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.05,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 34,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.05,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.05,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 35,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.0050000000000000044,
+      "after_surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        -0.01,
+        0.0
+      ],
+      "before_separation_m": -0.010000000000000002,
+      "before_surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        -0.01,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.02233990977749296,
+        -0.005766334920175843,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.030320180445014083,
+        -0.018467330159648306,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 36,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000001,
+      "after_surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        -0.01,
+        0.0
+      ],
+      "before_separation_m": 0.004999999999999999,
+      "before_surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        -0.01,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.02233990977749296,
+        -0.0057663349201758475,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.02233990977749296,
+        -0.005766334920175848,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 37,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.019999999999999997,
+      "after_surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        -0.01,
+        0.0
+      ],
+      "before_separation_m": 0.019999999999999997,
+      "before_surface_normal": [
+        0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        -0.01,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.014359639109971841,
+        0.006934660319296607,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        -0.014359639109971841,
+        0.006934660319296607,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 38,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000001,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        -0.02,
+        0.0
+      ],
+      "before_separation_m": -0.009999999999999998,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        -0.02,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        -0.015,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.0,
+        -0.03,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 39,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000001,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        -0.02,
+        0.0
+      ],
+      "before_separation_m": 0.005000000000000001,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        -0.02,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        -0.015,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.0,
+        -0.015,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 40,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        -0.02,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        -0.02,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 41,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.0050000000000000044,
+      "after_surface_normal": [
+        -0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        -0.01,
+        0.0
+      ],
+      "before_separation_m": -0.010000000000000002,
+      "before_surface_normal": [
+        -0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        -0.01,
+        0.0
+      ],
+      "collision_position_m": [
+        0.02233990977749296,
+        -0.005766334920175843,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.030320180445014083,
+        -0.018467330159648306,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 42,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000001,
+      "after_surface_normal": [
+        -0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        -0.01,
+        0.0
+      ],
+      "before_separation_m": 0.004999999999999999,
+      "before_surface_normal": [
+        -0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        -0.01,
+        0.0
+      ],
+      "collision_position_m": [
+        0.02233990977749296,
+        -0.0057663349201758475,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.02233990977749296,
+        -0.005766334920175848,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 43,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.019999999999999997,
+      "after_surface_normal": [
+        -0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        -0.01,
+        0.0
+      ],
+      "before_separation_m": 0.019999999999999997,
+      "before_surface_normal": [
+        -0.532018044501408,
+        0.8467330159648304,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        -0.01,
+        0.0
+      ],
+      "collision_position_m": [
+        0.014359639109971841,
+        0.006934660319296607,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.014359639109971841,
+        0.006934660319296607,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 44,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.05,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.05,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 45,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.05,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.05,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 46,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -7.694682774887159e-17,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.05,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.05,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 47,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.06000000000000001,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 48,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.06000000000000001,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 49,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.06000000000000001,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 50,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.1,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 51,
+      "u": 1.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.1,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 52,
+      "u": 1.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_shallow",
+      "initial_position_m": [
+        0.1,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 53,
+      "u": 1.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.1,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 54,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.1,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 55,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.1,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.1,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 56,
+      "u": 0.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.06,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 57,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.06,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 58,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.06,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.06,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.06,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 59,
+      "u": 0.2,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.05,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.05,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 60,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.05,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.05,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 61,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.049999999999999996,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.049999999999999996,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 62,
+      "u": 0.25,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000002,
+      "after_surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        -0.025,
+        0.0
+      ],
+      "before_separation_m": -0.010000000000000004,
+      "before_surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        -0.025,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.020782181959656157,
+        -0.022314853639268425,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.03343563608068769,
+        -0.030370292721463153,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 63,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000002,
+      "after_surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        -0.025,
+        0.0
+      ],
+      "before_separation_m": 0.005000000000000002,
+      "before_surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        -0.025,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.020782181959656157,
+        -0.022314853639268425,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.020782181959656157,
+        -0.022314853639268425,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 64,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.020000000000000004,
+      "after_surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "after_surface_position_m": [
+        -0.025,
+        -0.025,
+        0.0
+      ],
+      "before_separation_m": 0.020000000000000004,
+      "before_surface_normal": [
+        0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "before_surface_position_m": [
+        -0.025,
+        -0.025,
+        0.0
+      ],
+      "collision_position_m": [
+        -0.008128727838624627,
+        -0.0142594145570737,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        -0.008128727838624627,
+        -0.0142594145570737,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 65,
+      "u": 0.375,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.0050000000000000044,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "before_separation_m": -0.010000000000000002,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        -0.045,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.0,
+        -0.060000000000000005,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 66,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.0049999999999999975,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "before_separation_m": 0.0049999999999999975,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        -0.045000000000000005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.0,
+        -0.045000000000000005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 67,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.0,
+        -0.05,
+        0.0
+      ],
+      "collision_position_m": [
+        0.0,
+        -0.030000000000000002,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.0,
+        -0.030000000000000002,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 68,
+      "u": 0.5,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000002,
+      "after_surface_normal": [
+        -0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        -0.025,
+        0.0
+      ],
+      "before_separation_m": -0.010000000000000004,
+      "before_surface_normal": [
+        -0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        -0.025,
+        0.0
+      ],
+      "collision_position_m": [
+        0.020782181959656157,
+        -0.022314853639268425,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.03343563608068769,
+        -0.030370292721463153,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 69,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005000000000000002,
+      "after_surface_normal": [
+        -0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        -0.025,
+        0.0
+      ],
+      "before_separation_m": 0.005000000000000002,
+      "before_surface_normal": [
+        -0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        -0.025,
+        0.0
+      ],
+      "collision_position_m": [
+        0.020782181959656157,
+        -0.022314853639268425,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.020782181959656157,
+        -0.022314853639268425,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 70,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.020000000000000004,
+      "after_surface_normal": [
+        -0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.025,
+        -0.025,
+        0.0
+      ],
+      "before_separation_m": 0.020000000000000004,
+      "before_surface_normal": [
+        -0.8435636080687686,
+        0.5370292721463151,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.025,
+        -0.025,
+        0.0
+      ],
+      "collision_position_m": [
+        0.008128727838624627,
+        -0.0142594145570737,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.008128727838624627,
+        -0.0142594145570737,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 71,
+      "u": 0.625,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.05,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.05,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 72,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.05,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.05,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 73,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        -1.9236706937217898e-16,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.05,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.049999999999999996,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.049999999999999996,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 74,
+      "u": 0.75,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.06000000000000001,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 75,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.06000000000000001,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 76,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.06000000000000001,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.06000000000000001,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.06000000000000001,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 77,
+      "u": 0.8,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.004999999999999999,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": -0.01,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.004999999999999999,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.1,
+        -0.01,
+        0.0
+      ],
+      "offset_m": -0.01,
+      "stable_id": 78,
+      "u": 1.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.005,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.005,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.005,
+        0.0
+      ],
+      "contact": true,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.1,
+        0.005,
+        0.0
+      ],
+      "offset_m": 0.005,
+      "stable_id": 79,
+      "u": 1.0,
+      "v": 0.5
+    },
+    {
+      "after_separation_m": 0.02,
+      "after_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "after_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "before_separation_m": 0.02,
+      "before_surface_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "before_surface_position_m": [
+        0.1,
+        -0.0,
+        0.0
+      ],
+      "collision_position_m": [
+        0.1,
+        0.02,
+        0.0
+      ],
+      "contact": false,
+      "fixture_kind": "concave_deep",
+      "initial_position_m": [
+        0.1,
+        0.02,
+        0.0
+      ],
+      "offset_m": 0.02,
+      "stable_id": 80,
+      "u": 1.0,
+      "v": 0.5
+    }
+  ],
+  "schema": "GSR-007K-curved-collision-v1"
+}
