@@ -1,6 +1,6 @@
 # GSR-007J — Integrated analytic Surface Query to Collision parity
 
-Status: Implementation pending / execution pending
+Status: Flat-fixture integrated parity PASS (2026-10-20); extended fixtures pending
 Predecessors: GSR-007H flat stage parity PASS; GSR-007I analytic Surface Query 168/168 PASS.
 
 ## Purpose
@@ -24,4 +24,4 @@ Do not modify GSR-007G/H/I snapshots. Do not claim this flat-only integration de
 
 ## Execution record
 
-Pending Godot headless execution. Do not mark PASS until measured.
+Godot 4.7.2 headless: 4 cases, 12 points, 0 mismatches, exit code 0. Maximum position error: 0 m; maximum normal error: 0; maximum separation error: 0.00000000044703 m. This PASS applies only to the flat-fixture, zero-gravity, zero-conformity integrated parity. Convex/concave and nonzero-response integration remain pending.
