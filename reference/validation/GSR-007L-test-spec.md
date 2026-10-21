@@ -1,6 +1,6 @@
 # GSR-007L — Curved integrated Reference Solver parity
 
-Status: Test design completed; implementation and execution pending.
+Status: Rust snapshot generator PASS (2026-10-21); Godot parity implementation/execution pending.
 
 ## Purpose
 Compare Rust ReferenceSurfaceSolver::solve_with_debug against a Godot implementation that independently computes Support → Bridge → Gravity → Surface Query → Conformity → Surface Query → Collision → Surface Query. Never use Rust snapshot intermediate outputs as computation inputs on the Godot side.
@@ -32,4 +32,4 @@ Rust generator serializes case parameters and initial positions as inputs plus s
 This is analytic fixture reference parity, not production Godot solver or mesh closest-point query parity. Nonzero Gravity and Conformity must cause measurable movement in at least one case each; tests must assert this to avoid vacuous PASS.
 
 ## Execution record
-Not executed. No PASS claimed.
+2026-10-21 Windows Rust: `cargo test -p sansacloth-reference --test gsr_007l_integrated_snapshot -- --ignored --nocapture` PASS; 36 cases, 324 points, `GRAVITY_MOVED=true`, `CONFORMITY_MOVED=true`. Generated `reference/validation/surface-response-result/basic-v1/GSR-007L-integrated.json` locally, not yet committed. Godot independent parity has not been run; do not claim full GSR-007L PASS.
