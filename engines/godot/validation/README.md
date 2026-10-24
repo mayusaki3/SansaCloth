@@ -1,6 +1,6 @@
 # SansaCloth Godot Validation (bootstrap)
 
-This is a **Godot 4 editor/scene smoke-test scaffold**, not a solver validation result.
+This validation scaffold includes **verified GSR-007K / GSR-007L analytic fixture numerical parity**. Editor, interactive scene and real mesh integration remain unverified.
 
 ## Setup
 
@@ -18,12 +18,41 @@ The setup is non-destructive: it does not overwrite an existing scene. Generated
 - EditorPlugin load: **UNVERIFIED** (requires Godot Editor execution).
 - Scene generation: **UNVERIFIED**.
 - Interactive scene: **UNVERIFIED**.
-- SansaCloth solver execution: **NOT IMPLEMENTED**.
-- Reference fixture parity: **NOT IMPLEMENTED**.
+- SansaCloth solver execution: **analytic fixture computation verified for GSR-007K / GSR-007L; production engine integration not verified**.
+- Reference fixture parity: **PASS for GSR-007K and GSR-007L analytic fixtures (Godot 4.7.2, Windows headless)**.
 - Real mesh integration: **NOT IMPLEMENTED**.
 
 Do not treat the placeholder geometry, input movement, or a successful scene launch as evidence that the SansaCloth solver passes.
 
 ## Next implementation gate
 
-Inspect the Rust reference fixture and the existing Unity solver probe, then document Godot solver test cases and expected numerical tolerances **before** implementing the Godot solver adapter. Keep generated test output separate from tracked source files.
+GSR-007K / GSR-007L analytic fixture numerical parity is verified. Next, validate Godot EditorPlugin loading, scene generation and interactive operation, then proceed to real mesh integration. Keep generated runtime output separate from tracked reference fixtures.
+
+## GSR-007L execution
+
+Verified on 2026-10-24 using Godot 4.7.2 stable.
+
+- Cases: 36
+- Points: 324
+- Contacts: 61
+- Maximum position error: 7.50856e-9 m
+- Tolerance: 1e-6
+- Mismatches: 0
+- Exit code: 0
+
+Run from a disposable Godot project containing
+the repository's addons/sansacloth_validation.
+
+Test script:
+`res://addons/sansacloth_validation/tests/gsr_007l_integrated_parity_test.gd`
+
+Reference snapshot:
+`res://addons/sansacloth_validation/reference-results/GSR-007L-integrated.json`
+
+The test independently computes the integrated
+solver pipeline and compares its results with
+the Rust reference snapshot.
+
+This result does not establish EditorPlugin,
+interactive scene, real mesh, or cross-platform
+validation.

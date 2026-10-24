@@ -1,6 +1,6 @@
 # Godot Solver Reference Validation — test-first plan
 
-Status: SPECIFIED / NOT RUN. Target: Godot 4.7.2, Compatibility renderer.
+Status: PARTIALLY VERIFIED (GSR-007K / GSR-007L numerical parity PASS). Target: Godot 4.7.2, Compatibility renderer.
 
 ## Boundary
 
@@ -35,11 +35,11 @@ An O3DE OSR-008 evidence report records 30 PASS comparisons for analytic fixture
 - Initially target GSR-002 and GSR-003. Extend to curved surfaces and gravity only after these pass.
 - Keep reference fixtures in the repository; generated output should be excluded from source control.
 
-## Execution workflow (planned, not implemented)
+## Execution workflow (headless CLI verified; editor workflow unverified)
 
-1. Editor Tools menu: Setup Validation Scene / Run Solver Tests / Open Validation Scene.
-2. CLI: Godot headless project invocation of a test runner that loads fixture JSON and writes a report.
-3. Interactive scene remains usable after a test run.
+1. Editor Tools menu: Setup Validation Scene / Run Solver Tests / Open Validation Scene (UNVERIFIED).
+2. CLI: Godot headless execution of GSR-007K / GSR-007L parity scripts (VERIFIED; console results, exit code 0).
+3. Interactive scene remains usable after a test run (UNVERIFIED).
 
 ## Open questions to resolve from source
 
@@ -49,3 +49,39 @@ An O3DE OSR-008 evidence report records 30 PASS comparisons for analytic fixture
 - Existing Unity probe fixture paths and test case coverage.
 
 Do not infer answers to these from the O3DE report alone.
+
+## GSR-007L verification result
+
+Date: 2026-10-24
+Status: PASS
+
+- Godot: 4.7.2 stable
+- Execution: Windows headless CLI
+- Reference: Rust independent solver
+- Cases: 36
+- Points: 324
+- Contacts: 61
+- Gravity movement: confirmed
+- Conformity movement: confirmed
+- Comparison tolerance: 1e-6
+- Maximum position error: 7.50856e-9 m
+- Maximum separation error: 3.18371e-9 m
+- Mismatches: 0
+- Exit code: 0
+
+The Godot test independently evaluates support,
+bridge, gravity, surface query, conformity,
+collision and final surface query.
+
+Reference intermediate positions are used only
+for comparison, not as solver inputs.
+
+Test:
+addons/sansacloth_validation/tests/gsr_007l_integrated_parity_test.gd
+
+Reference snapshot:
+addons/sansacloth_validation/reference-results/GSR-007L-integrated.json
+
+Scope: analytic fixture numerical parity only.
+Editor integration, real mesh integration and
+cross-platform behavior remain unverified.
