@@ -1,6 +1,6 @@
 # SansaCloth Godot Validation (bootstrap)
 
-This validation scaffold includes **verified GSR-007K / GSR-007L analytic fixture numerical parity**. Editor, interactive scene and real mesh integration remain unverified.
+This validation scaffold includes **verified GSR-007K / GSR-007L analytic fixture numerical parity**. EditorPlugin loading and validation scene generation are verified by GSR-001. Interactive solver operation and real mesh integration remain unverified.
 
 ## Setup
 
@@ -16,7 +16,7 @@ The setup is non-destructive: it does not overwrite an existing scene. Generated
 ## Validation status
 
 - EditorPlugin load: **UNVERIFIED** (requires Godot Editor execution).
-- Scene generation: **UNVERIFIED**.
+- Scene generation: **PASS (GSR-001)**.
 - Interactive scene: **UNVERIFIED**.
 - SansaCloth solver execution: **analytic fixture computation verified for GSR-007K / GSR-007L; production engine integration not verified**.
 - Reference fixture parity: **PASS for GSR-007K and GSR-007L analytic fixtures (Godot 4.7.2, Windows headless)**.
@@ -56,3 +56,25 @@ the Rust reference snapshot.
 This result does not establish EditorPlugin,
 interactive scene, real mesh, or cross-platform
 validation.
+
+## GSR-001 execution
+
+Verified on 2026-10-28 using Godot 4.7.2 stable
+on Windows 11 with the Compatibility renderer.
+
+- EditorPlugin load: PASS
+- Validation scene generation: PASS
+- Scene persistence: PASS
+- Required nodes: PASS
+- Existing scene detection: PASS
+- Non-overwrite: PASS
+
+The generated scene was reopened after restarting
+Godot Editor. Repeating Setup Validation Scene
+reported SANSA_GODOT|SETUP|EXISTS.
+
+The scene SHA256 remained unchanged.
+
+This verification does not establish real mesh
+integration, interactive solver operation or
+cross-platform compatibility.

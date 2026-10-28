@@ -85,3 +85,39 @@ addons/sansacloth_validation/reference-results/GSR-007L-integrated.json
 Scope: analytic fixture numerical parity only.
 Editor integration, real mesh integration and
 cross-platform behavior remain unverified.
+
+## GSR-001 verification result
+
+Date: 2026-10-28
+Status: PASS
+
+- Godot: 4.7.2 stable
+- Platform: Windows 11
+- Renderer: Compatibility / OpenGL 3.3
+- EditorPlugin load: PASS
+- Scene generation: PASS
+- Scene persistence: PASS
+- Required scene nodes: PASS
+- Existing scene detection: PASS
+- Non-overwrite verification: PASS
+- Editor restart: PASS
+
+Scene:
+res://validation/sansacloth_validation.tscn
+
+SHA256:
+92C3F4BE2B34BE0C291BB920D7D4EB34AA5A93956B91D24026E23EE36C115A46
+
+Evidence:
+SANSA_GODOT|SETUP|PASS
+SANSA_GODOT|SETUP|EXISTS
+
+The scene SHA256 remained unchanged after
+restarting the Godot Editor and executing
+Setup Validation Scene again.
+
+Scope: EditorPlugin scene generation, persistence
+and non-overwrite behavior only.
+
+Interactive solver operation, real mesh integration
+and cross-platform behavior remain unverified.
